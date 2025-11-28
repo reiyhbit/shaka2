@@ -509,7 +509,7 @@
                         <button id="upload-m3u-button" aria-label="Upload M3U file">
                             <span class="material-symbols-rounded">add</span>
                         </button>
-                        <input type="text" id="m3uLink" placeholder="https://reiyhbit.github.io/playlist112525.m3u">
+                        <input type="text" id="m3uLink" placeholder="https://converse.nathcreqtives.com/playlist.m3u">
                         <input type="file" id="m3uFile" accept=".m3u,.m3u8" hidden>
                     </div>
                 </div>
@@ -634,8 +634,8 @@
         enabled: true,
         delay: 1000, // 1 second
         playlistUrls: [
-            "https://reiyhbit.github.io/playlist112525.m3u", // Russian channels - GUARANTEED WORKING
-            
+            "https://raw.githubusercontent.com/reiyhbit/iptv/refs/heads/main/playlist112525.m3u", // Russian channels - GUARANTEED WORKING
+          
         ],
         playFirstChannel: true,
         maxRetries: 3
@@ -710,7 +710,7 @@
                     // If no channels found, create a sample channel
                     playlistData = [{
                         name: 'Sample Stream (Auto-loaded)',
-                        url: 'https://reiyhbit.github.io/playlist112525.m3u',
+                        url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8',
                         group: 'Auto-loaded'
                     }];
                     showToast('Using sample stream', 'warning');
@@ -761,7 +761,7 @@
                 playlistData = [
                     {
                         name: 'Tears of Steel (HLS)',
-                        url: 'https://reiyhbit.github.io/playlist112525.m3u',
+                        url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8',
                         group: 'Samples'
                     },
                     {
