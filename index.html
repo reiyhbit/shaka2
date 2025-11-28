@@ -3,208 +3,142 @@
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-   <title>ReiTV Pro • AutoPlay + Full DRM</title>
+   <title>Stream Tester by Project Dev</title>
    <meta name="theme-color" content="#000000">
-   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:wght@400;500;700&display=swap">
+   <link rel="icon" type="image/png" href="assets/favicon-96x96.png" sizes="96x96" />
+   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+   <link rel="shortcut icon" href="assets/favicon.ico" />
+   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+   <meta name="apple-mobile-web-app-title" content="Stream Tester" />
+   <link rel="manifest" href="assets/site.webmanifest" />
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.cdnfonts.com/css/general-sans" rel="stylesheet">
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaspace-font/neon.css">
+   <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:wght@400;500;700&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:wght@400;500;700&display=swap" rel="stylesheet">
    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-   
-   <!-- Shaka Player Latest (pinakastable + full DRM support) -->
-   <script src="https://unpkg.com/mux.js@latest/dist/mux.js"></script>
-   <script src="https://cdn.jsdelivr.net/npm/shaka-player@latest/dist/shaka-player.ui.min.js"></script>
-   <link href="https://cdn.jsdelivr.net/npm/shaka-player@latest/dist/controls.min.css" rel="stylesheet">
-
+   <script src="https://unpkg.com/mux.js@5.10.0/dist/mux.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/shaka-player.ui.min.js"></script>
+   <link href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/controls.min.css" rel="stylesheet">
    <style>
-     :root{--primary:#00d4ff;--bg:#0f0f0f;--card:#1a1a1a;--text:#fff;--muted:#a1a1aa;--border:#374151;--error:#ef4444;--success:#10b981}
-     *{margin:0;padding:0;box-sizing:border-box}
-     body{font-family:'Google Sans Text',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;height:100vh;display:flex;flex-direction:column}
-     header{padding:1rem 2rem;background:var(--card);border-bottom:1px solid var(--border);text-align:center}
-     .logo{font-size:1.8rem;font-weight:700;background:linear-gradient(90deg,#00d4ff,#00ff9d);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-     .grid-container{display:grid;grid-template-columns:1fr 420px;gap:2rem;padding:2rem;flex:1;overflow:hidden}
-     @media(max-width:1024px){.grid-container{grid-template-columns:1fr;padding:1rem}}
-     #video-container{background:#000;position:relative;border-radius:0.75rem;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
-     #video{width:100%;height:100%;object-fit:contain}
-     #channel-name-display{padding:1rem;font-size:1.3rem;font-weight:600;text-align:center;background:var(--card);border-top:1px solid var(--border)}
-     .card{background:var(--card);border-radius:0.75rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
-     .loading-spinner{position:absolute;inset:0;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;z-index:10}
-     .spinner{border:4px solid #333;border-top:4px solid var(--primary);border-radius:50%;width:50px;height:50px;animation:s 1s linear infinite}
-     @keyframes s{to{transform:rotate(360deg)}}
-     .toast{position:fixed;bottom:2rem;right:2rem;padding:1rem 1.5rem;border-radius:0.5rem;background:var(--success);color:#fff;z-index:1001;opacity:0;transform:translateY(100px);transition:all .3s}
-     .toast.show{opacity:1;transform:translateY(0)}
-     .toast.error{background:var(--error)}
-     .stats-panel,.channel-info{background:#2d2d2d;border-radius:0.5rem;padding:1rem;margin-top:1rem;font-size:0.85rem}
-     .info-row,.stats-row{display:flex;justify-content:space-between;margin:0.5rem 0}
-     footer{padding:1.5rem;background:var(--card);border-top:1px solid var(--border);text-align:center;color:var(--muted);font-size:0.9rem}
+     :root {
+       --primary-color: #2563eb;
+       --primary-hover: #1d4ed8;
+       --bg-color: #0f0f0f;
+       --card-bg: #1a1a1a;
+       --text-primary: #ffffff;
+       --text-secondary: #a1a1aa;
+       --border-color: #374151;
+       --error-color: #ef4444;
+       --success-color: #10b981;
+       --warning-color: #f59e0b;
+     }
+     * { margin: 0; padding: 0; box-sizing: border-box; }
+     body { font-family: 'Google Sans Text', sans-serif; background: var(--bg-color); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
+     .container { min-height: 100vh; display: flex; flex-direction: column; }
+     .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
+     .logo-img { height: 32px; }
+     .menu-button { background: none; border: none; color: var(--text-primary); cursor: pointer; padding: 0.5rem; border-radius: 0.375rem; transition: background-color 0.2s; }
+     .menu-button:hover { background: var(--border-color); }
+     .grid-container { display: grid; grid-template-columns: 1fr 400px; gap: 2rem; padding: 2rem; flex: 1; }
+     @media (max-width: 1024px) { .grid-container { grid-template-columns: 1fr; gap: 1rem; padding: 1rem; } }
+     .player-wrapper { background: var(--card-bg); border-radius: 0.75rem; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+     #video-container { width: 100%; background: #000; position: relative; }
+     #video { width: 100%; height: auto; aspect-ratio: 16/9; display: block; }
+     #channel-name-display { padding: 1rem; font-size: 1.25rem; font-weight: 600; text-align: center; background: var(--card-bg); border-top: 1px solid var(--border-color); }
+     .card { background: var(--card-bg); border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+     /* ... lahat ng ibang CSS mo, hindi na ulit inulit para hindi mahaba ... */
+     .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--success-color); color: white; padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1001; }
+     .toast.show { transform: translateY(0); opacity: 1; }
+     .toast.error { background: var(--error-color); }
    </style>
 </head>
 <body>
+  <!-- HTML body mo... same lang lahat hanggang </footer> -->
+  <div class="container">
+     <header class="header">
+       <a href="/stream-tester"><img src="assets/stream_tester_logo.svg" alt="Stream Tester Logo" class="logo-img"></a>
+       <button id="menu-toggle-btn" class="menu-button" aria-label="Open menu"><span class="material-symbols-rounded">menu</span></button>
+     </header>
+     <!-- ... lahat ng content mo ... -->
+  </div>
 
-<div class="container">
-  <header><div class="logo">ReiTV Pro • AutoPlay</div></header>
+  <nav id="floating-menu" class="floating-menu"></nav>
+  <div id="toast" class="toast"></div>
+  <footer class="site-footer">
+    <p>© 2025 Project Dev. All Rights Reserved.</p>
+    <p>Powered by Shaka Player (4.16.9)</p>
+  </footer>
 
-  <main class="grid-container">
-    <div class="player-wrapper">
-      <div id="video-container">
-        <video id="video" autoplay playsinline></video>
-        <div class="loading-spinner" id="loading">
-          <div class="spinner"></div>
-          <p>Auto-loading your playlist...<br><small>Finding first working channel...</small></p>
-        </div>
-      </div>
-      <h2 id="channel-name-display">Initializing AutoPlay...</h2>
-      <div class="stats-panel" id="stats-panel" style="display:none">
-        <div class="stats-row"><span>Buffer:</span><span id="buffer-health">0s</span></div>
-        <div class="stats-row"><span>Bitrate:</span><span id="current-bitrate">0 kbps</span></div>
-        <div class="stats-row"><span>Resolution:</span><span id="current-resolution">N/A</span></div>
-      </div>
-    </div>
+  <script>
+    let player, ui, playlistData = [], defaultStreamsData = {}, currentStreamStats = { bufferHealth: 0, bitrate: 0, resolution: 'N/A' };
+    const video = document.getElementById('video');
+    const videoContainer = document.getElementById('video-container');
+    const errorDisplay = document.getElementById('error-display');
+    const manifestUriInput = document.getElementById('manifestUri');
+    const channelSelector = document.getElementById('channelSelector');
+    const channelNameDisplay = document.getElementById('channel-name-display');
+    const m3uLinkInput = document.getElementById('m3uLink');
+    const loadPlaylistButton = document.getElementById('loadPlaylistButton');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const statsPanel = document.getElementById('stats-panel');
+    const channelInfo = document.getElementById('channel-info');
+    const toast = document.getElementById('toast');
 
-    <div class="card">
-      <h3 style="margin-bottom:1rem;color:var(--primary)">Auto-loaded Playlist</h3>
-      <p style="margin-bottom:1rem;font-size:0.9rem;color:var(--muted)">
-        <strong>reiyhbit.github.io/iptv/playlist112525.m3u</strong><br>
-        <span id="channel-count">Loading channels...</span>
-      </p>
-      <button onclick="playNext()" style="background:var(--primary);margin-bottom:1rem">Next Working Channel</button>
-      <button onclick="location.reload()" style="background:#666">Reload Playlist</button>
-      
-      <div class="channel-info">
-        <div class="info-row"><span>Current:</span><span id="info-name">—</span></div>
-        <div class="info-row"><span>Status:</span><span id="info-status">Testing...</span></div>
-      </div>
-    </div>
-  </main>
-</div>
+    // AUTO-LOAD YOUR PLAYLIST
+    const AUTO_M3U_URL = "https://reiyhbit.github.io/iptv/playlist112525.m3u";
 
-<div id="toast" class="toast"></div>
-<footer>© 2025 ReiTV Pro • Full DRM Support • AutoPlay Engine v2</footer>
-
-<script>
-  const video = document.getElementById('video');
-  const container = document.getElementById('video-container');
-  const channelNameDisplay = document.getElementById('channel-name-display');
-  const loading = document.getElementById('loading');
-  const toast = document.getElementById('toast');
-  const infoName = document.getElementById('info-name');
-  const infoStatus = document.getElementById('info-status');
-  const channelCount = document.getElementById('channel-count');
-
-  let player, channels = [], currentIdx = 0;
-
-  const PLAYLIST_URL = "https://reiyhbit.github.io/iptv/playlist112525.m3u";
-
-  function showToast(msg, type = 'success') {
-    toast.textContent = msg;
-    toast.className = `toast ${type} show`;
-    setTimeout(() => toast.className = 'toast', 4000);
-  }
-
-  function initPlayer() {
-    shaka.polyfill.installAll();
-    player = new shaka.Player(video);
-    new shaka.ui.Overlay(player, container, video);
-    player.addEventListener('error', () => {
-      infoStatus.textContent = "Failed → skipping...";
-      setTimeout(playNext, 3000);
-    });
-  }
-
-  async function loadPlaylist() {
-    try {
-      const res = await fetch(PLAYLIST_URL + "?t=" + Date.now());
-      const text = await res.text();
-      channels = parseM3U(text);
-      channelCount.textContent = `${channels.length} channels loaded • Testing live ones...`;
-      playFirstWorking();
-    } catch {
-      channelNameDisplay.textContent = "Playlist unreachable";
-    }
-  }
-
-  function parseM3U(t) {
-    const lines = t.split('\n');
-    const res = [];
-    let ch = {};
-    for (let l of lines) {
-      l = l.trim();
-      if (l.startsWith('#EXTINF:')) {
-        const name = l.split(',').pop().trim();
-        const logo = l.match(/tvg-logo="([^"]+)"/)?.[1] || '';
-        const group = l.match(/group-title="([^"]+)"/)?.[1] || '';
-        ch = {name, logo, group};
-      } else if (l && !l.startsWith('#')) {
-        ch.url = l;
-        if (ch.name) res.push(ch);
-        ch = {};
-      }
-    }
-    return res.sort((a,b) => a.name.localeCompare(b.name));
-  }
-
-  async function testStream(url) {
-    try {
-      await fetch(url, {method:'HEAD', mode:'no-cors'});
-      return true;
-    } catch {
+    async function autoLoadMyPlaylist() {
       try {
-        const r = await fetch(url, {signal: AbortSignal.timeout(9000)});
-        return r.ok;
-      } catch { return false; }
-    }
-  }
-
-  async function playFirstWorking() {
-    for (let i = 0; i < channels.length; i++) {
-      channelNameDisplay.textContent = `Testing: ${channels[i].name}`;
-      if (await testStream(channels[i].url)) {
-        currentIdx = i;
-        playChannel(i);
-        return;
+        showToast("Auto-loading your playlist...", "success", 2500);
+        const response = await fetch(AUTO_M3U_URL);
+        if (!response.ok) throw new Error("Failed to fetch playlist");
+        const m3uData = await response.text();
+        playlistData = parseM3U(m3uData);
+        m3uLinkInput.value = AUTO_M3U_URL;           // ipapakita sa input box
+        populatePlaylistChannels();
+        showToast(`Auto-loaded ${playlistData.length} channels! Choose one to play.`, "success", 4000);
+      } catch (err) {
+        showToast("Auto-load failed: " + err.message, "error", 6000);
+        console.error(err);
       }
     }
-    channelNameDisplay.textContent = "No working channels found";
-    loading.style.display = "none";
-  }
 
-  async function playChannel(i) {
-    const ch = channels[i];
-    currentIdx = i;
-    channelNameDisplay.textContent = ch.name;
-    infoName.textContent = ch.name;
-    infoStatus.textContent = "Loading...";
-    loading.style.display = "flex";
-
-    try {
-      await player.load(ch.url);
-      loading.style.display = "none";
-      infoStatus.textContent = "LIVE";
-      showToast(`Now playing: ${ch.name}`);
-      document.getElementById('stats-panel').style.display = 'block';
-    } catch {
-      infoStatus.textContent = "Failed → next";
-      setTimeout(playNext, 3000);
+    function showToast(message, type = 'success', duration = 3000) {
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), duration);
     }
-  }
 
-  function playNext() {
-    let next = (currentIdx + 1) % channels.length;
-    playChannel(next);
-  }
+    function showError(message) {
+      console.error(message);
+      errorDisplay.textContent = message;
+      errorDisplay.style.display = 'block';
+      showToast(message, 'error', 5000);
+    }
 
-  // Auto start
-  initPlayer();
-  loadPlaylist();
+    // ... lahat ng functions mo (parseM3U, loadStream, initPlayer, etc.) ... same lang
 
-  // Optional: stats update every second
-  setInterval(() => {
-    if (player) {
-      const tracks = player.getVariantTracks().filter(t => t.active);
-      if (tracks[0]) {
-        document.getElementById('current-bitrate').textContent = Math.round(tracks[0].bandwidth/1000) + " kbps";
-        document.getElementById('current-resolution').textContent = `${tracks[0].width||'?' }x${tracks[0].height||'?'}`;
-        document.getElementById('buffer-health').textContent = player.getBufferHealth().toFixed(1) + "s";
+    function main() {
+      setupStaticPageHandlers();
+      if (document.getElementById('video-container')) {
+        setupPlayerEventListeners();
+        handleRouting();
+        initPlayer();
+        autoLoadMyPlaylist();           // AUTOMATIC LOAD NG PLAYLIST MO
+        fetchDefaultStreams();
+        toggleDrmBlockVisibility();
+        updateDrmFieldVisibility();
+        renderMenu();
+        updateSliderPosition();
       }
     }
-  }, 1000);
-</script>
+
+    document.addEventListener('DOMContentLoaded', main);
+  </script>
 </body>
 </html>
