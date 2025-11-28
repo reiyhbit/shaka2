@@ -1,88 +1,1159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PH TV Live • Zero Click</title>
-  <meta name="theme-color" content="#000000">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family: system-ui, sans-serif; background:#000; color:#fff; overflow:hidden; height:100vh; }
-    .container { display:grid; grid-template-rows:auto 1fr auto; height:100vh; }
-    header { padding:15px; text-align:center; background:#111; border-bottom:1px solid #333; }
-    .logo { height:40px; }
-    main { display:grid; grid-template-columns:1fr 380px; gap:15px; padding:15px; }
-    @media (max-width: 1024px) { main { grid-template-columns:1fr; } }
-    #video-container { background:#000; border-radius:12px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,0.6); }
-    #video { width:100%; height:100%; aspect-ratio:16/9; }
-    .sidebar { background:#111; border-radius:12px; padding:20px; overflow-y:auto; }
-    h2 { margin-bottom:15px; font-size:1.4rem; }
-    select { width:100%; padding:14px; background:#222; color:#fff; border:1px solid #444; border-radius:8px; font-size:1rem; }
-    #channel-name { padding:15px; text-align:center; background:#111; font-size:1.3rem; font-weight:bold; }
-    .stats { margin-top:10px; font-size:0.85rem; background:#222; padding:10px; border-radius:8px; }
-    .stats div { display:flex; justify-content:space-between; margin:6px 0; }
-    .loading { text-align:center; padding:40px; color:#888; }
-    .spinner { border:4px solid #333; border-top:4px solid #00ff00; border-radius:50%; width:50px; height:50px; animation:spin 1s linear infinite; margin:0 auto 15px; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#00ff00; color:#000; padding:12px 24px; border-radius:50px; font-weight:bold; z-index:9999; opacity:0; transition:all 0.4s; }
-    .toast.show { opacity:1; }
-    .toast.error { background:#ff0033; color:#fff; }
-    footer { padding:12px; text-align:center; background:#111; font-size:0.8rem; color:#666; border-top:1px solid #333; }
-  </style>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+   <title>Stream Tester by Project Dev</title>
+   <meta name="theme-color" content="#000000">
+   <link rel="icon" type="image/png" href="assets/favicon-96x96.png" sizes="96x96" />
+   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+   <link rel="shortcut icon" href="assets/favicon.ico" />
+   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+   <meta name="apple-mobile-web-app-title" content="Stream Tester" />
+   <link rel="manifest" href="assets/site.webmanifest" />
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.cdnfonts.com/css/general-sans" rel="stylesheet">
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaspace-font/neon.css">
+   <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:wght@400;500;700&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:wght@400;500;700&display=swap" rel="stylesheet">
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+   <script src="https://unpkg.com/mux.js@5.10.0/dist/mux.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/shaka-player.ui.min.js"></script>
+   <link href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/controls.min.css" rel="stylesheet">
+   <style>
+     :root {
+       --primary-color: #2563eb;
+       --primary-hover: #1d4ed8;
+       --bg-color: #0f0f0f;
+       --card-bg: #1a1a1a;
+       --text-primary: #ffffff;
+       --text-secondary: #a1a1aa;
+       --border-color: #374151;
+       --error-color: #ef4444;
+       --success-color: #10b981;
+       --warning-color: #f59e0b;
+     }
 
-  <!-- Shaka Player -->
-  <script src="https://unpkg.com/mux.js@5.10.0/dist/mux.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/shaka-player.ui.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/controls.min.css">
+     * {
+       margin: 0;
+       padding: 0;
+       box-sizing: border-box;
+     }
+
+     body {
+       font-family: 'Google Sans Text', sans-serif;
+       background: var(--bg-color);
+       color: var(--text-primary);
+       line-height: 1.6;
+       overflow-x: hidden;
+     }
+
+     .container {
+       min-height: 100vh;
+       display: flex;
+       flex-direction: column;
+     }
+
+     .header {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       padding: 1rem 2rem;
+       background: var(--card-bg);
+       border-bottom: 1px solid var(--border-color);
+     }
+
+     .logo-img {
+       height: 32px;
+     }
+
+     .menu-button {
+       background: none;
+       border: none;
+       color: var(--text-primary);
+       cursor: pointer;
+       padding: 0.5rem;
+       border-radius: 0.375rem;
+       transition: background-color 0.2s;
+     }
+
+     .menu-button:hover {
+       background: var(--border-color);
+     }
+
+     .grid-container {
+       display: grid;
+       grid-template-columns: 1fr 400px;
+       gap: 2rem;
+       padding: 2rem;
+       flex: 1;
+     }
+
+     @media (max-width: 1024px) {
+       .grid-container {
+         grid-template-columns: 1fr;
+         gap: 1rem;
+         padding: 1rem;
+       }
+     }
+
+     .player-wrapper {
+       background: var(--card-bg);
+       border-radius: 0.75rem;
+       overflow: hidden;
+       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+     }
+
+     #video-container {
+       width: 100%;
+       background: #000;
+       position: relative;
+     }
+
+     #video {
+       width: 100%;
+       height: auto;
+       aspect-ratio: 16/9;
+       display: block;
+     }
+
+     #channel-name-display {
+       padding: 1rem;
+       font-size: 1.25rem;
+       font-weight: 600;
+       text-align: center;
+       background: var(--card-bg);
+       border-top: 1px solid var(--border-color);
+     }
+
+     .card {
+       background: var(--card-bg);
+       border-radius: 0.75rem;
+       padding: 1.5rem;
+       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+     }
+
+     .input-mode-switcher {
+       display: flex;
+       background: #2d2d2d;
+       border-radius: 0.5rem;
+       padding: 0.25rem;
+       margin-bottom: 1.5rem;
+       position: relative;
+     }
+
+     .input-mode-switcher::before {
+       content: '';
+       position: absolute;
+       top: 0.25rem;
+       left: var(--slider-left, 0);
+       width: var(--slider-width, 50%);
+       height: calc(100% - 0.5rem);
+       background: var(--primary-color);
+       border-radius: 0.375rem;
+       transition: all 0.3s ease;
+     }
+
+     .input-mode-switcher button {
+       flex: 1;
+       background: none;
+       border: none;
+       color: var(--text-secondary);
+       padding: 0.75rem 1rem;
+       border-radius: 0.375rem;
+       cursor: pointer;
+       font-weight: 500;
+       z-index: 1;
+       transition: color 0.2s;
+     }
+
+     .input-mode-switcher button.active {
+       color: var(--text-primary);
+     }
+
+     .input-group {
+       margin-bottom: 1.25rem;
+     }
+
+     .input-group label {
+       display: block;
+       margin-bottom: 0.5rem;
+       font-weight: 500;
+       color: var(--text-secondary);
+       font-size: 0.875rem;
+     }
+
+     .input-group input,
+     .select-wrapper select {
+       width: 100%;
+       padding: 0.75rem 1rem;
+       background: #2d2d2d;
+       border: 1px solid var(--border-color);
+       border-radius: 0.5rem;
+       color: var(--text-primary);
+       font-size: 0.875rem;
+       transition: border-color 0.2s;
+     }
+
+     .input-group input:focus,
+     .select-wrapper select:focus {
+       outline: none;
+       border-color: var(--primary-color);
+     }
+
+     .select-wrapper {
+       position: relative;
+     }
+
+     .select-wrapper::after {
+       content: '▼';
+       position: absolute;
+       right: 1rem;
+       top: 50%;
+       transform: translateY(-50%);
+       color: var(--text-secondary);
+       pointer-events: none;
+       font-size: 0.75rem;
+     }
+
+     .m3u-input-container {
+       display: flex;
+       gap: 0.5rem;
+       align-items: center;
+     }
+
+     .m3u-input-container input[type="text"] {
+       flex: 1;
+     }
+
+     #upload-m3u-button {
+       background: var(--primary-color);
+       border: none;
+       color: white;
+       padding: 0.75rem;
+       border-radius: 0.5rem;
+       cursor: pointer;
+       transition: background-color 0.2s;
+     }
+
+     #upload-m3u-button:hover {
+       background: var(--primary-hover);
+     }
+
+     button:not(.menu-button):not(.input-mode-switcher button) {
+       width: 100%;
+       background: var(--primary-color);
+       color: white;
+       border: none;
+       padding: 0.875rem 1rem;
+       border-radius: 0.5rem;
+       font-weight: 500;
+       cursor: pointer;
+       transition: background-color 0.2s;
+       margin-top: 0.5rem;
+     }
+
+     button:not(.menu-button):not(.input-mode-switcher button):hover {
+       background: var(--primary-hover);
+     }
+
+     button:disabled {
+       background: #4b5563;
+       cursor: not-allowed;
+     }
+
+     hr {
+       border: none;
+       border-top: 1px solid var(--border-color);
+       margin: 1.5rem 0;
+     }
+
+     #error-display {
+       display: none;
+       background: var(--error-color);
+       color: white;
+       padding: 1rem;
+       border-radius: 0.5rem;
+       margin-top: 1rem;
+       font-size: 0.875rem;
+     }
+
+     .stats-panel {
+       background: #2d2d2d;
+       border-radius: 0.5rem;
+       padding: 1rem;
+       margin-top: 1rem;
+       font-size: 0.75rem;
+     }
+
+     .stats-row {
+       display: flex;
+       justify-content: space-between;
+       margin-bottom: 0.5rem;
+     }
+
+     .stats-label {
+       color: var(--text-secondary);
+     }
+
+     .stats-value {
+       color: var(--text-primary);
+       font-family: 'Google Sans Code', monospace;
+     }
+
+     .floating-menu {
+       position: fixed;
+       top: 0;
+       right: -300px;
+       width: 300px;
+       height: 100vh;
+       background: var(--card-bg);
+       border-left: 1px solid var(--border-color);
+       transition: right 0.3s ease;
+       z-index: 1000;
+       padding: 2rem 1rem;
+       overflow-y: auto;
+     }
+
+     .floating-menu.active {
+       right: 0;
+     }
+
+     .floating-menu ul {
+       list-style: none;
+     }
+
+     .floating-menu li {
+       margin-bottom: 0.5rem;
+     }
+
+     .floating-menu a {
+       display: flex;
+       align-items: center;
+       gap: 0.75rem;
+       padding: 0.75rem 1rem;
+       color: var(--text-primary);
+       text-decoration: none;
+       border-radius: 0.5rem;
+       transition: background-color 0.2s;
+     }
+
+     .floating-menu a:hover {
+       background: #2d2d2d;
+     }
+
+     .site-footer {
+       text-align: center;
+       padding: 1.5rem;
+       background: var(--card-bg);
+       border-top: 1px solid var(--border-color);
+       color: var(--text-secondary);
+       font-size: 0.875rem;
+     }
+
+     .loading-spinner {
+       display: none;
+       text-align: center;
+       padding: 1rem;
+     }
+
+     .spinner {
+       border: 2px solid #333;
+       border-top: 2px solid var(--primary-color);
+       border-radius: 50%;
+       width: 20px;
+       height: 20px;
+       animation: spin 1s linear infinite;
+       margin: 0 auto;
+     }
+
+     @keyframes spin {
+       0% { transform: rotate(0deg); }
+       100% { transform: rotate(360deg); }
+     }
+
+     .toast {
+       position: fixed;
+       bottom: 2rem;
+       right: 2rem;
+       background: var(--success-color);
+       color: white;
+       padding: 1rem 1.5rem;
+       border-radius: 0.5rem;
+       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+       transform: translateY(100px);
+       opacity: 0;
+       transition: all 0.3s ease;
+       z-index: 1001;
+     }
+
+     .toast.show {
+       transform: translateY(0);
+       opacity: 1;
+     }
+
+     .toast.error {
+       background: var(--error-color);
+     }
+
+     .channel-info {
+       background: #2d2d2d;
+       border-radius: 0.5rem;
+       padding: 1rem;
+       margin-top: 1rem;
+       font-size: 0.75rem;
+     }
+
+     .info-row {
+       display: flex;
+       justify-content: space-between;
+       margin-bottom: 0.5rem;
+     }
+
+     .info-label {
+       color: var(--text-secondary);
+     }
+
+     .info-value {
+       color: var(--text-primary);
+       font-family: 'Google Sans Code', monospace;
+       word-break: break-all;
+     }
+   </style>
 </head>
 <body>
-
-<div class="container">
-  <header>
-    <h1>PH TV Live • Auto Play</h1>
-  </header>
-
-  <main>
-    <div id="video-container">
-      <video id="video" autoplay playsinline poster="https://via.placeholder.com/1920x1080/111/fff?text=PH+TV+LIVE"></video>
-    </div>
-
-    <div class="sidebar">
-      <h2>Channels (Auto-playing first)</h2>
-      <select id="channelSelector">
-        <option>Loading 300+ PH channels...</option>
-      </select>
-      <div class="stats" id="stats" style="display:none;">
-        <div><span>Buffer:</span> <span id="buffer">0s</span></div>
-        <div><span>Bitrate:</span> <span id="bitrate">0 kbps</span></div>
-        <div><span>Resolution:</span> <span id="res">N/A</span></div>
+  <div class="container">
+     <header class="header">
+       <a href="/stream-tester">
+         <img src="assets/stream_tester_logo.svg" alt="Stream Tester Logo" class="logo-img">
+       </a>
+       <button id="menu-toggle-btn" class="menu-button" aria-label="Open menu">
+         <span class="material-symbols-rounded">menu</span>
+       </button>
+     </header>
+    <main class="grid-container">
+      <div class="player-wrapper">
+        <div id="video-container" data-shaka-player-container>
+          <video id="video" poster="assets/video_poster.svg" data-shaka-player autoplay></video>
+        </div>
+        <h2 id="channel-name-display">No Channel Loaded</h2>
+        <div class="loading-spinner" id="loading-spinner">
+          <div class="spinner"></div>
+          <p>Loading stream...</p>
+        </div>
+        <div class="stats-panel" id="stats-panel" style="display: none;">
+          <div class="stats-row">
+            <span class="stats-label">Buffer Health:</span>
+            <span class="stats-value" id="buffer-health">0s</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">Bitrate:</span>
+            <span class="stats-value" id="current-bitrate">0 kbps</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">Resolution:</span>
+            <span class="stats-value" id="current-resolution">N/A</span>
+          </div>
+        </div>
       </div>
-    </div>
-  </main>
 
-  <div id="channel-name">Loading playlist...</div>
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-    <p>Preparing channels...</p>
+      <div class="card">
+        <div class="input-mode-switcher">
+            <button id="add-mode-btn" class="active">Playlist</button>
+            <button id="manual-mode-btn">Manual</button>
+        </div>
+        <div id="add-mode-container">
+            <h2>Load Playlist</h2>
+            <div class="input-group">
+                <label for="sourceSelector">Source</label>
+                <div class="select-wrapper">
+                  <select id="sourceSelector">
+                      <option value="playlist" selected>Upload</option>
+                      <option value="default">Samples</option>
+                  </select>
+                </div>
+            </div>
+            <div id="playlist-inputs">
+                <div class="input-group">
+                    <label for="m3uLink">Enter M3U Link or Upload File</label>
+                    <div class="m3u-input-container">
+                        <button id="upload-m3u-button" aria-label="Upload M3U file">
+                            <span class="material-symbols-rounded">add</span>
+                        </button>
+                        <input type="text" id="m3uLink" placeholder="https://converse.nathcreqtives.com/playlist.m3u">
+                        <input type="file" id="m3uFile" accept=".m3u,.m3u8" hidden>
+                    </div>
+                </div>
+                <button id="loadPlaylistButton">Load Playlist</button>
+            </div>
+            <hr>
+            <div class="input-group">
+              <label for="channelSelector">Select Channel</label>
+              <div class="select-wrapper">
+                <select id="channelSelector">
+                  <option value="">-- Select a source first --</option>
+                </select>
+              </div>
+            </div>
+            <div class="channel-info" id="channel-info" style="display: none;">
+              <div class="info-row">
+                <span class="info-label">URL:</span>
+                <span class="info-value" id="info-url">N/A</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">DRM:</span>
+                <span class="info-value" id="info-drm">None</span>
+              </div>
+            </div>
+        </div>
+        <div id="manual-mode-container" style="display: none;">
+            <h2>Manual Input</h2>
+            <div class="input-group">
+              <label for="manifestUri">Manifest URI</label>
+              <input type="text" id="manifestUri" placeholder="Enter HLS or MPEG-DASH URI">
+            </div>
+            <div class="drm-fields" style="display: none;">
+              <p style="font-size: 0.7rem; color: #888; margin-top: 1rem; margin-bottom: 0.5rem;">DRM (for MPEG-DASH only)</p>
+              <div class="input-group">
+                <label for="licenseTypeSelect">DRM Type</label>
+                <div class="select-wrapper">
+                  <select id="licenseTypeSelect">
+                      <option value="com.widevine.alpha" selected>License URL (com.widevine.alpha)</option>
+                      <option value="org.w3.clearkey">ClearKey (org.w3.clearkey)</option>
+                  </select>
+                </div>
+              </div>
+              <div id="license-url-container">
+                  <div class="input-group">
+                    <label for="licenseServerUrl">License Server URL</label>
+                    <input type="text" id="licenseServerUrl" placeholder="Enter license server URL">
+                  </div>
+              </div>
+              <div id="clearkey-container" style="display: none;">
+                  <div class="input-group">
+                    <label for="k1">Key ID (KID) in hex</label>
+                    <input type="text" id="k1" placeholder="Enter Key ID (hex)">
+                  </div>
+                  <div class="input-group">
+                    <label for="k2">Key in hex</label>
+                    <input type="text" id="k2" placeholder="Enter Key (hex)">
+                  </div>
+              </div>
+            </div>
+            <button id="loadButton">Load Manual Input</button>
+        </div>
+        <div id="error-display"></div>
+      </div>
+    </main>
   </div>
-</div>
+  
+  <nav id="floating-menu" class="floating-menu"></nav>
 
-<div class="toast" id="toast">Auto-playing first channel!</div>
-<footer>© 2025 PH TV Live • Zero Click • Works on Phone, TV, PC</footer>
+  <div id="toast" class="toast"></div>
 
-<script>
-  let player, playlistData = [];
-  const video = document.getElementById('video');
-  const channelName = document.getElementById('channel-name');
-  const channelSelector = document.getElementById('channelSelector');
-  const loading = document.getElementById('loading');
-  const stats = document.getElementById('stats');
-  const toast = document.getElementById('toast');
+  <footer class="site-footer">
+    <p>&copy; 2025 Project Dev. All Rights Reserved.</p>
+    <p>Powered by Shaka Player (4.16.9)</p>
+  </footer>
 
-  // PALITAN MO LANG DITO KUNG GUSTO MO IBANG PLAYLIST
-  const PLAYLIST_URL = "https://converse.nathcreqtives.com/playlist.m3u";
-  // O private mo: "https://converse.nathcreqtives.com/playlist.m3u"
+  <script>
+    let player;
+    let ui;
+    let playlistData = [];
+    let defaultStreamsData = {}; 
+    let currentStreamStats = {
+      bufferHealth: 0,
+      bitrate: 0,
+      resolution: 'N/A'
+    };
 
-  function showToast(msg, error = false) {
-    toast.textContent = msg;
-    toast.className = 'toast show' + (<|eos|>
+    const video = document.getElementById('video');
+    const videoContainer = document.getElementById('video-container');
+    const errorDisplay = document.getElementById('error-display');
+    const manifestUriInput = document.getElementById('manifestUri');
+    const licenseServerUrlInput = document.getElementById('licenseServerUrl');
+    const licenseTypeSelect = document.getElementById('licenseTypeSelect');
+    const k1Input = document.getElementById('k1');
+    const k2Input = document.getElementById('k2');
+    const drmFieldsContainer = document.querySelector('.drm-fields');
+    const licenseUrlContainer = document.getElementById('license-url-container');
+    const clearkeyContainer = document.getElementById('clearkey-container');
+    const channelSelector = document.getElementById('channelSelector');
+    const channelNameDisplay = document.getElementById('channel-name-display');
+    const m3uLinkInput = document.getElementById('m3uLink');
+    const m3uFileInput = document.getElementById('m3uFile');
+    const uploadM3uButton = document.getElementById('upload-m3u-button');
+    const loadPlaylistButton = document.getElementById('loadPlaylistButton');
+    const loadManualButton = document.getElementById('loadButton');
+    const inputModeSwitcher = document.querySelector('.input-mode-switcher');
+    const addModeBtn = document.getElementById('add-mode-btn');
+    const manualModeBtn = document.getElementById('manual-mode-btn');
+    const addModeContainer = document.getElementById('add-mode-container');
+    const manualModeContainer = document.getElementById('manual-mode-container');
+    const sourceSelector = document.getElementById('sourceSelector');
+    const playlistInputs = document.getElementById('playlist-inputs');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const statsPanel = document.getElementById('stats-panel');
+    const channelInfo = document.getElementById('channel-info');
+    const toast = document.getElementById('toast');
+
+    const menuToggleBtn = document.getElementById('menu-toggle-btn');
+    const floatingMenu = document.getElementById('floating-menu');
+
+    // Enhanced M3U parsing with better error handling
+    function parseM3U(data) {
+      const lines = data.split('\n');
+      const channels = [];
+      let currentChannel = {};
+      let groupTitle = '';
+
+      for (const line of lines) {
+        const trimmedLine = line.trim();
+        
+        if (trimmedLine.startsWith('#EXTM3U')) {
+          continue;
+        }
+        
+        if (trimmedLine.startsWith('#EXTINF:')) {
+          const info = trimmedLine.split(/,(.*)/s);
+          const params = info[0].split(' ');
+          currentChannel.name = info[1]?.trim() || 'Unknown Channel';
+          
+          // Parse additional EXTINF parameters
+          params.forEach(param => {
+            if (param.includes('group-title=')) {
+              currentChannel.group = param.split('=')[1]?.replace(/"/g, '');
+            }
+            if (param.includes('tvg-logo=')) {
+              currentChannel.logo = param.split('=')[1]?.replace(/"/g, '');
+            }
+          });
+        } 
+        else if (trimmedLine.startsWith('#EXTGRP:')) {
+          groupTitle = trimmedLine.substring(8).trim();
+        }
+        else if (trimmedLine.startsWith('#KODIPROP:')) {
+          const prop = trimmedLine.substring(10);
+          if (prop.startsWith('inputstream.adaptive.license_type=')) {
+            const type = prop.split('=')[1]?.trim();
+            currentChannel.licenseType = type.toLowerCase() === 'clearkey' ? 'org.w3.clearkey' : type;
+          } 
+          else if (prop.startsWith('inputstream.adaptive.license_key=')) {
+            const keyData = prop.split('=').slice(1).join('=');
+            parseLicenseKeyData(currentChannel, keyData);
+          }
+        }
+        else if (trimmedLine && !trimmedLine.startsWith('#')) {
+          currentChannel.url = trimmedLine;
+          if (!currentChannel.group && groupTitle) {
+            currentChannel.group = groupTitle;
+          }
+          channels.push(currentChannel);
+          currentChannel = {};
+        }
+      }
+      return channels;
+    }
+
+    function parseLicenseKeyData(channel, keyData) {
+      if (keyData.trim().startsWith('{')) {
+        try {
+          const parsedJson = JSON.parse(keyData);
+          if (parsedJson.keys && parsedJson.keys.length > 0) {
+            const keyInfo = parsedJson.keys[0];
+            if (keyInfo.k && keyInfo.kid) {
+              channel.k2 = base64UrlToHex(keyInfo.k);
+              channel.k1 = base64UrlToHex(keyInfo.kid);
+              channel.licenseType = 'org.w3.clearkey';
+            }
+          }
+        } catch (e) {
+          console.error('Failed to parse license_key JSON:', keyData, e);
+        }
+      }
+      else if (keyData.includes('http://') || keyData.includes('https://')) {
+        channel.licenseKey = keyData.trim();
+      } 
+      else {
+        const keyParts = keyData.split(':');
+        if (keyParts.length === 2 && keyParts[0].trim() && keyParts[1].trim()) {
+          channel.k1 = keyParts[0].trim();
+          channel.k2 = keyParts[1].trim();
+        }
+      }
+    }
+
+    // Enhanced toast notification system
+    function showToast(message, type = 'success', duration = 3000) {
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, duration);
+    }
+
+    // Enhanced error handling
+    function showError(message) {
+      console.error(message);
+      errorDisplay.textContent = message;
+      errorDisplay.style.display = 'block';
+      showToast(message, 'error', 5000);
+    }
+
+    function clearError() {
+      errorDisplay.style.display = 'none';
+      errorDisplay.textContent = '';
+    }
+
+    // Enhanced stream loading with better feedback
+    async function loadStream(name) {
+      const manifestUri = manifestUriInput.value.trim();
+      const displayName = name || 'Manual Input';
+
+      clearError();
+      if (!manifestUri) {
+        showError('Manifest URI is required.');
+        return;
+      }
+      
+      loadingSpinner.style.display = 'block';
+      statsPanel.style.display = 'none';
+      channelNameDisplay.textContent = `Loading: ${displayName}...`;
+
+      const config = { 
+        drm: {},
+        streaming: {
+          bufferingGoal: 30,
+          rebufferingGoal: 2
+        }
+      };
+
+      const selectedDrmType = licenseTypeSelect.value;
+
+      if (drmFieldsContainer.style.display === 'block' && selectedDrmType !== 'none') {
+        if (selectedDrmType === 'com.widevine.alpha') {
+          const licenseServerUrl = licenseServerUrlInput.value.trim();
+          if (licenseServerUrl) {
+            config.drm.servers = { [selectedDrmType]: licenseServerUrl };
+          }
+        } else if (selectedDrmType === 'org.w3.clearkey') {
+          const kid = k1Input.value.trim();
+          const key = k2Input.value.trim();
+          if (kid && key) {
+            config.drm.clearKeys = { [kid]: key };
+          }
+        }
+      }
+      
+      player.configure(config);
+
+      try {
+        await player.load(manifestUri);
+        channelNameDisplay.textContent = displayName;
+        loadingSpinner.style.display = 'none';
+        statsPanel.style.display = 'block';
+        showToast(`Successfully loaded: ${displayName}`);
+        
+        // Update channel info
+        updateChannelInfo(displayName, manifestUri, selectedDrmType);
+        
+      } catch (e) {
+        onError({ detail: e });
+        channelNameDisplay.textContent = `Failed to load: ${displayName}`;
+        loadingSpinner.style.display = 'none';
+      }
+    }
+
+    function updateChannelInfo(name, url, drmType) {
+      const infoUrl = document.getElementById('info-url');
+      const infoDrm = document.getElementById('info-drm');
+      
+      infoUrl.textContent = url.length > 50 ? url.substring(0, 50) + '...' : url;
+      infoDrm.textContent = drmType === 'none' ? 'None' : drmType;
+      channelInfo.style.display = 'block';
+    }
+
+    // Enhanced statistics monitoring
+    function updateStats() {
+      if (!player || !player.isBuffering()) return;
+
+      const buffering = player.isBuffering();
+      const bufferHealth = player.getBufferHealth();
+      const activeTracks = player.getVariantTracks().filter(track => track.active);
+      
+      if (activeTracks.length > 0) {
+        const track = activeTracks[0];
+        currentStreamStats.bitrate = Math.round(track.bandwidth / 1000);
+        currentStreamStats.resolution = `${track.width || 'N/A'}x${track.height || 'N/A'}`;
+      }
+      
+      currentStreamStats.bufferHealth = bufferHealth.toFixed(1);
+      
+      // Update UI
+      document.getElementById('buffer-health').textContent = `${currentStreamStats.bufferHealth}s`;
+      document.getElementById('current-bitrate').textContent = `${currentStreamStats.bitrate} kbps`;
+      document.getElementById('current-resolution').textContent = currentStreamStats.resolution;
+    }
+
+    // Initialize enhanced player with statistics
+    function initPlayer() {
+      shaka.polyfill.installAll();
+      if (shaka.Player.isBrowserSupported()) {
+        player = new shaka.Player(video);
+        ui = new shaka.ui.Overlay(player, videoContainer, video);
+        
+        // Enhanced error handling
+        player.addEventListener('error', onError);
+        
+        // Statistics monitoring
+        player.addEventListener('buffering', (event) => {
+          if (!event.buffering) {
+            updateStats();
+          }
+        });
+        
+        // Update stats periodically
+        setInterval(updateStats, 1000);
+        
+      } else {
+        showError('Your browser does not support Shaka Player.');
+      }
+    }
+
+    // Enhanced playlist loading with progress indication
+    async function handlePlaylistLoad() {
+      let m3uData = '';
+      clearError();
+      const file = m3uFileInput.files[0];
+      const link = m3uLinkInput.value.trim();
+
+      try {
+        loadPlaylistButton.disabled = true;
+        loadPlaylistButton.textContent = 'Loading...';
+
+        if (link) {
+          const response = await fetch(link);
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+          m3uData = await response.text();
+        } else if (file) {
+          m3uData = await file.text();
+        } else {
+          showError('Please enter an M3U link or upload a file first.');
+          return;
+        }
+        
+        playlistData = parseM3U(m3uData);
+        populatePlaylistChannels();
+        showToast(`Loaded ${playlistData.length} channels from playlist`);
+        
+      } catch (e) {
+        showError(`Failed to load playlist: ${e.message}`);
+      } finally {
+        loadPlaylistButton.disabled = false;
+        loadPlaylistButton.textContent = 'Load Playlist';
+      }
+    }
+
+    // Enhanced channel selection with better UI
+    function onChannelSelect(event) {
+      const selectedValue = event.target.value;
+      if (!selectedValue) return;
+
+      let channel;
+      let displayName;
+
+      if (selectedValue.startsWith('playlist_')) {
+          const m3uIndex = parseInt(selectedValue.substring(9), 10);
+          channel = playlistData[m3uIndex];
+          displayName = channel.name;
+      } else if (selectedValue.startsWith('default_')) {
+          const streamKey = selectedValue.substring(8);
+          channel = defaultStreamsData[streamKey];
+          displayName = streamKey.replace(/_/g, ' ');
+      }
+
+      if (channel) {
+        manifestUriInput.value = channel.url || '';
+        
+        if ((channel.licenseType === 'org.w3.clearkey' || (channel.k1 && channel.k2)) && channel.k1 && channel.k2) {
+            licenseTypeSelect.value = 'org.w3.clearkey';
+            k1Input.value = channel.k1;
+            k2Input.value = channel.k2;
+            licenseServerUrlInput.value = '';
+        } else if (channel.licenseType && channel.licenseKey) {
+            licenseTypeSelect.value = channel.licenseType;
+            licenseServerUrlInput.value = channel.licenseKey;
+            k1Input.value = '';
+            k2Input.value = '';
+        } else {
+            licenseTypeSelect.value = 'none';
+            licenseServerUrlInput.value = '';
+            k1Input.value = '';
+            k2Input.value = '';
+        }
+        
+        toggleDrmBlockVisibility();
+        updateDrmFieldVisibility(); 
+        loadStream(displayName);
+      }
+    }
+
+    // Keep the rest of your existing functions (base64UrlToHex, renderMenu, etc.)
+    // ... [Previous functions remain the same]
+
+    function base64UrlToHex(base64Url) {
+      try {
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4) {
+          base64 += '=';
+        }
+        const raw = atob(base64);
+        let hex = '';
+        for (let i = 0; i < raw.length; i++) {
+          hex += raw.charCodeAt(i).toString(16).padStart(2, '0');
+        }
+        return hex;
+      } catch (e) {
+        console.error('Failed to decode base64 string:', base64Url, e);
+        return null;
+      }
+    }
+
+    function renderMenu() {
+      const floatingMenu = document.getElementById('floating-menu');
+      if (floatingMenu) {
+        floatingMenu.innerHTML = `
+        <ul>
+            <li>
+                <a href="/stream-tester/about">
+                    <span class="material-symbols-rounded">info</span>
+                    <span>About Us</span>
+                </a>
+            </li>
+            <li>
+                <a href="/stream-tester/how-to-use">
+                    <span class="material-symbols-rounded">help_center</span>
+                    <span>How to Use</span>
+                </a>
+            </li>
+            <li>
+                <a href="/stream-tester/feedback">
+                    <span class="material-symbols-rounded">feedback</span>
+                    <span>Feedback</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://litestream-iptv.vercel.app/home">
+                    <span class="material-symbols-rounded">sensors</span>
+                    <span>Litestream</span>
+                </a>
+            </li>
+        </ul>`;
+
+        floatingMenu.querySelectorAll("li").forEach(item => {
+          item.addEventListener("click", event => {
+            const link = item.querySelector("a");
+            if (link) {
+              event.preventDefault();
+              window.location.href = link.href;
+            }
+          });
+          item.addEventListener("contextmenu", event => {
+            event.preventDefault();
+          });
+        });
+      }
+    }
+
+    function toggleDrmBlockVisibility() {
+      const manifestUri = manifestUriInput.value.toLowerCase().trim();
+      const isMpd = manifestUri.includes('.mpd');
+      
+      if (drmFieldsContainer) {
+        drmFieldsContainer.style.display = isMpd ? 'block' : 'none';
+      }
+    }
+
+    function updateDrmFieldVisibility() {
+        const selectedType = licenseTypeSelect.value;
+        const isWidevine = selectedType === 'com.widevine.alpha';
+        const isNone = selectedType === 'none';
+
+        if (licenseUrlContainer && clearkeyContainer) {
+            licenseUrlContainer.style.display = isWidevine ? 'block' : 'none';
+            clearkeyContainer.style.display = !isWidevine && !isNone ? 'block' : 'none';
+        }
+    }
+
+    function handleRouting() {
+      const redirectPath = sessionStorage.getItem('redirectPath');
+      if (redirectPath) sessionStorage.removeItem('redirectPath');
+      const currentPath = redirectPath || window.location.pathname;
+      const pathSegments = currentPath.split('/').filter(Boolean);
+      const isGitHubPages = window.location.hostname.includes('github.io');
+      const effectivePath = isGitHubPages && pathSegments.length > 1 
+        ? `/${pathSegments[pathSegments.length - 1]}` 
+        : currentPath;
+
+      if (effectivePath.toLowerCase().startsWith('/manual')) {
+        switchInputMode('manual', false);
+      } else {
+        switchInputMode('playlist', false);
+      }
+    }
+
+    function switchInputMode(mode, pushState = true) {
+      const isPlaylist = mode === 'playlist';
+      addModeContainer.style.display = isPlaylist ? 'block' : 'none';
+      manualModeContainer.style.display = isPlaylist ? 'none' : 'block';
+      addModeBtn.classList.toggle('active', isPlaylist);
+      manualModeBtn.classList.toggle('active', !isPlaylist);
+      updateSliderPosition();
+
+      if (pushState) {
+        const newRoute = isPlaylist ? 'playlist' : 'manual';
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        const repoName = isGitHubPages ? `/${window.location.pathname.split('/')[1]}` : '';
+        const finalPath = `${repoName}/${newRoute}`;
+        if (window.location.pathname !== finalPath) {
+          history.pushState({ mode: mode }, '', finalPath);
+        }
+      }
+    }
+
+    async function fetchDefaultStreams() {
+        try {
+            const response = await fetch('js/getChannels.js');
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            defaultStreamsData = await response.json();
+            if (sourceSelector && sourceSelector.value === 'default') {
+                populateDefaultChannels();
+            }
+        } catch (e) {
+            showError(`Failed to load default streams: ${e.message}`);
+        }
+    }
+
+    function populatePlaylistChannels() {
+      channelSelector.innerHTML = '<option value="">-- Select a channel --</option>';
+      if (playlistData.length > 0) {
+        playlistData.forEach((channel, index) => {
+          const option = new Option(channel.name, `playlist_${index}`);
+          channelSelector.appendChild(option);
+        });
+        showToast(`${playlistData.length} channels loaded. Please select one.`);
+      } else {
+        showError('No channels found or playlist is empty.');
+      }
+      
+      m3uFileInput.value = '';
+    }
+
+    function populateDefaultChannels() {
+        channelSelector.innerHTML = '<option value="">-- Select a Sample Stream --</option>';
+        Object.keys(defaultStreamsData).forEach(channelKey => {
+            const displayName = channelKey.replace(/_/g, ' '); 
+            const option = new Option(displayName, `default_${channelKey}`);
+            channelSelector.appendChild(option);
+        });
+    }
+
+    function handleSourceChange(event) {
+        const selectedSource = event.target.value;
+        channelSelector.innerHTML = '<option value="">-- Select a source first --</option>';
+        if (selectedSource === 'default') {
+            playlistInputs.style.display = 'none'; 
+            populateDefaultChannels();
+        } else { 
+            playlistInputs.style.display = 'block';
+            if (playlistData.length > 0) populatePlaylistChannels();
+        }
+    }
+
+    function updateSliderPosition() {
+      const activeButton = inputModeSwitcher.querySelector('button.active');
+      if (activeButton) {
+        inputModeSwitcher.style.setProperty('--slider-left', `${activeButton.offsetLeft}px`);
+        inputModeSwitcher.style.setProperty('--slider-width', `${activeButton.offsetWidth}px`);
+      }
+    }
+
+    function onError(event) {
+      const error = event.detail;
+      console.error('Shaka Player Error:', error);
+      showError(`Error Code: ${error.code}\nCategory: ${error.category}`);
+    }
+
+    function toggleMenu() {
+        const floatingMenu = document.getElementById('floating-menu');
+        if (floatingMenu) {
+            floatingMenu.classList.toggle('active');
+        }
+    }
+
+    function setupPlayerEventListeners() {
+      uploadM3uButton.addEventListener('click', () => m3uFileInput.click());
+      loadPlaylistButton.addEventListener('click', handlePlaylistLoad);
+      loadManualButton.addEventListener('click', () => loadStream());
+      channelSelector.addEventListener('change', onChannelSelect);
+      addModeBtn.addEventListener('click', () => switchInputMode('playlist'));
+      manualModeBtn.addEventListener('click', () => switchInputMode('manual'));
+      window.addEventListener('resize', updateSliderPosition);
+      window.addEventListener('popstate', handleRouting);
+      manifestUriInput.addEventListener('input', toggleDrmBlockVisibility);
+      licenseTypeSelect.addEventListener('change', updateDrmFieldVisibility);
+      m3uFileInput.addEventListener('change', handlePlaylistLoad);
+      
+      if (sourceSelector) {
+        sourceSelector.addEventListener('change', handleSourceChange);
+      }
+
+      if (menuToggleBtn && floatingMenu) {
+          menuToggleBtn.addEventListener('click', (event) => {
+              event.stopPropagation();
+              toggleMenu();
+          });
+          window.addEventListener('click', (event) => {
+              if (floatingMenu.classList.contains('active') && !floatingMenu.contains(event.target)) {
+                  toggleMenu();
+              }
+          });
+      }
+    }
+
+    function setupStaticPageHandlers() {
+        const interactiveElements = document.querySelectorAll(
+            '.back-button, .feedback-link, .social-icon-links a, .developer-section a'
+        );
+
+        if (interactiveElements.length > 0) {
+            interactiveElements.forEach(el => {
+                el.addEventListener('contextmenu', event => event.preventDefault());
+            });
+        }
+    }
+
+    function main() {
+      setupStaticPageHandlers();
+
+      if (document.getElementById('video-container')) {
+        setupPlayerEventListeners();
+        handleRouting(); 
+        initPlayer();
+        fetchDefaultStreams(); 
+        toggleDrmBlockVisibility(); 
+        updateDrmFieldVisibility();
+        renderMenu();
+        updateSliderPosition();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', main);
+  </script>
+</body>
+</html>
