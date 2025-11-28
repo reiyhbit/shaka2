@@ -10,65 +10,71 @@
    <link rel="shortcut icon" href="assets/favicon.ico" />
    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
    <link rel="manifest" href="assets/site.webmanifest" />
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.cdnfonts.com/css/general-sans" rel="stylesheet">
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaspace-font/neon.css">
+   <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:wght@400;500;700&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:wght@400;500;700&display=swap" rel="stylesheet">
    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
    <script src="https://unpkg.com/mux.js@5.10.0/dist/mux.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/shaka-player.ui.min.js"></script>
    <link href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/controls.min.css" rel="stylesheet">
    <style>
-     :root{--p:#2563eb;--ph:#1d4ed8;--bg:#0f0f0f;--c:#1a1a1a;--t:#fff;--ts:#a1a1aa;--b:#374151;--e:#ef4444;--s:#10b981;}
+     :root {--primary-color:#2563eb;--primary-hover:#1d4ed8;--bg-color:#0f0f0f;--card-bg:#1a1a1a;--text-primary:#ffffff;--text-secondary:#a1a1aa;--border-color:#374151;--error-color:#ef4444;--success-color:#10b981;}
      *{margin:0;padding:0;box-sizing:border-box;}
-     body{font-family:'Google Sans Text',sans-serif;background:var(--bg);color:var(--t);line-height:1.6;overflow-x:hidden;}
+     body{font-family:'Google Sans Text',sans-serif;background:var(--bg-color);color:var(--text-primary);overflow-x:hidden;}
      .container{min-height:100vh;display:flex;flex-direction:column;}
-     .header{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;background:var(--c);border-bottom:1px solid var(--b);}
+     .header{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;background:var(--card-bg);border-bottom:1px solid var(--border-color);}
      .logo-img{height:32px;}
-     .menu-button{background:none;border:none;color:var(--t);cursor:pointer;padding:.5rem;border-radius:.375rem;}
-     .menu-button:hover{background:var(--b);}
+     .menu-button{background:none;border:none;color:var(--text-primary);cursor:pointer;padding:.5rem;border-radius:.375rem;}
+     .menu-button:hover{background:var(--border-color);}
      .grid-container{display:grid;grid-template-columns:1fr 400px;gap:2rem;padding:2rem;flex:1;}
      @media(max-width:1024px){.grid-container{grid-template-columns:1fr;gap:1rem;padding:1rem;}}
-     .player-wrapper{background:var(--c);border-radius:.75rem;overflow:hidden;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);}
+     .player-wrapper{background:var(--card-bg);border-radius:.75rem;overflow:hidden;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);}
      #video-container{width:100%;background:#000;position:relative;}
-     #video{width:100%;aspect-ratio:16/9;display:block;}
-     #channel-name-display{padding:1rem;font-size:1.25rem;font-weight:600;text-align:center;background:var(--c);border-top:1px solid var(--b);}
-     .card{background:var(--c);border-radius:.75rem;padding:1.5rem;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);}
+     #.video{width:100%;aspect-ratio:16/9;display:block;}
+     #channel-name-display{padding:1rem;font-size:1.25rem;font-weight:600;text-align:center;background:var(--card-bg);border-top:1px solid var(--border-color);}
+     .card{background:var(--card-bg);border-radius:.75rem;padding:1.5rem;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);}
      .input-mode-switcher{display:flex;background:#2d2d2d;border-radius:.5rem;padding:.25rem;margin-bottom:1.5rem;position:relative;}
-     .input-mode-switcher::before{content:'';position:absolute;top:.25rem;left:var(--sl,0);width:var(--sw,50%);height:calc(100% - .5rem);background:var(--p);border-radius:.375rem;transition:all .3s;}
-     .input-mode-switcher button{flex:1;background:none;border:none;color:var(--ts);padding:.75rem 1rem;border-radius:.375rem;cursor:pointer;font-weight:500;z-index:1;}
-     .input-mode-switcher button.active{color:var(--t);}
+     .input-mode-switcher::before{content:'';position:absolute;top:.25rem;left:var(--slider-left,0);width:var(--slider-width,50%);height:calc(100%-.5rem);background:var(--primary-color);border-radius:.375rem;transition:all .3s;}
+     .input-mode-switcher button{flex:1;background:none;border:none;color:var(--text-secondary);padding:.75rem 1rem;border-radius:.375rem;cursor:pointer;font-weight:500;z-index:1;}
+     .input-mode-switcher button.active{color:var(--text-primary);}
      .input-group{margin-bottom:1.25rem;}
-     .input-group label{display:block;margin-bottom:.5rem;font-weight:500;color:var(--ts);font-size:.875rem;}
-     .input-group input,.select-wrapper select{width:100%;padding:.75rem 1rem;background:#2d2d2d;border:1px solid var(--b);border-radius:.5rem;color:var(--t);font-size:.875rem;}
-     .input-group input:focus,.select-wrapper select:focus{outline:none;border-color:var(--p);}
+     .input-group label{display:block;margin-bottom:.5rem;font-weight:500;color:var(--text-secondary);font-size:.875rem;}
+     .input-group input,.select-wrapper select{width:100%;padding:.75rem 1rem;background:#2d2d2d;border:1px solid var(--border-color);border-radius:.5rem;color:var(--text-primary);font-size:.875rem;}
+     .input-group input:focus,.select-wrapper select:focus{outline:none;border-color:var(--primary-color);}
      .select-wrapper{position:relative;}
-     .select-wrapper::after{content:'▼';position:absolute;right:1rem;top:50%;transform:translateY(-50%);color:var(--ts);pointer-events:none;font-size:.75rem;}
-     button{background:var(--p);color:#fff;border:none;padding:.875rem 1rem;border-radius:.5rem;font-weight:500;cursor:pointer;width:100%;margin-top:.5rem;}
-     button:hover{background:var(--ph);}
-     #error-display{display:none;background:var(--e);color:#fff;padding:1rem;border-radius:.5rem;margin-top:1rem;font-size:.875rem;}
+     .select-wrapper::after{content:'▼';position:absolute;right:1rem;top:50%;transform:translateY(-50%);color:var(--text-secondary);pointer-events:none;font-size:.75rem;}
+     button{background:var(--primary-color);color:white;border:none;padding:.875rem 1rem;border-radius:.5rem;font-weight:500;cursor:pointer;width:100%;margin-top:.5rem;}
+     button:hover{background:var(--primary-hover);}
+     #error-display{display:none;background:var(--error-color);color:white;padding:1rem;border-radius:.5rem;margin-top:1rem;}
      .stats-panel,.channel-info{background:#2d2d2d;border-radius:.5rem;padding:1rem;margin-top:1rem;font-size:.75rem;}
      .stats-row,.info-row{display:flex;justify-content:space-between;margin-bottom:.5rem;}
-     .stats-label,.info-label{color:var(--ts);}
-     .stats-value,.info-value{color:var(--t);font-family:monospace;word-break:break-all;}
-     .toast{position:fixed;bottom:2rem;right:2rem;background:var(--s);color:#fff;padding:1rem 1.5rem;border-radius:.5rem;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);transform:translateY(100px);opacity:0;transition:all .3s;z-index:1001;}
+     .stats-label,.info-label{color:var(--text-secondary);}
+     .stats-value,.info-value{color:var(--text-primary);font-family:'Google Sans Code',monospace;word-break:break-all;}
+     .toast{position:fixed;bottom:2rem;right:2rem;background:var(--success-color);color:white;padding:1rem 1.5rem;border-radius:.5rem;transform:translateY(100px);opacity:0;transition:all .3s;z-index:1001;}
      .toast.show{transform:translateY(0);opacity:1;}
-     .toast.error{background:var(--e);}
+     .toast.error{background:var(--error-color);}
      .loading-spinner{display:none;text-align:center;padding:1rem;}
-     .spinner{border:2px solid #333;border-top:2px solid var(--p);border-radius:50%;width:20px;height:20px;animation:s 1s linear infinite;margin:0 auto;}
-     @keyframes s{to{transform:rotate(360deg)}}
+     .spinner{border:2px solid #333;border-top:2px solid var(--primary-color);border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;margin:0 auto;}
+     @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
    </style>
 </head>
 <body>
   <div class="container">
-    <header class="header">
-      <a href="/stream-tester"><img src="assets/stream_tester_logo.svg" alt="Logo" class="logo-img"></a>
-      <button id="menu-toggle-btn" class="menu-button"><span class="material-symbols-rounded">menu</span></button>
-    </header>
-
+     <header class="header">
+       <a href="/stream-tester"><img src="assets/stream_tester_logo.svg" alt="Logo" class="logo-img"></a>
+       <button id="menu-toggle-btn" class="menu-button"><span class="material-symbols-rounded">menu</span></button>
+     </header>
     <main class="grid-container">
       <div class="player-wrapper">
         <div id="video-container" data-shaka-player-container>
           <video id="video" poster="assets/video_poster.svg" data-shaka-player autoplay playsinline></video>
         </div>
-        <h2 id="channel-name-display">Loading your playlist...</h2>
+        <h2 id="channel-name-display">Loading your channels...</h2>
         <div class="loading-spinner" id="loading-spinner"><div class="spinner"></div><p>Loading stream...</p></div>
         <div class="stats-panel" id="stats-panel" style="display:none;">
           <div class="stats-row"><span class="stats-label">Buffer Health:</span><span class="stats-value" id="buffer-health">0s</span></div>
@@ -76,166 +82,73 @@
           <div class="stats-row"><span class="stats-label">Resolution:</span><span class="stats-value" id="current-resolution">N/A</span></div>
         </div>
       </div>
-
       <div class="card">
         <div class="input-mode-switcher">
-          <button id="add-mode-btn" class="active">Playlist</button>
-          <button id="manual-mode-btn">Manual</button>
+            <button id="add-mode-btn" class="active">Playlist</button>
+            <button id="manual-mode-btn">Manual</button>
         </div>
-
         <div id="add-mode-container">
-          <div class="input-group">
-            <label for="channelSelector">Select Channel</label>
-            <div class="select-wrapper">
-              <select id="channelSelector">
-                <option>Loading your channels...</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="channel-info" id="channel-info">
-            <div class="info-row"><span class="info-label">URL:</span><span class="info-value" id="info-url">Please wait...</span></div>
-            <div class="info-row"><span class="info-label">DRM:</span><span class="info-value" id="info-drm">None</span></div>
-          </div>
-        </div>
-
-        <div id="manual-mode-container" style="display:none;">
-          <h2>Manual Input</h2>
-          <div class="input-group">
-            <label for="manifestUri">Manifest URI</label>
-            <input type="text" id="manifestUri" placeholder="Enter HLS/DASH URL">
-          </div>
-          <div class="drm-fields" style="display:none;">
             <div class="input-group">
-              <label for="licenseTypeSelect">DRM Type</label>
+              <label for="channelSelector">Select Channel</label>
               <div class="select-wrapper">
-                <select id="licenseTypeSelect">
-                  <option value="com.widevine.alpha">Widevine</option>
-                  <option value="org.w3.clearkey">ClearKey</option>
-                </select>
+                <select id="channelSelector"><option>Loading channels...</option></select>
               </div>
             </div>
-            <div id="license-url-container">
-              <div class="input-group">
-                <label for="licenseServerUrl">License Server URL</label>
-                <input type="text" id="licenseServerUrl">
-              </div>
+            <div class="channel-info" id="channel-info" style="display:block;">
+              <div class="info-row"><span class="info-label">URL:</span><span class="info-value" id="info-url">Auto-loading...</span></div>
+              <div class="info-row"><span class="info-label">DRM:</span><span class="info-value" id="info-drm">None</span></div>
             </div>
-            <div id="clearkey-container" style="display:none;">
-              <div class="input-group"><label for="k1">KID (hex)</label><input type="text" id="k1"></div>
-              <div class="input-group"><label for="k2">Key (hex)</label><input type="text" id="k2"></div>
-            </div>
-          </div>
-          <button id="loadButton">Load Manual Input</button>
         </div>
-
+        <div id="manual-mode-container" style="display:none;">
+            <h2>Manual Input</h2>
+            <div class="input-group"><label for="manifestUri">Manifest URI</label><input type="text" id="manifestUri"></div>
+            <button id="loadButton">Load Manual Input</button>
+        </div>
         <div id="error-display"></div>
       </div>
     </main>
   </div>
-
   <div id="toast" class="toast"></div>
 
   <script>
+    let player, ui, playlistData = [], currentStreamStats = {bufferHealth:0,bitrate:0,resolution:'N/A'};
     const video = document.getElementById('video');
     const videoContainer = document.getElementById('video-container');
     const channelNameDisplay = document.getElementById('channel-name-display');
     const channelSelector = document.getElementById('channelSelector');
     const manifestUriInput = document.getElementById('manifestUri');
+    const m3uLinkInput = document.getElementById('m3uLink');
     const infoUrl = document.getElementById('info-url');
     const infoDrm = document.getElementById('info-drm');
-    const toast = document.getElementById('toast');
     const loadingSpinner = document.getElementById('loading-spinner');
     const statsPanel = document.getElementById('stats-panel');
-    const channelInfo = document.getElementById('channel-info');
-    let player, playlistData = [];
+    const toast = document.getElementById('toast');
 
-    // AUTO-LOAD YOUR PLAYLIST (CORS fixed)
-    const MY_M3U = "https://reiyhbit.github.io/iptv/playlist112525.m3u";
-    const PROXY = "https://api.allorigins.win/raw?url=";
-
-    function showToast(msg, type = 'success', time = 4000) {
-      toast.textContent = msg;
-      toast.className = `toast ${type} show`;
-      setTimeout(() => toast.classList.remove('show'), time);
-    }
-
-    async function autoLoadPlaylist() {
+    // AUTO-LOAD FROM LOCAL FILE (100% gagana, walang CORS!)
+    async function autoLoadMyPlaylist() {
       try {
-        showToast("Loading your personal playlist...");
-        const res = await fetch(PROXY + encodeURIComponent(MY_M3U));
-        if (!res.ok) throw new Error("Network error");
+        const res = await fetch('myplaylist.m3u');
         const text = await res.text();
         playlistData = parseM3U(text);
-        populateChannels();
-        showToast(`Loaded ${playlistData.length} channels! Playing first...`);
-        if (playlistData.length > 0) {
-          setTimeout(() => {
-            channelSelector.selectedIndex = 1;
-            channelSelector.dispatchEvent(new Event('change'));
-          }, 800);
-        }
-      } catch (e) {
-        showToast("Auto-load failed: " + e.message, "error", 8000);
-      }
+        m3uLinkInput ? m3uLinkInput.value = "myplaylist.m3u (auto)" : null;
+        populatePlaylistChannels();
+        showToast(`Auto-loaded ${playlistData.length} channels! Playing first...`, "success", 4000);
+        setTimeout(() => {
+          channelSelector.selectedIndex = 1;
+          channelSelector.dispatchEvent(new Event('change'));
+        }, 1000);
+      } catch (e) { showToast("Failed to load myplaylist.m3u", "error", 6000); }
     }
 
-    function parseM3U(data) {
-      const lines = data.split('\n');
-      const channels = [];
-      let ch = {};
-      for (const line of lines) {
-        const l = line.trim();
-        if (l.startsWith('#EXTINF:')) {
-          ch.name = l.split(',').pop().trim();
-        } else if (l && !l.startsWith('#')) {
-          ch.url = l;
-          channels.push({name: ch.name || 'Unknown', url: ch.url});
-          ch = {};
-        }
-      }
-      return channels;
-    }
+    function showToast(m,t="success",d=3000){toast.textContent=m;toast.className=`toast ${t} show`;setTimeout(()=>toast.classList.remove("show"),d);}
+    function parseM3U(data){const lines=data.split('\n'),ch=[],cur={};for(const l of lines){const t=l.trim();if(t.startsWith('#EXTINF:')){cur.name=t.split(',').pop().trim();}else if(t && !t.startsWith('#')){cur.url=t;ch.push({name:cur.name||"Unknown",url:cur.url});cur={};}}return ch;}
+    function populatePlaylistChannels(){channelSelector.innerHTML='<option>-- Select Channel --</option>';playlistData.forEach((c,i)=>{channelSelector.add(new Option(c.name,i));});}
+    function onChannelSelect(){const i=channelSelector.value;if(i==="")return;const ch=playlistData[i];if(!ch)return;manifestUriInput.value=ch.url;infoUrl.textContent=ch.url.length>60?ch.url.slice(0,57)+'...':ch.url;infoDrm.textContent="None";channelNameDisplay.textContent="Loading: "+ch.name;loadingSpinner.style.display="block";player.load(ch.url).then(()=>{channelNameDisplay.textContent=ch.name;loadingSpinner.style.display="none";statsPanel.style.display="block";}).catch(()=>{channelNameDisplay.textContent="Failed";loadingSpinner.style.display="none";});}
+    channelSelector.onchange=onChannelSelect;
 
-    function populateChannels() {
-      channelSelector.innerHTML = '<option value="">-- Select Channel --</option>';
-      playlistData.forEach((ch, i) => {
-        const opt = new Option(ch.name, i);
-        channelSelector.add(opt);
-      });
-    }
-
-    function playChannel(idx) {
-      const ch = playlistData[idx];
-      if (!ch) return;
-      manifestUriInput.value = ch.url;
-      infoUrl.textContent = ch.url.length > 60 ? ch.url.slice(0,57)+'...' : ch.url;
-      infoDrm.textContent = 'None';
-      channelInfo.style.display = 'block';
-      channelNameDisplay.textContent = 'Loading: ' + ch.name;
-      loadingSpinner.style.display = 'block';
-      player.load(ch.url).then(() => {
-        channelNameDisplay.textContent = ch.name;
-        loadingSpinner.style.display = 'none';
-        statsPanel.style.display = 'block';
-      }).catch(() => {
-        channelNameDisplay.textContent = 'Failed: ' + ch.name;
-        loadingSpinner.style.display = 'none';
-      });
-    }
-
-    channelSelector.onchange = () => {
-      const i = channelSelector.value;
-      if (i !== "") playChannel(parseInt(i));
-    };
-
-    // Init player
-    shaka.polyfill.installAll();
-    player = new shaka.Player(video);
-    new shaka.ui.Overlay(player, videoContainer, video);
-
-    // Start auto-load
-    autoLoadPlaylist();
+    function initPlayer(){shaka.polyfill.installAll();if(shaka.Player.isBrowserSupported()){player=new shaka.Player(video);ui=new shaka.ui.Overlay(player,videoContainer,video);}}
+    function main(){initPlayer();autoLoadMyPlaylist();}
+    document.addEventListener('DOMContentLoaded',main);
   </script>
 </body>
 </html>
