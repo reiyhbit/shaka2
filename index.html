@@ -422,6 +422,24 @@
        font-family: 'Google Sans Code', monospace;
        word-break: break-all;
      }
+
+     .auto-load-indicator {
+       position: fixed;
+       top: 50%;
+       left: 50%;
+       transform: translate(-50%, -50%);
+       background: var(--card-bg);
+       padding: 1rem 2rem;
+       border-radius: 0.75rem;
+       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+       z-index: 1002;
+       text-align: center;
+       border: 1px solid var(--primary-color);
+     }
+
+     .auto-load-indicator .spinner {
+       margin-bottom: 0.5rem;
+     }
    </style>
 </head>
 <body>
@@ -602,6 +620,78 @@
 
     const menuToggleBtn = document.getElementById('menu-toggle-btn');
     const floatingMenu = document.getElementById('floating-menu');
+
+    // Auto-load configuration
+    const AUTO_LOAD_CONFIG = {
+        enabled: true,
+        delay: 1000, // 1 second
+        playlistUrl: "https://converse.nathcrektives.com/playlist.m3u",
+        playFirstChannel: true
+    };
+
+    // Auto-load function
+    function initAutoLoad() {
+        if (!AUTO_LOAD_CONFIG.enabled) return;
+        
+        console.log(`Auto-loading playlist in ${AUTO_LOAD_CONFIG.delay}ms...`);
+        
+        setTimeout(async () => {
+            try {
+                showToast('Auto-loading playlist...', 'info', 2000);
+                loadingSpinner.style.display = 'block';
+                
+                // Switch to playlist mode
+                switchInputMode('playlist', false);
+                sourceSelector.value = 'playlist';
+                
+                // Load playlist data
+                const response = await fetch(AUTO_LOAD_CONFIG.playlistUrl);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                const m3uData = await response.text();
+                
+                playlistData = parseM3U(m3uData);
+                populatePlaylistChannels();
+                
+                // Auto-play first channel if available
+                if (AUTO_LOAD_CONFIG.playFirstChannel && playlistData.length > 0) {
+                    setTimeout(() => {
+                        const firstChannelIndex = 0;
+                        const firstChannel = playlistData[firstChannelIndex];
+                        
+                        // Set the channel selector
+                        channelSelector.value = `playlist_${firstChannelIndex}`;
+                        
+                        // Load the stream
+                        manifestUriInput.value = firstChannel.url || '';
+                        
+                        // Set DRM info if available
+                        if (firstChannel.licenseType === 'org.w3.clearkey' && firstChannel.k1 && firstChannel.k2) {
+                            licenseTypeSelect.value = 'org.w3.clearkey';
+                            k1Input.value = firstChannel.k1;
+                            k2Input.value = firstChannel.k2;
+                        } else if (firstChannel.licenseType && firstChannel.licenseKey) {
+                            licenseTypeSelect.value = firstChannel.licenseType;
+                            licenseServerUrlInput.value = firstChannel.licenseKey;
+                        }
+                        
+                        updateDrmFieldVisibility();
+                        loadStream(firstChannel.name);
+                        
+                        showToast(`Auto-playing: ${firstChannel.name}`, 'success');
+                        
+                    }, 500);
+                } else {
+                    showToast(`Loaded ${playlistData.length} channels. Select one to play.`, 'success');
+                }
+                
+            } catch (error) {
+                console.error('Auto-load failed:', error);
+                showToast(`Auto-load failed: ${error.message}`, 'error', 5000);
+            } finally {
+                loadingSpinner.style.display = 'none';
+            }
+        }, AUTO_LOAD_CONFIG.delay);
+    }
 
     // Enhanced M3U parsing with better error handling
     function parseM3U(data) {
@@ -903,9 +993,6 @@
       }
     }
 
-    // Keep the rest of your existing functions (base64UrlToHex, renderMenu, etc.)
-    // ... [Previous functions remain the same]
-
     function base64UrlToHex(base64Url) {
       try {
         let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -1150,6 +1237,9 @@
         updateDrmFieldVisibility();
         renderMenu();
         updateSliderPosition();
+        
+        // Start auto-load
+        initAutoLoad();
       }
     }
 
