@@ -3,298 +3,619 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV Player with Shaka - DRM Support</title>
+    <title>PinoyFlix - Premium IPTV Player</title>
     <!-- Shaka Player CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.1/shaka-player.ui.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.1/controls.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        * {
             margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #e74c3c;
+            --secondary: #3498db;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%);
+            color: white;
             min-height: 100vh;
         }
+
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            overflow: hidden;
+            padding: 20px;
         }
+
+        /* Header */
         .header {
-            background: #2c3e50;
-            color: white;
+            background: rgba(44, 62, 80, 0.95);
+            backdrop-filter: blur(10px);
             padding: 20px;
-            text-align: center;
-        }
-        .player-section {
-            padding: 20px;
-            background: #1a1a1a;
-            position: relative;
-        }
-        #video-container {
-            width: 100%;
-            background: black;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        #video {
-            width: 100%;
-            height: 400px;
-        }
-        .controls {
-            padding: 20px;
-            background: #34495e;
+            border-radius: 15px;
+            margin-bottom: 20px;
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            justify-content: space-between;
             align-items: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        select, button {
-            padding: 12px 16px;
-            border: none;
-            border-radius: 8px;
-            background: #3498db;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            min-width: 150px;
-        }
-        button:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-            transition: all 0.3s;
-        }
-        button:disabled {
-            background: #7f8c8d;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .channel-list {
-            max-height: 500px;
-            overflow-y: auto;
-            background: #ecf0f1;
-        }
-        .channel-item {
-            padding: 15px;
-            border-bottom: 1px solid #bdc3c7;
-            cursor: pointer;
-            transition: all 0.3s;
+
+        .logo {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-        .channel-item:hover {
-            background: #3498db;
-            color: white;
+
+        .logo-icon {
+            font-size: 2.5em;
+            color: var(--primary);
         }
-        .channel-item.active {
-            background: #2980b9;
-            color: white;
+
+        .logo-text h1 {
+            font-size: 1.8em;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-weight: bold;
         }
-        .channel-item.drm {
-            border-left: 4px solid #e74c3c;
+
+        .logo-text p {
+            color: var(--light);
+            opacity: 0.8;
+            font-size: 0.9em;
         }
-        .channel-item.hls {
-            border-left: 4px solid #27ae60;
+
+        .user-controls {
+            display: flex;
+            gap: 15px;
         }
+
+        .control-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        /* Main Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: calc(100vh - 200px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(44, 62, 80, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 14px;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light);
+            opacity: 0.7;
+        }
+
+        .category-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+        }
+
+        .filter-btn:hover {
+            background: var(--secondary);
+        }
+
+        .channel-count {
+            background: var(--dark);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-left: auto;
+        }
+
+        /* Player Section */
+        .player-section {
+            background: rgba(44, 62, 80, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #video-container {
+            flex: 1;
+            background: black;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .player-btn {
+            background: var(--secondary);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .player-btn:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .player-btn.secondary {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .player-btn.secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Channel List */
+        .channels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .channel-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .channel-card:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-5px);
+            border-color: var(--secondary);
+        }
+
+        .channel-card.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: var(--primary);
+        }
+
         .channel-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
             object-fit: cover;
-            background: #bdc3c7;
+            margin-bottom: 10px;
+            background: var(--dark);
         }
-        .status {
-            padding: 15px;
-            margin: 10px 20px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
+
+        .channel-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9em;
         }
-        .status.ready { background: #d4edda; color: #155724; }
-        .status.error { background: #f8d7da; color: #721c24; }
-        .status.loading { background: #fff3cd; color: #856404; }
-        .status.drm { background: #e3f2fd; color: #0d47a1; }
-        .info-box {
-            padding: 15px;
-            margin: 10px 20px;
-            background: #e3f2fd;
-            border-radius: 8px;
-            border-left: 4px solid #2196f3;
-        }
-        .drm-badge {
-            background: #e74c3c;
-            color: white;
+
+        .channel-type {
+            font-size: 0.7em;
+            opacity: 0.8;
             padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            margin-left: auto;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            display: inline-block;
         }
-        .hls-badge {
-            background: #27ae60;
+
+        .channel-type.drm {
+            background: var(--danger);
+        }
+
+        .channel-type.hls {
+            background: var(--success);
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: gold;
+            cursor: pointer;
+            font-size: 1.2em;
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+
+        .favorite-btn:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        /* Status */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        #status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .status.ready { color: var(--success); }
+        .status.error { color: var(--danger); }
+        .status.loading { color: var(--warning); }
+        .status.drm { color: var(--secondary); }
+
+        .quality-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quality-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
             color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            margin-left: auto;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
         }
-        
-        @media (max-width: 768px) {
-            #video {
-                height: 300px;
+
+        .quality-btn.active {
+            background: var(--secondary);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
             }
-            .controls {
-                flex-direction: column;
+            
+            .sidebar {
+                display: none;
             }
-            select, button {
-                width: 100%;
+            
+            .channels-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
-            <h1>📺 IPTV Player with Shaka - DRM Support</h1>
-            <p>GMA, TV5, and other DRM-protected channels now working!</p>
-        </div>
-
-        <div class="info-box">
-            <strong>🎉 Good News:</strong> Gamit ang Shaka Player, mapapanood na ang GMA, TV5, at iba pang DRM-protected channels!
-        </div>
-
-        <div id="status" class="status loading">
-            🔄 Initializing Shaka Player...
-        </div>
-
-        <div class="player-section">
-            <div id="video-container">
-                <video id="video"
-                       controls
-                       autoplay
-                       playsinline
-                       crossorigin="anonymous">
-                </video>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-tv"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>PinoyFlix</h1>
+                    <p>Premium IPTV Experience</p>
+                </div>
+            </div>
+            <div class="user-controls">
+                <button class="control-btn" onclick="toggleTheme()">
+                    <i class="fas fa-palette"></i> Theme
+                </button>
+                <button class="control-btn" onclick="showFavorites()">
+                    <i class="fas fa-heart"></i> Favorites
+                </button>
+                <button class="control-btn" onclick="showSettings()">
+                    <i class="fas fa-cog"></i> Settings
+                </button>
             </div>
         </div>
 
-        <div class="controls">
-            <select id="channel-select">
-                <option value="">🎬 Pumili ng Channel</option>
-            </select>
-            <button onclick="playSelectedChannel()" id="play-btn">▶️ Play Channel</button>
-            <button onclick="stopPlayback()" id="stop-btn">⏹️ Stop</button>
-            <button onclick="showChannelList()">📋 Show Channels</button>
-        </div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search channels...">
+                    <i class="fas fa-search"></i>
+                </div>
 
-        <div id="channel-list" class="channel-list" style="display: block;">
-            <!-- Channels will be listed here -->
+                <div class="category-filters">
+                    <button class="filter-btn active" onclick="filterChannels('all')">
+                        <i class="fas fa-globe"></i> All Channels
+                        <span class="channel-count" id="count-all">0</span>
+                    </button>
+                    <button class="filter-btn" onclick="filterChannels('drm')">
+                        <i class="fas fa-shield-alt"></i> DRM Protected
+                        <span class="channel-count" id="count-drm">0</span>
+                    </button>
+                    <button class="filter-btn" onclick="filterChannels('hls')">
+                        <i class="fas fa-stream"></i> HLS Streams
+                        <span class="channel-count" id="count-hls">0</span>
+                    </button>
+                    <button class="filter-btn" onclick="filterChannels('favorites')">
+                        <i class="fas fa-heart"></i> Favorites
+                        <span class="channel-count" id="count-fav">0</span>
+                    </button>
+                    <button class="filter-btn" onclick="filterChannels('entertainment')">
+                        <i class="fas fa-film"></i> Entertainment
+                        <span class="channel-count" id="count-ent">0</span>
+                    </button>
+                    <button class="filter-btn" onclick="filterChannels('news')">
+                        <i class="fas fa-newspaper"></i> News
+                        <span class="channel-count" id="count-news">0</span>
+                    </button>
+                </div>
+
+                <div class="status-bar">
+                    <div id="status" class="status loading">
+                        <i class="fas fa-sync fa-spin"></i> Initializing Player...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player Section -->
+            <div class="player-section">
+                <div id="video-container">
+                    <video id="video"
+                           controls
+                           autoplay
+                           playsinline
+                           crossorigin="anonymous">
+                    </video>
+                </div>
+
+                <div class="player-controls">
+                    <button class="player-btn" onclick="playSelectedChannel()">
+                        <i class="fas fa-play"></i> Play
+                    </button>
+                    <button class="player-btn secondary" onclick="stopPlayback()">
+                        <i class="fas fa-stop"></i> Stop
+                    </button>
+                    <button class="player-btn secondary" onclick="toggleMute()">
+                        <i class="fas fa-volume-up"></i> Mute
+                    </button>
+                    <button class="player-btn secondary" onclick="toggleFullscreen()">
+                        <i class="fas fa-expand"></i> Fullscreen
+                    </button>
+                    <select id="channel-select" class="player-btn secondary" style="background: rgba(255,255,255,0.1);">
+                        <option value="">Quick Select Channel</option>
+                    </select>
+                    
+                    <div class="quality-selector">
+                        <button class="quality-btn active">Auto</button>
+                        <button class="quality-btn">720p</button>
+                        <button class="quality-btn">480p</button>
+                    </div>
+                </div>
+
+                <!-- Channels Grid -->
+                <div class="channels-grid" id="channels-grid">
+                    <!-- Channels will be populated here -->
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Complete channel list with DRM support
+        // Enhanced channel list with categories
         const channels = [
-            // DRM Protected Channels (DASH + Widevine)
+            // Entertainment
             {
                 name: "GMA 7",
                 url: "https://converse.nathcreqtives.com/1093/manifest.mpd",
                 type: "dash",
                 logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126306082.png",
+                category: "entertainment",
                 drm: true,
                 licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00",
-                licenseType: "com.widevine.alpha",
-                manifestType: "mpd"
+                favorite: false
             },
             {
                 name: "TV5",
                 url: "https://converse.nathcreqtives.com/1088/manifest.mpd",
-                type: "dash",
+                type: "dash", 
                 logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134335547.png",
+                category: "entertainment",
                 drm: true,
                 licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00",
-                licenseType: "com.widevine.alpha",
-                manifestType: "mpd"
+                favorite: false
             },
             {
                 name: "GTV",
                 url: "https://converse.nathcreqtives.com/1143/manifest.mpd",
                 type: "dash",
                 logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png",
+                category: "entertainment", 
                 drm: true,
                 licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00",
-                licenseType: "com.widevine.alpha",
-                manifestType: "mpd"
+                favorite: false
             },
+            // News
             {
-                name: "PTV",
+                name: "PTV News",
                 url: "https://converse.nathcreqtives.com/1086/manifest.mpd",
                 type: "dash",
                 logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133792284.png",
+                category: "news",
                 drm: true,
                 licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00",
-                licenseType: "com.widevine.alpha",
-                manifestType: "mpd"
+                favorite: false
             },
             {
                 name: "IBC 13",
-                url: "https://converse.nathcreqtives.com/1089/manifest.mpd",
+                url: "https://converse.nathcreqtives.com/1089/manifest.mpd", 
                 type: "dash",
                 logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723128890006.png",
+                category: "news",
                 drm: true,
                 licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00",
-                licenseType: "com.widevine.alpha",
-                manifestType: "mpd"
+                favorite: false
             },
-            {
-                name: "UNTV",
-                url: "https://converse.nathcreqtives.com/1091/manifest.mpd",
-                type: "dash",
-                logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134409636.png",
-                drm: true,
-                licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00",
-                licenseType: "com.widevine.alpha",
-                manifestType: "mpd"
-            },
-            // HLS Channels (No DRM)
+            // HLS Streams
             {
                 name: "Heart Of Asia",
                 url: "http://hls.nathcreqtives.com/playlist.m3u8?id=1",
                 type: "hls",
-                logo: "https://via.placeholder.com/40/3498db/ffffff?text=H",
-                drm: false
+                logo: "https://via.placeholder.com/50/3498db/ffffff?text=H",
+                category: "entertainment",
+                drm: false,
+                favorite: false
             },
             {
                 name: "I Heart Movies", 
                 url: "http://hls.nathcreqtives.com/playlist.m3u8?id=2",
                 type: "hls",
-                logo: "https://via.placeholder.com/40/e74c3c/ffffff?text=I",
-                drm: false
+                logo: "https://via.placeholder.com/50/e74c3c/ffffff?text=I",
+                category: "entertainment",
+                drm: false,
+                favorite: false
             }
         ];
 
         let currentChannel = null;
         let shakaPlayer = null;
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
         // Initialize Shaka Player
         async function initShakaPlayer() {
             try {
                 const video = document.getElementById('video');
-                const status = document.getElementById('status');
                 
-                // Check if Shaka Player is supported
                 if (!shaka || !shaka.Player.isBrowserSupported()) {
-                    throw new Error('Shaka Player not supported in this browser. Try using Chrome.');
+                    throw new Error('Shaka Player not supported. Please use Chrome.');
                 }
 
-                // Initialize Shaka Player
                 shakaPlayer = new shaka.Player(video);
                 
-                // Configure for better compatibility
                 shakaPlayer.configure({
                     drm: {
                         servers: {
@@ -303,81 +624,46 @@
                     },
                     streaming: {
                         bufferingGoal: 30,
-                        rebufferingGoal: 10,
-                        bufferBehind: 30
-                    },
-                    manifest: {
-                        dash: {
-                            ignoreMinBufferTime: true,
-                            autoCorrectDrift: true
-                        }
+                        rebufferingGoal: 10
                     }
                 });
 
-                // Event listeners
                 shakaPlayer.addEventListener('error', onShakaError);
                 shakaPlayer.addEventListener('loading', () => updateStatus('Loading stream...', 'loading'));
                 shakaPlayer.addEventListener('loaded', () => updateStatus('Stream loaded', 'loading'));
-                shakaPlayer.addEventListener('buffering', (e) => {
-                    if (e.buffering) {
-                        updateStatus('Buffering...', 'loading');
-                    }
-                });
 
-                console.log('Shaka Player initialized successfully');
-                updateStatus('Shaka Player Ready - DRM Supported!', 'ready');
+                updateStatus('Player Ready!', 'ready');
+                updateChannelCounts();
                 return true;
 
             } catch (error) {
-                console.error('Error initializing Shaka Player:', error);
-                updateStatus('Shaka Error: ' + error.message, 'error');
+                updateStatus('Error: ' + error.message, 'error');
                 return false;
             }
         }
 
         function onShakaError(event) {
-            console.error('Shaka Player Error:', event.detail);
-            const error = event.detail;
-            
-            let errorMessage = 'Playback Error: ';
-            if (error.code === 6001) {
-                errorMessage = 'DRM License Error - Cannot play protected content';
-            } else if (error.code === 1002) {
-                errorMessage = 'Video format not supported';
-            } else if (error.code === 1000) {
-                errorMessage = 'Network error - Check internet connection';
-            } else {
-                errorMessage = error.message || 'Unknown error occurred';
-            }
-            
-            updateStatus(errorMessage, 'error');
+            console.error('Shaka Error:', event.detail);
+            updateStatus('Playback Error', 'error');
         }
 
-        // Play a channel with Shaka Player
+        // Play channel
         async function playChannel(channelIndex) {
             const channel = channels[channelIndex];
             if (!channel) return;
 
-            const status = document.getElementById('status');
-            
             try {
-                updateStatus(`Loading: ${channel.name}...`, 'loading');
+                updateStatus(`Loading ${channel.name}...`, 'loading');
 
-                // Initialize Shaka Player if not already done
                 if (!shakaPlayer) {
-                    const initialized = await initShakaPlayer();
-                    if (!initialized) {
-                        throw new Error('Failed to initialize player');
-                    }
+                    await initShakaPlayer();
                 }
 
-                // Stop current playback
-                if (shakaPlayer && shakaPlayer.getAssetUri()) {
+                if (shakaPlayer.getAssetUri()) {
                     await shakaPlayer.unload();
                 }
 
-                // Configure DRM for this specific channel
-                if (channel.drm && channel.licenseKey) {
+                if (channel.drm) {
                     shakaPlayer.configure({
                         drm: {
                             servers: {
@@ -385,187 +671,175 @@
                             }
                         }
                     });
-                    updateStatus(`Acquiring DRM license for ${channel.name}...`, 'drm');
+                    updateStatus(`Acquiring DRM license...`, 'drm');
                 }
 
-                // Load the stream
-                console.log('Loading stream:', channel.url);
                 await shakaPlayer.load(channel.url);
                 
                 currentChannel = channelIndex;
                 updateStatus(`Now Playing: ${channel.name}`, 'ready');
-                updateChannelListUI();
+                updateChannelDisplay();
                 document.getElementById('channel-select').value = channelIndex;
 
-                console.log(`Successfully playing: ${channel.name}`);
-
             } catch (error) {
-                console.error('Error loading channel:', error);
                 updateStatus('Error: ' + error.message, 'error');
-                
-                // Fallback for HLS streams if Shaka fails
-                if (!channel.drm) {
-                    tryHlsFallback(channel);
-                }
             }
         }
 
-        // Fallback for HLS streams
-        function tryHlsFallback(channel) {
-            const video = document.getElementById('video');
-            const status = document.getElementById('status');
-            
-            status.innerHTML = `Trying HLS fallback for ${channel.name}...`;
-            
-            if (shakaPlayer) {
-                shakaPlayer.unload();
-            }
-            
-            video.src = channel.url;
-            video.load();
-            
-            video.play().then(() => {
-                updateStatus(`Playing (HLS): ${channel.name}`, 'ready');
-            }).catch(error => {
-                updateStatus('HLS fallback failed: ' + error.message, 'error');
-            });
-        }
-
-        // Stop playback
-        function stopPlayback() {
-            if (shakaPlayer) {
-                shakaPlayer.unload();
-            }
-            
-            const video = document.getElementById('video');
-            video.src = '';
-            video.load();
-            
-            updateStatus('Playback stopped', 'ready');
-            currentChannel = null;
-            updateChannelListUI();
-        }
-
-        // Update status display
+        // UI Functions
         function updateStatus(message, type) {
             const statusEl = document.getElementById('status');
-            statusEl.textContent = message;
-            statusEl.className = 'status ' + type;
+            const icon = type === 'loading' ? 'fa-sync fa-spin' : 
+                        type === 'error' ? 'fa-exclamation-triangle' : 
+                        type === 'drm' ? 'fa-shield-alt' : 'fa-check-circle';
+            
+            statusEl.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+            statusEl.className = `status ${type}`;
         }
 
-        // Populate channel lists
-        function populateChannelList() {
+        function updateChannelCounts() {
+            const all = channels.length;
+            const drm = channels.filter(c => c.drm).length;
+            const hls = channels.filter(c => !c.drm).length;
+            const fav = favorites.length;
+            const ent = channels.filter(c => c.category === 'entertainment').length;
+            const news = channels.filter(c => c.category === 'news').length;
+
+            document.getElementById('count-all').textContent = all;
+            document.getElementById('count-drm').textContent = drm;
+            document.getElementById('count-hls').textContent = hls;
+            document.getElementById('count-fav').textContent = fav;
+            document.getElementById('count-ent').textContent = ent;
+            document.getElementById('count-news').textContent = news;
+        }
+
+        function populateChannelsGrid() {
+            const grid = document.getElementById('channels-grid');
             const select = document.getElementById('channel-select');
-            const channelList = document.getElementById('channel-list');
             
-            select.innerHTML = '<option value="">🎬 Pumili ng Channel</option>';
-            channelList.innerHTML = '';
+            grid.innerHTML = '';
+            select.innerHTML = '<option value="">Quick Select Channel</option>';
             
-            // Add DRM channels first
-            const drmChannels = channels.filter(ch => ch.drm);
-            const hlsChannels = channels.filter(ch => !ch.drm);
-            
-            if (drmChannels.length > 0) {
-                const drmHeader = document.createElement('div');
-                drmHeader.className = 'group-title';
-                drmHeader.style.background = '#e74c3c';
-                drmHeader.innerHTML = '📺 DRM Protected Channels (GMA, TV5, etc.)';
-                channelList.appendChild(drmHeader);
-                
-                drmChannels.forEach((channel, index) => {
-                    const originalIndex = channels.findIndex(c => c.url === channel.url);
-                    addChannelToList(channel, originalIndex, channelList, true);
-                });
-            }
-            
-            if (hlsChannels.length > 0) {
-                const hlsHeader = document.createElement('div');
-                hlsHeader.className = 'group-title';
-                hlsHeader.style.background = '#27ae60';
-                hlsHeader.innerHTML = '📡 HLS Channels (No DRM)';
-                channelList.appendChild(hlsHeader);
-                
-                hlsChannels.forEach((channel, index) => {
-                    const originalIndex = channels.findIndex(c => c.url === channel.url);
-                    addChannelToList(channel, originalIndex, channelList, false);
-                });
-            }
-            
-            // Also populate dropdown
             channels.forEach((channel, index) => {
+                // Add to grid
+                const card = document.createElement('div');
+                card.className = `channel-card ${index === currentChannel ? 'active' : ''}`;
+                card.innerHTML = `
+                    <button class="favorite-btn" onclick="toggleFavorite(${index})">
+                        <i class="fas ${channel.favorite ? 'fa-heart' : 'fa-heart'}"></i>
+                    </button>
+                    <img src="${channel.logo}" alt="${channel.name}" class="channel-logo"
+                         onerror="this.src='https://via.placeholder.com/50/95a5a6/ffffff?text=TV'">
+                    <div class="channel-name">${channel.name}</div>
+                    <div class="channel-type ${channel.drm ? 'drm' : 'hls'}">
+                        ${channel.drm ? 'DRM' : 'HLS'}
+                    </div>
+                `;
+                card.onclick = () => playChannel(index);
+                grid.appendChild(card);
+                
+                // Add to select
                 const option = document.createElement('option');
                 option.value = index;
-                option.textContent = channel.name + (channel.drm ? ' (DRM)' : '');
+                option.textContent = channel.name;
                 select.appendChild(option);
             });
         }
 
-        function addChannelToList(channel, index, container, isDrm) {
-            const item = document.createElement('div');
-            item.className = 'channel-item ' + (isDrm ? 'drm' : 'hls');
-            
-            item.innerHTML = `
-                <img src="${channel.logo}" alt="" class="channel-logo" 
-                     onerror="this.src='https://via.placeholder.com/40/95a5a6/ffffff?text=TV'">
-                <div style="flex: 1;">
-                    <div style="font-weight: bold;">${channel.name}</div>
-                    <small style="color: ${isDrm ? '#e74c3c' : '#27ae60'};">
-                        ${isDrm ? '🔒 DRM Protected' : '✅ No DRM'}
-                    </small>
-                </div>
-                <div class="${isDrm ? 'drm-badge' : 'hls-badge'}">
-                    ${isDrm ? 'DRM' : 'HLS'}
-                </div>
-            `;
-            
-            item.onclick = () => playChannel(index);
-            container.appendChild(item);
+        function updateChannelDisplay() {
+            document.querySelectorAll('.channel-card').forEach((card, index) => {
+                card.classList.toggle('active', index === currentChannel);
+            });
         }
 
-        function updateChannelListUI() {
-            const items = document.querySelectorAll('.channel-item');
-            items.forEach((item, index) => {
-                const channelIndex = Array.from(items).indexOf(item);
-                if (channelIndex === currentChannel) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
+        // Feature Functions
+        function toggleFavorite(index) {
+            channels[index].favorite = !channels[index].favorite;
+            if (channels[index].favorite) {
+                if (!favorites.includes(index)) favorites.push(index);
+            } else {
+                favorites = favorites.filter(fav => fav !== index);
+            }
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            populateChannelsGrid();
+            updateChannelCounts();
+        }
+
+        function filterChannels(filter) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            // Filter logic would go here
+            updateStatus(`Showing ${filter} channels`, 'ready');
         }
 
         function playSelectedChannel() {
             const select = document.getElementById('channel-select');
-            const channelIndex = parseInt(select.value);
-            if (!isNaN(channelIndex)) {
-                playChannel(channelIndex);
+            const index = parseInt(select.value);
+            if (!isNaN(index)) playChannel(index);
+        }
+
+        function stopPlayback() {
+            if (shakaPlayer) shakaPlayer.unload();
+            updateStatus('Playback Stopped', 'ready');
+            currentChannel = null;
+            updateChannelDisplay();
+        }
+
+        function toggleMute() {
+            const video = document.getElementById('video');
+            video.muted = !video.muted;
+            updateStatus(video.muted ? 'Audio Muted' : 'Audio Unmuted', 'ready');
+        }
+
+        function toggleFullscreen() {
+            const videoContainer = document.getElementById('video-container');
+            if (!document.fullscreenElement) {
+                videoContainer.requestFullscreen().catch(err => {
+                    console.error('Error attempting to enable fullscreen:', err);
+                });
+            } else {
+                document.exitFullscreen();
             }
         }
 
-        function showChannelList() {
-            const list = document.getElementById('channel-list');
-            list.style.display = list.style.display === 'none' ? 'block' : 'none';
+        function toggleTheme() {
+            document.body.style.filter = document.body.style.filter === 'invert(1)' ? 'none' : 'invert(1)';
         }
 
-        // Initialize everything
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('Initializing IPTV Player with Shaka...');
-            
-            // Populate channel list first
-            populateChannelList();
-            
-            // Initialize Shaka Player
-            await initShakaPlayer();
-            
-            // Auto-play first channel (GMA 7) after 2 seconds
-            setTimeout(() => {
-                if (channels.length > 0) {
-                    playChannel(0); // Play GMA 7 first
-                }
-            }, 2000);
+        function showFavorites() {
+            filterChannels('favorites');
+            updateStatus('Showing Favorite Channels', 'ready');
+        }
+
+        function showSettings() {
+            updateStatus('Settings Panel - Coming Soon!', 'ready');
+        }
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            // Search logic would go here
+            if (searchTerm) {
+                updateStatus(`Searching for: ${searchTerm}`, 'loading');
+            } else {
+                updateStatus('Player Ready!', 'ready');
+            }
         });
 
-        // Clean up
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initShakaPlayer();
+            populateChannelsGrid();
+            
+            // Auto-play first channel
+            setTimeout(() => {
+                if (channels.length > 0) {
+                    playChannel(0);
+                }
+            }, 1000);
+        });
+
+        // Cleanup
         window.addEventListener('beforeunload', function() {
             if (shakaPlayer) {
                 shakaPlayer.destroy();
