@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinoyFlix - Premium IPTV Player</title>
-    <!-- Shaka Player CDN -->
+    <title>PinoyTV - IPTV Player</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.1/shaka-player.ui.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.1/controls.css">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -17,19 +15,17 @@
         }
 
         :root {
-            --primary: #e74c3c;
-            --secondary: #3498db;
-            --dark: #2c3e50;
-            --light: #ecf0f1;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --danger: #e74c3c;
+            --amoled-bg: #000000;
+            --amoled-card: #1a1a1a;
+            --amoled-accent: #00ff00;
+            --amoled-text: #ffffff;
+            --amoled-secondary: #666666;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%);
-            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--amoled-bg);
+            color: var(--amoled-text);
             min-height: 100vh;
         }
 
@@ -41,16 +37,11 @@
 
         /* Header */
         .header {
-            background: rgba(44, 62, 80, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+            padding: 0 10px;
         }
 
         .logo {
@@ -60,79 +51,117 @@
         }
 
         .logo-icon {
-            font-size: 2.5em;
-            color: var(--primary);
+            font-size: 2em;
+            color: var(--amoled-accent);
         }
 
         .logo-text h1 {
             font-size: 1.8em;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: bold;
+            font-weight: 700;
+            color: var(--amoled-text);
         }
 
         .logo-text p {
-            color: var(--light);
-            opacity: 0.8;
+            color: var(--amoled-secondary);
             font-size: 0.9em;
         }
 
-        .user-controls {
-            display: flex;
-            gap: 15px;
-        }
-
-        .control-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
+        .theme-selector {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            background: var(--amoled-card);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid #333;
         }
 
-        .control-btn:hover {
-            background: var(--secondary);
-            transform: translateY(-2px);
+        .theme-selector span {
+            color: var(--amoled-secondary);
+            font-size: 0.9em;
+        }
+
+        .theme-option {
+            background: #333;
+            color: var(--amoled-text);
+            border: none;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            cursor: pointer;
+        }
+
+        .theme-option.active {
+            background: var(--amoled-accent);
+            color: var(--amoled-bg);
         }
 
         /* Main Layout */
-        .main-content {
+        .main-layout {
             display: grid;
-            grid-template-columns: 300px 1fr;
+            grid-template-columns: 350px 1fr;
             gap: 20px;
-            height: calc(100vh - 200px);
+            height: calc(100vh - 150px);
         }
 
         /* Sidebar */
         .sidebar {
-            background: rgba(44, 62, 80, 0.95);
-            backdrop-filter: blur(10px);
+            background: var(--amoled-card);
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-            overflow-y: auto;
+            border: 1px solid #333;
         }
 
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--amoled-text);
+        }
+
+        /* Filter Chips */
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .filter-chip {
+            background: #333;
+            color: var(--amoled-text);
+            border: 1px solid #444;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-chip.active {
+            background: var(--amoled-accent);
+            color: var(--amoled-bg);
+            border-color: var(--amoled-accent);
+        }
+
+        .filter-chip i {
+            margin-right: 5px;
+        }
+
+        /* Search Box */
         .search-box {
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .search-box input {
             width: 100%;
-            padding: 12px 40px 12px 15px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            font-size: 14px;
+            padding: 12px 45px 12px 15px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: var(--amoled-text);
+            font-size: 0.9em;
         }
 
         .search-box i {
@@ -140,147 +169,172 @@
             right: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--light);
-            opacity: 0.7;
+            color: var(--amoled-secondary);
         }
 
-        .category-filters {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
+        /* Settings */
+        .settings {
+            margin-bottom: 25px;
         }
 
-        .filter-btn {
-            background: rgba(255,255,255,0.05);
-            border: none;
-            color: white;
-            padding: 12px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: left;
+        .setting-item {
             display: flex;
             align-items: center;
             gap: 10px;
+            padding: 10px 0;
+            color: var(--amoled-text);
         }
 
-        .filter-btn.active {
-            background: var(--primary);
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #444;
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
         }
 
-        .filter-btn:hover {
-            background: var(--secondary);
+        .checkbox.checked {
+            background: var(--amoled-accent);
+            border-color: var(--amoled-accent);
         }
 
-        .channel-count {
-            background: var(--dark);
-            padding: 2px 8px;
-            border-radius: 12px;
+        .checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--amoled-bg);
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Recently Watched */
+        .recently-watched {
+            margin-top: 30px;
+        }
+
+        .recent-channels {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .recent-channel {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .recent-channel:hover {
+            border-color: var(--amoled-accent);
+        }
+
+        .channel-number {
+            background: var(--amoled-accent);
+            color: var(--amoled-bg);
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 0.8em;
-            margin-left: auto;
+            font-weight: bold;
+        }
+
+        .channel-info {
+            flex: 1;
+        }
+
+        .channel-name {
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .channel-provider {
+            color: var(--amoled-secondary);
+            font-size: 0.8em;
         }
 
         /* Player Section */
         .player-section {
-            background: rgba(44, 62, 80, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
             display: flex;
             flex-direction: column;
+            gap: 20px;
         }
 
-        #video-container {
-            flex: 1;
-            background: black;
-            border-radius: 10px;
+        .video-container {
+            background: var(--amoled-card);
+            border-radius: 15px;
             overflow: hidden;
-            position: relative;
-            margin-bottom: 20px;
+            border: 1px solid #333;
+            flex: 1;
         }
 
         #video {
             width: 100%;
             height: 100%;
-            border-radius: 10px;
+            min-height: 400px;
         }
 
-        .player-controls {
+        /* Channels Grid */
+        .channels-section {
+            background: var(--amoled-card);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid #333;
+        }
+
+        .channels-header {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
+            margin-bottom: 20px;
         }
 
-        .player-btn {
-            background: var(--secondary);
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-        }
-
-        .player-btn:hover {
-            background: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .player-btn.secondary {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .player-btn.secondary:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        /* Channel List */
         .channels-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 15px;
-            margin-top: 20px;
             max-height: 400px;
             overflow-y: auto;
         }
 
         .channel-card {
-            background: rgba(255,255,255,0.05);
+            background: #1a1a1a;
+            border: 1px solid #333;
             border-radius: 12px;
             padding: 15px;
             cursor: pointer;
             transition: all 0.3s;
-            border: 1px solid rgba(255,255,255,0.1);
             position: relative;
-            overflow: hidden;
         }
 
         .channel-card:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateY(-5px);
-            border-color: var(--secondary);
+            border-color: var(--amoled-accent);
+            transform: translateY(-2px);
         }
 
         .channel-card.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-color: var(--primary);
+            border-color: var(--amoled-accent);
+            background: linear-gradient(135deg, #1a1a1a 0%, #004400 100%);
         }
 
         .channel-logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            object-fit: cover;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
             margin-bottom: 10px;
-            background: var(--dark);
+            background: #333;
+            object-fit: cover;
         }
 
         .channel-name {
@@ -289,126 +343,47 @@
             font-size: 0.9em;
         }
 
-        .channel-type {
+        .channel-provider {
+            color: var(--amoled-accent);
             font-size: 0.7em;
-            opacity: 0.8;
-            padding: 2px 8px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.1);
-            display: inline-block;
+            text-transform: uppercase;
         }
 
-        .channel-type.drm {
-            background: var(--danger);
-        }
-
-        .channel-type.hls {
-            background: var(--success);
-        }
-
-        .favorite-btn {
+        .live-indicator {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: none;
-            border: none;
-            color: gold;
-            cursor: pointer;
-            font-size: 1.2em;
-            opacity: 0.7;
-            transition: all 0.3s;
-        }
-
-        .favorite-btn:hover {
-            opacity: 1;
-            transform: scale(1.2);
-        }
-
-        /* Status */
-        .status-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        #status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
-        }
-
-        .status.ready { color: var(--success); }
-        .status.error { color: var(--danger); }
-        .status.loading { color: var(--warning); }
-        .status.drm { color: var(--secondary); }
-
-        .quality-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .quality-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
+            background: #ff4444;
             color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.8em;
-        }
-
-        .quality-btn.active {
-            background: var(--secondary);
-        }
-
-        /* Animations */
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .loading {
-            animation: pulse 1.5s infinite;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            font-weight: bold;
         }
 
         /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
+            background: #1a1a1a;
+            border-radius: 3px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--secondary);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
+            background: var(--amoled-accent);
+            border-radius: 3px;
         }
 
         /* Responsive */
         @media (max-width: 1024px) {
-            .main-content {
+            .main-layout {
                 grid-template-columns: 1fr;
             }
             
             .sidebar {
                 display: none;
-            }
-            
-            .channels-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
         }
     </style>
@@ -419,72 +394,78 @@
         <div class="header">
             <div class="logo">
                 <div class="logo-icon">
-                    <i class="fas fa-tv"></i>
+                    <i class="fas fa-satellite-dish"></i>
                 </div>
                 <div class="logo-text">
-                    <h1>PinoyFlix</h1>
-                    <p>Premium IPTV Experience</p>
+                    <h1>Channels</h1>
+                    <p>Favorites • HLS • Converge • Cignal</p>
                 </div>
             </div>
-            <div class="user-controls">
-                <button class="control-btn" onclick="toggleTheme()">
-                    <i class="fas fa-palette"></i> Theme
-                </button>
-                <button class="control-btn" onclick="showFavorites()">
-                    <i class="fas fa-heart"></i> Favorites
-                </button>
-                <button class="control-btn" onclick="showSettings()">
-                    <i class="fas fa-cog"></i> Settings
-                </button>
+            <div class="theme-selector">
+                <span>Theme:</span>
+                <button class="theme-option active">AMOLED</button>
+                <button class="theme-option">DARK</button>
+                <button class="theme-option">LIGHT</button>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
+        <!-- Main Layout -->
+        <div class="main-layout">
             <!-- Sidebar -->
             <div class="sidebar">
+                <div class="section-title">Filters</div>
+                
+                <div class="filter-chips">
+                    <div class="filter-chip active">
+                        <i class="fas fa-heart"></i>Favorites
+                    </div>
+                    <div class="filter-chip">
+                        <i class="fas fa-stream"></i>HLS
+                    </div>
+                    <div class="filter-chip">
+                        <i class="fas fa-wifi"></i>Converge
+                    </div>
+                    <div class="filter-chip">
+                        <i class="fas fa-satellite"></i>Cignal
+                    </div>
+                </div>
+
                 <div class="search-box">
-                    <input type="text" id="search-input" placeholder="Search channels...">
+                    <input type="text" placeholder="Search channel...">
                     <i class="fas fa-search"></i>
                 </div>
 
-                <div class="category-filters">
-                    <button class="filter-btn active" onclick="filterChannels('all')">
-                        <i class="fas fa-globe"></i> All Channels
-                        <span class="channel-count" id="count-all">0</span>
-                    </button>
-                    <button class="filter-btn" onclick="filterChannels('drm')">
-                        <i class="fas fa-shield-alt"></i> DRM Protected
-                        <span class="channel-count" id="count-drm">0</span>
-                    </button>
-                    <button class="filter-btn" onclick="filterChannels('hls')">
-                        <i class="fas fa-stream"></i> HLS Streams
-                        <span class="channel-count" id="count-hls">0</span>
-                    </button>
-                    <button class="filter-btn" onclick="filterChannels('favorites')">
-                        <i class="fas fa-heart"></i> Favorites
-                        <span class="channel-count" id="count-fav">0</span>
-                    </button>
-                    <button class="filter-btn" onclick="filterChannels('entertainment')">
-                        <i class="fas fa-film"></i> Entertainment
-                        <span class="channel-count" id="count-ent">0</span>
-                    </button>
-                    <button class="filter-btn" onclick="filterChannels('news')">
-                        <i class="fas fa-newspaper"></i> News
-                        <span class="channel-count" id="count-news">0</span>
-                    </button>
+                <div class="settings">
+                    <div class="setting-item">
+                        <div class="checkbox checked" onclick="toggleSetting(this)"></div>
+                        <span>Hide DRM channels</span>
+                    </div>
                 </div>
 
-                <div class="status-bar">
-                    <div id="status" class="status loading">
-                        <i class="fas fa-sync fa-spin"></i> Initializing Player...
+                <div class="recently-watched">
+                    <div class="section-title">RECENTLY WATCHED</div>
+                    <div class="recent-channels">
+                        <div class="recent-channel" onclick="playChannel(1)">
+                            <div class="channel-number">5</div>
+                            <div class="channel-info">
+                                <div class="channel-name">TV5</div>
+                                <div class="channel-provider">Converge</div>
+                            </div>
+                        </div>
+                        <div class="recent-channel" onclick="playChannel(0)">
+                            <div class="channel-number">1</div>
+                            <div class="channel-info">
+                                <div class="channel-name">GMA 7</div>
+                                <div class="channel-provider">Converge</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Player Section -->
+            <!-- Main Content -->
             <div class="player-section">
-                <div id="video-container">
+                <div class="video-container">
                     <video id="video"
                            controls
                            autoplay
@@ -493,117 +474,96 @@
                     </video>
                 </div>
 
-                <div class="player-controls">
-                    <button class="player-btn" onclick="playSelectedChannel()">
-                        <i class="fas fa-play"></i> Play
-                    </button>
-                    <button class="player-btn secondary" onclick="stopPlayback()">
-                        <i class="fas fa-stop"></i> Stop
-                    </button>
-                    <button class="player-btn secondary" onclick="toggleMute()">
-                        <i class="fas fa-volume-up"></i> Mute
-                    </button>
-                    <button class="player-btn secondary" onclick="toggleFullscreen()">
-                        <i class="fas fa-expand"></i> Fullscreen
-                    </button>
-                    <select id="channel-select" class="player-btn secondary" style="background: rgba(255,255,255,0.1);">
-                        <option value="">Quick Select Channel</option>
-                    </select>
-                    
-                    <div class="quality-selector">
-                        <button class="quality-btn active">Auto</button>
-                        <button class="quality-btn">720p</button>
-                        <button class="quality-btn">480p</button>
+                <div class="channels-section">
+                    <div class="channels-header">
+                        <div class="section-title">All Channels</div>
+                        <div class="filter-chips">
+                            <div class="filter-chip active">All</div>
+                            <div class="filter-chip">Entertainment</div>
+                            <div class="filter-chip">News</div>
+                            <div class="filter-chip">Sports</div>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Channels Grid -->
-                <div class="channels-grid" id="channels-grid">
-                    <!-- Channels will be populated here -->
+                    
+                    <div class="channels-grid" id="channels-grid">
+                        <!-- Channels will be populated here -->
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Enhanced channel list with categories
+        // Channel data
         const channels = [
-            // Entertainment
             {
                 name: "GMA 7",
+                provider: "Converge",
+                logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126306082.png",
                 url: "https://converse.nathcreqtives.com/1093/manifest.mpd",
                 type: "dash",
-                logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126306082.png",
-                category: "entertainment",
                 drm: true,
                 licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00",
-                favorite: false
+                favorite: true,
+                live: true
             },
             {
                 name: "TV5",
-                url: "https://converse.nathcreqtives.com/1088/manifest.mpd",
-                type: "dash", 
+                provider: "Converge", 
                 logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134335547.png",
-                category: "entertainment",
+                url: "https://converse.nathcreqtives.com/1088/manifest.mpd",
+                type: "dash",
                 drm: true,
                 licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00",
-                favorite: false
+                favorite: true,
+                live: true
             },
             {
                 name: "GTV",
+                provider: "Converge",
+                logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png",
                 url: "https://converse.nathcreqtives.com/1143/manifest.mpd",
                 type: "dash",
-                logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png",
-                category: "entertainment", 
                 drm: true,
                 licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00",
-                favorite: false
+                favorite: false,
+                live: true
             },
-            // News
-            {
-                name: "PTV News",
-                url: "https://converse.nathcreqtives.com/1086/manifest.mpd",
-                type: "dash",
-                logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133792284.png",
-                category: "news",
-                drm: true,
-                licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00",
-                favorite: false
-            },
-            {
-                name: "IBC 13",
-                url: "https://converse.nathcreqtives.com/1089/manifest.mpd", 
-                type: "dash",
-                logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723128890006.png",
-                category: "news",
-                drm: true,
-                licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00",
-                favorite: false
-            },
-            // HLS Streams
             {
                 name: "Heart Of Asia",
+                provider: "HLS",
+                logo: "https://via.placeholder.com/40/00ff00/000000?text=H",
                 url: "http://hls.nathcreqtives.com/playlist.m3u8?id=1",
                 type: "hls",
-                logo: "https://via.placeholder.com/50/3498db/ffffff?text=H",
-                category: "entertainment",
                 drm: false,
-                favorite: false
+                favorite: true,
+                live: true
             },
             {
-                name: "I Heart Movies", 
+                name: "I Heart Movies",
+                provider: "HLS", 
+                logo: "https://via.placeholder.com/40/00ff00/000000?text=I",
                 url: "http://hls.nathcreqtives.com/playlist.m3u8?id=2",
                 type: "hls",
-                logo: "https://via.placeholder.com/50/e74c3c/ffffff?text=I",
-                category: "entertainment",
                 drm: false,
-                favorite: false
+                favorite: false,
+                live: true
+            },
+            {
+                name: "PTV",
+                provider: "Cignal",
+                logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133792284.png",
+                url: "https://converse.nathcreqtives.com/1086/manifest.mpd",
+                type: "dash",
+                drm: true,
+                licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00",
+                favorite: false,
+                live: true
             }
         ];
 
         let currentChannel = null;
         let shakaPlayer = null;
-        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
         // Initialize Shaka Player
         async function initShakaPlayer() {
@@ -621,30 +581,14 @@
                         servers: {
                             'com.widevine.alpha': 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00'
                         }
-                    },
-                    streaming: {
-                        bufferingGoal: 30,
-                        rebufferingGoal: 10
                     }
                 });
 
-                shakaPlayer.addEventListener('error', onShakaError);
-                shakaPlayer.addEventListener('loading', () => updateStatus('Loading stream...', 'loading'));
-                shakaPlayer.addEventListener('loaded', () => updateStatus('Stream loaded', 'loading'));
-
-                updateStatus('Player Ready!', 'ready');
-                updateChannelCounts();
                 return true;
-
             } catch (error) {
-                updateStatus('Error: ' + error.message, 'error');
+                console.error('Shaka init error:', error);
                 return false;
             }
-        }
-
-        function onShakaError(event) {
-            console.error('Shaka Error:', event.detail);
-            updateStatus('Playback Error', 'error');
         }
 
         // Play channel
@@ -653,8 +597,6 @@
             if (!channel) return;
 
             try {
-                updateStatus(`Loading ${channel.name}...`, 'loading');
-
                 if (!shakaPlayer) {
                     await initShakaPlayer();
                 }
@@ -671,159 +613,59 @@
                             }
                         }
                     });
-                    updateStatus(`Acquiring DRM license...`, 'drm');
                 }
 
                 await shakaPlayer.load(channel.url);
-                
                 currentChannel = channelIndex;
-                updateStatus(`Now Playing: ${channel.name}`, 'ready');
                 updateChannelDisplay();
-                document.getElementById('channel-select').value = channelIndex;
 
             } catch (error) {
-                updateStatus('Error: ' + error.message, 'error');
+                console.error('Playback error:', error);
             }
         }
 
-        // UI Functions
-        function updateStatus(message, type) {
-            const statusEl = document.getElementById('status');
-            const icon = type === 'loading' ? 'fa-sync fa-spin' : 
-                        type === 'error' ? 'fa-exclamation-triangle' : 
-                        type === 'drm' ? 'fa-shield-alt' : 'fa-check-circle';
-            
-            statusEl.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
-            statusEl.className = `status ${type}`;
-        }
-
-        function updateChannelCounts() {
-            const all = channels.length;
-            const drm = channels.filter(c => c.drm).length;
-            const hls = channels.filter(c => !c.drm).length;
-            const fav = favorites.length;
-            const ent = channels.filter(c => c.category === 'entertainment').length;
-            const news = channels.filter(c => c.category === 'news').length;
-
-            document.getElementById('count-all').textContent = all;
-            document.getElementById('count-drm').textContent = drm;
-            document.getElementById('count-hls').textContent = hls;
-            document.getElementById('count-fav').textContent = fav;
-            document.getElementById('count-ent').textContent = ent;
-            document.getElementById('count-news').textContent = news;
-        }
-
-        function populateChannelsGrid() {
-            const grid = document.getElementById('channels-grid');
-            const select = document.getElementById('channel-select');
-            
-            grid.innerHTML = '';
-            select.innerHTML = '<option value="">Quick Select Channel</option>';
-            
-            channels.forEach((channel, index) => {
-                // Add to grid
-                const card = document.createElement('div');
-                card.className = `channel-card ${index === currentChannel ? 'active' : ''}`;
-                card.innerHTML = `
-                    <button class="favorite-btn" onclick="toggleFavorite(${index})">
-                        <i class="fas ${channel.favorite ? 'fa-heart' : 'fa-heart'}"></i>
-                    </button>
-                    <img src="${channel.logo}" alt="${channel.name}" class="channel-logo"
-                         onerror="this.src='https://via.placeholder.com/50/95a5a6/ffffff?text=TV'">
-                    <div class="channel-name">${channel.name}</div>
-                    <div class="channel-type ${channel.drm ? 'drm' : 'hls'}">
-                        ${channel.drm ? 'DRM' : 'HLS'}
-                    </div>
-                `;
-                card.onclick = () => playChannel(index);
-                grid.appendChild(card);
-                
-                // Add to select
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = channel.name;
-                select.appendChild(option);
-            });
-        }
-
+        // Update channel display
         function updateChannelDisplay() {
             document.querySelectorAll('.channel-card').forEach((card, index) => {
                 card.classList.toggle('active', index === currentChannel);
             });
         }
 
-        // Feature Functions
-        function toggleFavorite(index) {
-            channels[index].favorite = !channels[index].favorite;
-            if (channels[index].favorite) {
-                if (!favorites.includes(index)) favorites.push(index);
-            } else {
-                favorites = favorites.filter(fav => fav !== index);
-            }
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-            populateChannelsGrid();
-            updateChannelCounts();
+        // Populate channels grid
+        function populateChannelsGrid() {
+            const grid = document.getElementById('channels-grid');
+            grid.innerHTML = '';
+
+            channels.forEach((channel, index) => {
+                const card = document.createElement('div');
+                card.className = `channel-card ${index === currentChannel ? 'active' : ''}`;
+                card.innerHTML = `
+                    ${channel.live ? '<div class="live-indicator">LIVE</div>' : ''}
+                    <img src="${channel.logo}" alt="${channel.name}" class="channel-logo"
+                         onerror="this.src='https://via.placeholder.com/40/333333/ffffff?text=TV'">
+                    <div class="channel-name">${channel.name}</div>
+                    <div class="channel-provider">${channel.provider}</div>
+                `;
+                card.onclick = () => playChannel(index);
+                grid.appendChild(card);
+            });
         }
 
-        function filterChannels(filter) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            // Filter logic would go here
-            updateStatus(`Showing ${filter} channels`, 'ready');
+        // Toggle settings
+        function toggleSetting(checkbox) {
+            checkbox.classList.toggle('checked');
         }
 
-        function playSelectedChannel() {
-            const select = document.getElementById('channel-select');
-            const index = parseInt(select.value);
-            if (!isNaN(index)) playChannel(index);
-        }
-
-        function stopPlayback() {
-            if (shakaPlayer) shakaPlayer.unload();
-            updateStatus('Playback Stopped', 'ready');
-            currentChannel = null;
-            updateChannelDisplay();
-        }
-
-        function toggleMute() {
-            const video = document.getElementById('video');
-            video.muted = !video.muted;
-            updateStatus(video.muted ? 'Audio Muted' : 'Audio Unmuted', 'ready');
-        }
-
-        function toggleFullscreen() {
-            const videoContainer = document.getElementById('video-container');
-            if (!document.fullscreenElement) {
-                videoContainer.requestFullscreen().catch(err => {
-                    console.error('Error attempting to enable fullscreen:', err);
-                });
-            } else {
-                document.exitFullscreen();
-            }
-        }
-
-        function toggleTheme() {
-            document.body.style.filter = document.body.style.filter === 'invert(1)' ? 'none' : 'invert(1)';
-        }
-
-        function showFavorites() {
-            filterChannels('favorites');
-            updateStatus('Showing Favorite Channels', 'ready');
-        }
-
-        function showSettings() {
-            updateStatus('Settings Panel - Coming Soon!', 'ready');
-        }
-
-        // Search functionality
-        document.getElementById('search-input').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            // Search logic would go here
-            if (searchTerm) {
-                updateStatus(`Searching for: ${searchTerm}`, 'loading');
-            } else {
-                updateStatus('Player Ready!', 'ready');
-            }
+        // Filter chips functionality
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                if (!this.classList.contains('active')) {
+                    this.parentElement.querySelectorAll('.filter-chip').forEach(c => {
+                        c.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
         });
 
         // Initialize
@@ -833,17 +675,20 @@
             
             // Auto-play first channel
             setTimeout(() => {
-                if (channels.length > 0) {
-                    playChannel(0);
-                }
+                playChannel(0);
             }, 1000);
         });
 
-        // Cleanup
-        window.addEventListener('beforeunload', function() {
-            if (shakaPlayer) {
-                shakaPlayer.destroy();
-            }
+        // Theme switching
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.theme-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Theme switching logic would go here
+            });
         });
     </script>
 </body>
