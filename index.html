@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Converge TV Pro</title>
+    <title>Converge TV</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.1/shaka-player.ui.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.1/controls.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -64,7 +64,7 @@
 
     <div class="player-area">
         <div class="channel-info">
-            <div id="ch-name">Ch 1 • Loading...</div>
+            <div id="ch-name">Loading...</div>
             <div class="live-indicator">LIVE</div>
         </div>
         <div id="video-container">
@@ -81,13 +81,14 @@
     </div>
 
     <div class="bottom-tabs">
-        <div class="tab favorites active" onclick="showTab('favorites')"><i class="fas fa-heart"></i> Favorites</div>
-        <div class="tab" onclick="showTab('all')">All Channels</div>
-        <div class="tab active">Converge</div>
+        <div class="tab favorites" onclick="showFavorites()">Favorites</div>
+        <div class="tab">HLS</div>
+        <div class="tab active" onclick="showAll()">Converge</div>
+        <div class="tab">Cignal</div>
     </div>
 
     <div class="search-bar">
-        <input type="text" id="search" placeholder="Search channel..." oninput="filterChannels()">
+        <input type="text" id="search" placeholder="Search channel..." oninput="renderChannels()">
     </div>
 
     <div class="recently">RECENTLY WATCHED</div>
@@ -98,7 +99,7 @@
     </div>
 
     <script>
-        // ================== FULL CONVERGE CHANNELS (70+ channels) ==================
+        // ================== LAHAT NG CHANNELS MO (83) ==================
         const channels = [
             {name:"GTV",url:"https://converse.nathcreqtives.com/1143/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png",drm:true},
             {name:"TV5",url:"https://converse.nathcreqtives.com/1088/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134335547.png",drm:true},
@@ -110,96 +111,120 @@
             {name:"UNTV",url:"https://converse.nathcreqtives.com/1091/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134409636.png",drm:true},
             {name:"KNOWLEDGE CHANNEL",url:"https://converse.nathcreqtives.com/1340/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723604992973.png",drm:true},
             {name:"JEEPNEY TV",url:"https://converse.nathcreqtives.com/1250/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723128953472.png",drm:true},
-            {name:"DZMM TELERADYO",url:"https://converse.nathcreqtives.com/1249/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1749519196399.png",drm:true},
+            {name:"DZMM TELERADIO",url:"https://converse.nathcreqtives.com/1249/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1749519196399.png",drm:true},
             {name:"ONE SPORTS",url:"https://converse.nathcreqtives.com/1083/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723131202156.png",drm:true},
             {name:"CINEMA ONE",url:"https://converse.nathcreqtives.com/1283/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125628005.png",drm:true},
+            {name:"EWTN",url:"https://converse.nathcreqtives.com/1104/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126078814.png",drm:true},
+            {name:"INC TV",url:"https://converse.nathcreqtives.com/1092/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723605495653.png",drm:true},
+            {name:"CHANNEL NEWS ASIA",url:"https://converse.nathcreqtives.com/1106/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125590334.png",drm:true},
+            {name:"CINEMAX",url:"https://converse.nathcreqtives.com/1108/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125660668.png",drm:true},
+            {name:"KAPAMILYA HD",url:"https://converse.nathcreqtives.com/1286/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129013828.png",drm:true},
+            {name:"NET 25",url:"https://converse.nathcreqtives.com/1090/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129823252.png",drm:true},
+            {name:"MYX",url:"https://converse.nathcreqtives.com/1252/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129763447.png",drm:true},
+            {name:"ALIW TV",url:"https://converse.nathcreqtives.com/1109/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125129835.png",drm:true},
+            {name:"HBO",url:"https://converse.nathcreqtives.com/1065/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126386617.png",drm:true},
+            {name:"CNN",url:"https://converse.nathcreqtives.com/1073/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125798255.png",drm:true},
+            {name:"A2Z",url:"https://converse.nathcreqtives.com/1087/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125016586.png",drm:true},
+            {name:"CELESTIAL MOVIES PINOY",url:"https://converse.nathcreqtives.com/1077/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723219252241.png",drm:true},
+            {name:"RJTV 29",url:"https://converse.nathcreqtives.com/1159/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133830822.png",drm:true},
+            {name:"CCTV4",url:"https://converse.nathcreqtives.com/1223/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125521068.png",drm:true},
+            {name:"CARTOON NETWORK",url:"https://converse.nathcreqtives.com/1178/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125431025.png",drm:true},
+            {name:"VIVA CINEMA",url:"https://converse.nathcreqtives.com/1079/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134481136.png",drm:true},
+            {name:"HALLYPOP",url:"https://converse.nathcreqtives.com/1152/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1733707474289.png",drm:true},
+            {name:"ALL TV",url:"https://converse.nathcreqtives.com/1179/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723136602348.png",drm:true},
+            {name:"TAP TV",url:"https://converse.nathcreqtives.com/1149/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134180637.png",drm:true},
+            {name:"DZRH",url:"https://converse.nathcreqtives.com/1174/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126004028.png",drm:true},
+            {name:"METRO",url:"https://converse.nathcreqtives.com/1267/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129722508.png",drm:true},
+            {name:"STAR CHANNEL 1",url:"https://converse.nathcreqtives.com/1202/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723219661968.png",drm:true},
+            {name:"KIX",url:"https://converse.nathcreqtives.com/1263/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129053549.png",drm:true},
+            {name:"ANC HD",url:"https://converse.nathcreqtives.com/1216/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723219396137.png",drm:true},
+            {name:"TAP SPORTS",url:"https://converse.nathcreqtives.com/1151/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134161793.png",drm:true},
+            {name:"FASHION TV",url:"https://converse.nathcreqtives.com/1102/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126284675.png",drm:true},
+            {name:"GNN tv44",url:"https://converse.nathcreqtives.com/1234/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1735903243498.png",drm:true},
+            {name:"TV5MONDE",url:"https://converse.nathcreqtives.com/1156/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134373931.png",drm:true},
+            {name:"SOLAR SPORTS",url:"https://converse.nathcreqtives.com/1081/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134030645.png",drm:true},
+        
             {name:"Heart Of Asia",url:"http://hls.nathcreqtives.com/playlist.m3u8?id=1",logo:"https://via.placeholder.com/150/333/fff?text=HOA",drm:false},
             {name:"I Heart Movies",url:"http://hls.nathcreqtives.com/playlist.m3u8?id=2",logo:"https://via.placeholder.com/150/e74c3c/fff?text=IHM",drm:false}
-            // ... pwede mo pa idagdag ang iba kung gusto mo, pero sapat na ito para gumana lahat
         ];
 
         let currentChannel = 0;
         let shakaPlayer = null;
-        let currentView = 'favorites'; // default view
-
-        // Load favorites from localStorage
+        let showFavoritesOnly = false;
         let favorites = JSON.parse(localStorage.getItem('converge_fav') || '[]');
 
         async function initPlayer() {
             const video = document.getElementById('video');
-            if (!shaka.Player.isBrowserSupported()) return alert("Use Chrome/Firefox");
+            if (!shaka.Player.isBrowserSupported()) return alert("Gumamit ng Chrome o Firefox");
             shakaPlayer = new shaka.Player(video);
             shakaPlayer.configure({ drm: { servers: { 'com.widevine.alpha': 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00' }}});
             renderChannels();
             populateRecentlyWatched();
-            playChannel(1); // TV5
+            playChannel(1); // TV5 muna
         }
 
         async function playChannel(idx) {
             const ch = channels[idx];
-            document.getElementById('ch-name').textContent = `Ch ${idx+1} • ${ch.name}`;
+            document.getElementById('ch-name').textContent = `Ch ${idx+1} · ${ch.name}`;
             try {
-                if (shakaPlayer.getAssetUri()) await shakaPlayer.unload();
-                await shakaPlayer.load(ch.url);
+                if (shakaPlayer && shakaPlayer.getAssetUri()) await shakaPlayer.unload();
+                if (ch.drm) {
+                    await shakaPlayer.load(ch.url);
+                } else {
+                    video.src = ch.url; // HLS direct
+                }
                 currentChannel = idx;
                 addToRecentlyWatched(idx);
-                renderChannels(); // update playing state
-            } catch(e) { console.log("Error:", e); }
+                renderChannels();
+            } catch(e) { console.error(e); }
         }
 
         function nextChannel() { playChannel((currentChannel + 1) % channels.length); }
         function prevChannel() { playChannel((currentChannel - 1 + channels.length) % channels.length); }
         function reloadChannel() { playChannel(currentChannel); }
-        function stopPlayback() { if(shakaPlayer) shakaPlayer.unload(); }
+        function stopPlayback() { if(shakaPlayer) shakaPlayer.unload(); video.src=''; }
         function toggleFullscreen() {
             const el = document.getElementById('video-container');
-            if (!document.fullscreenElement) el.requestFullscreen();
-            else document.exitFullscreen();
+            if (!document.fullscreenElement) el.requestFullscreen(); else document.exitFullscreen();
         }
 
         function toggleFavorite(idx, e) {
             e.stopPropagation();
-            if (favorites.includes(idx)) {
-                favorites = favorites.filter(i => i !== idx);
-            } else {
-                favorites.push(idx);
-            }
+            if (favorites.includes(idx)) favorites = favorites.filter(i => i !== idx);
+            else favorites.push(idx);
             localStorage.setItem('converge_fav', JSON.stringify(favorites));
             renderChannels();
         }
 
-        function showTab(tab) {
-            currentView = tab;
+        function showAll() {
+            showFavoritesOnly = false;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            if (tab === 'favorites') document.querySelector('.tab.favorites').classList.add('active');
-            else document.querySelectorAll('.tab')[1].classList.add('active');
+            document.querySelectorAll('.tab')[2].classList.add('active');
             renderChannels();
         }
 
-        function filterChannels() {
+        function showFavorites() {
+            showFavoritesOnly = true;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.tab.favorites').classList.add('active');
             renderChannels();
         }
 
         function renderChannels() {
             const grid = document.getElementById('channels-grid');
             grid.innerHTML = '';
-            let list = channels;
+            let list = showFavoritesOnly ? channels.filter((_,i) => favorites.includes(i)) : channels;
+            const term = document.getElementById('search').value.toLowerCase();
+            list = list.filter(ch => ch.name.toLowerCase().includes(term));
 
-            if (currentView === 'favorites') {
-                list = channels.filter((_, i) => favorites.includes(i));
-            }
-
-            const search = document.getElementById('search').value.toLowerCase();
-            list = list.filter(ch => ch.name.toLowerCase().includes(search));
-
-            list.forEach((ch, idx) => {
+            list.forEach((ch, i) => {
                 const realIdx = channels.indexOf(ch);
                 const card = document.createElement('div');
                 card.className = `channel-card ${realIdx === currentChannel ? 'playing' : ''}`;
                 card.innerHTML = `
                     <img src="${ch.logo}" class="channel-logo" onerror="this.src='https://via.placeholder.com/150/222/fff?text=TV'">
                     <div class="channel-name">${ch.name}</div>
-                    <div class="fav-heart ${favorites.includes(realIdx) ? 'active' : ''}" onclick="toggleFavorite(${realIdx}, event)">
+                    <div class="fav-heart ${favorites.includes(realIdx) ? 'active' : ''}" onclick="toggleFavorite(${realIdx},event)">
                         <i class="fas fa-heart"></i>
                     </div>
                 `;
@@ -230,7 +255,6 @@
             });
         }
 
-        // Live clock
         setInterval(() => {
             const d = new Date();
             document.getElementById('clock').textContent = d.toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit'});
