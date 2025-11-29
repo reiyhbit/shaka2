@@ -117,11 +117,11 @@
     <div class="container">
         <div class="header">
             <h1>📺 Simple IPTV Player</h1>
-            <p>Pinoy TV Channels</p>
+            <p>Pinoy TV Channels - No Shaka Player Needed</p>
         </div>
 
-        <div id="status" class="status loading">
-            🔄 Initializing Player...
+        <div id="status" class="status ready">
+            ✅ Player Ready - Pumili ng channel!
         </div>
 
         <div class="player-section">
@@ -136,7 +136,7 @@
             </select>
             <button onclick="playSelectedChannel()">▶️ Play Channel</button>
             <button onclick="showChannelList()">📋 Show All Channels</button>
-            <button onclick="testHLS()">🧪 Test HLS Stream</button>
+            <button onclick="testStream()">🧪 Test Simple Stream</button>
         </div>
 
         <div id="channel-list" class="channel-list" style="display: none;">
@@ -145,20 +145,8 @@
     </div>
 
     <script>
-        // Simple channel list - direct streaming approach
+        // Simple channel list
         const channels = [
-            {
-                name: "Heart Of Asia (HLS Test)",
-                url: "http://hls.nathcreqtives.com/playlist.m3u8?id=1",
-                type: "hls",
-                logo: "https://via.placeholder.com/40/3498db/ffffff?text=H"
-            },
-            {
-                name: "I Heart Movies (HLS Test)", 
-                url: "http://hls.nathcreqtives.com/playlist.m3u8?id=2",
-                type: "hls",
-                logo: "https://via.placeholder.com/40/e74c3c/ffffff?text=I"
-            },
             {
                 name: "GMA 7",
                 url: "https://converse.nathcreqtives.com/1093/manifest.mpd",
@@ -167,8 +155,8 @@
             },
             {
                 name: "TV5",
-                url: "https://converse.nathcreqtives.com/1088/manifest.mpd",
-                type: "dash", 
+                url: "https://converse.nathcreqtives.com/1088/manifest.mpd", 
+                type: "dash",
                 logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134335547.png"
             },
             {
@@ -176,34 +164,24 @@
                 url: "https://converse.nathcreqtives.com/1143/manifest.mpd",
                 type: "dash",
                 logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png"
+            },
+            {
+                name: "PTV",
+                url: "https://converse.nathcreqtives.com/1086/manifest.mpd",
+                type: "dash",
+                logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133792284.png"
+            },
+            {
+                name: "IBC 13",
+                url: "https://converse.nathcreqtives.com/1089/manifest.mpd",
+                type: "dash",
+                logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723128890006.png"
             }
         ];
 
         let currentChannel = null;
 
-        // Initialize the player
-        function initializePlayer() {
-            const video = document.getElementById('video');
-            const status = document.getElementById('status');
-            
-            try {
-                // Check basic video support
-                if (!video.canPlayType) {
-                    throw new Error('Browser does not support video playback');
-                }
-                
-                status.className = 'status ready';
-                status.innerHTML = '✅ Player Ready - Pumili ng channel para mag-play';
-                console.log('Player initialized successfully');
-                
-            } catch (error) {
-                status.className = 'status error';
-                status.innerHTML = '❌ Error: ' + error.message;
-                console.error('Initialization error:', error);
-            }
-        }
-
-        // Play a channel
+        // Play a channel using native HTML5 video
         function playChannel(channelIndex) {
             const channel = channels[channelIndex];
             if (!channel) return;
@@ -215,20 +193,31 @@
                 status.className = 'status loading';
                 status.innerHTML = `🔄 Loading: ${channel.name}`;
                 
-                console.log('Attempting to play:', channel.name, channel.url);
+                console.log('Attempting to play:', channel.name);
                 
                 // Stop current playback
                 video.pause();
                 video.src = '';
                 
-                // Set new source
+                // Set new source directly
                 video.src = channel.url;
                 
-                // Add source type for better compatibility
-                video.innerHTML = `
-                    <source src="${channel.url}" type="${channel.type === 'dash' ? 'application/dash+xml' : 'application/x-mpegURL'}">
-                    Your browser doesn't support this video format.
-                `;
+                // Clear any existing source elements and add new one
+                video.innerHTML = '';
+                const source = document.createElement('source');
+                source.src = channel.url;
+                
+                if (channel.type === 'dash') {
+                    source.type = 'application/dash+xml';
+                } else if (channel.type === 'hls') {
+                    source.type = 'application/x-mpegURL';
+                }
+                
+                video.appendChild(source);
+                video.innerHTML += 'Your browser doesn\'t support this video format.';
+                
+                // Load the new source
+                video.load();
                 
                 // Attempt to play
                 const playPromise = video.play();
@@ -244,6 +233,9 @@
                         status.className = 'status error';
                         status.innerHTML = `❌ Playback Error: ${error.message}`;
                         console.error('Playback failed:', error);
+                        
+                        // Try alternative approach
+                        tryAlternativePlayback(channel);
                     });
                 }
                 
@@ -252,6 +244,50 @@
                 status.innerHTML = `❌ Error: ${error.message}`;
                 console.error('Channel play error:', error);
             }
+        }
+
+        // Alternative playback method
+        function tryAlternativePlayback(channel) {
+            const status = document.getElementById('status');
+            status.innerHTML = `🔄 Trying alternative method for: ${channel.name}`;
+            
+            // Simple retry with different approach
+            const video = document.getElementById('video');
+            video.src = channel.url;
+            
+            setTimeout(() => {
+                video.play().catch(e => {
+                    status.innerHTML = `❌ Cannot play: ${channel.name} - DRM Protected?`;
+                });
+            }, 1000);
+        }
+
+        // Test with a simple stream
+        function testStream() {
+            const status = document.getElementById('status');
+            const video = document.getElementById('video');
+            
+            // Use a test stream that should work
+            const testStreams = [
+                "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8", // Public test HLS
+                "https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd" // Public test DASH
+            ];
+            
+            status.className = 'status loading';
+            status.innerHTML = '🧪 Testing with public stream...';
+            
+            video.src = testStreams[1]; // Use DASH test stream
+            video.load();
+            
+            video.play().then(() => {
+                status.className = 'status ready';
+                status.innerHTML = '✅ Public Stream Works! Your player is OK.';
+                currentChannel = null;
+                updateChannelList();
+            }).catch(error => {
+                status.className = 'status error';
+                status.innerHTML = '❌ Even public stream failed: ' + error.message;
+            });
         }
 
         // Play selected channel from dropdown
@@ -312,36 +348,14 @@
             });
         }
 
-        // Test HLS stream (simpler approach)
-        function testHLS() {
-            const testUrl = "http://hls.nathcreqtives.com/playlist.m3u8?id=1";
-            const status = document.getElementById('status');
-            const video = document.getElementById('video');
-            
-            status.className = 'status loading';
-            status.innerHTML = '🧪 Testing HLS Stream...';
-            
-            video.src = testUrl;
-            video.load();
-            
-            video.play().then(() => {
-                status.className = 'status ready';
-                status.innerHTML = '✅ HLS Test Successful!';
-            }).catch(error => {
-                status.className = 'status error';
-                status.innerHTML = '❌ HLS Test Failed: ' + error.message;
-            });
-        }
-
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            initializePlayer();
             populateChannelList();
             
             // Auto-play first channel after 2 seconds
             setTimeout(() => {
                 if (channels.length > 0) {
-                    playChannel(0);
+                    document.getElementById('status').innerHTML = '✅ Click any channel to start playing!';
                 }
             }, 2000);
         });
@@ -349,14 +363,40 @@
         // Error handling for video element
         document.getElementById('video').addEventListener('error', function(e) {
             const status = document.getElementById('status');
+            const error = document.getElementById('video').error;
             status.className = 'status error';
-            status.innerHTML = '❌ Video Error - May problema sa stream';
-            console.error('Video error:', e);
+            
+            let errorMessage = 'Video Error - ';
+            if (error) {
+                switch(error.code) {
+                    case error.MEDIA_ERR_ABORTED:
+                        errorMessage += 'Playback was aborted';
+                        break;
+                    case error.MEDIA_ERR_NETWORK:
+                        errorMessage += 'Network error - check connection';
+                        break;
+                    case error.MEDIA_ERR_DECODE:
+                        errorMessage += 'Format not supported - may need DRM';
+                        break;
+                    case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                        errorMessage += 'Stream not supported - DRM protected?';
+                        break;
+                    default:
+                        errorMessage += 'Unknown error';
+                }
+            }
+            
+            status.innerHTML = `❌ ${errorMessage}`;
+            console.error('Video error:', e, error);
         });
 
-        // Load event for successful playback
+        // Success events
         document.getElementById('video').addEventListener('loadeddata', function() {
             console.log('Video data loaded successfully');
+        });
+
+        document.getElementById('video').addEventListener('canplay', function() {
+            console.log('Video can start playing');
         });
     </script>
 </body>
