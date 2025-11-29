@@ -3,500 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV Player with Shaka</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.16.9/shaka-player.ui.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.16.9/controls.css">
+    <title>Simple IPTV Player</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f0f0f0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             overflow: hidden;
         }
-        #video-container {
-            width: 100%;
-            background: black;
-            position: relative;
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .player-section {
+            padding: 20px;
+            background: #1a1a1a;
         }
         #video {
             width: 100%;
-            height: 500px;
+            height: 400px;
+            border-radius: 10px;
+            background: black;
         }
         .controls {
             padding: 20px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            background: #2c3e50;
-            color: white;
-            flex-wrap: wrap;
-        }
-        .channel-list {
-            max-height: 400px;
-            overflow-y: auto;
             background: #34495e;
-            color: white;
-        }
-        .channel-item {
-            padding: 10px 15px;
-            border-bottom: 1px solid #4a6278;
-            cursor: pointer;
-            transition: background 0.3s;
             display: flex;
-            align-items: center;
             gap: 10px;
-        }
-        .channel-item:hover {
-            background: #4a6278;
-        }
-        .channel-item.active {
-            background: #3498db;
-            font-weight: bold;
-        }
-        .channel-logo {
-            width: 30px;
-            height: 30px;
-            border-radius: 4px;
-            object-fit: cover;
+            flex-wrap: wrap;
+            align-items: center;
         }
         select, button {
-            padding: 8px 12px;
+            padding: 12px 16px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             background: #3498db;
             color: white;
             cursor: pointer;
-            min-width: 120px;
+            font-size: 14px;
+            min-width: 150px;
         }
         button:hover {
             background: #2980b9;
+            transform: translateY(-2px);
+            transition: all 0.3s;
         }
-        button:disabled {
-            background: #7f8c8d;
-            cursor: not-allowed;
+        .channel-list {
+            max-height: 500px;
+            overflow-y: auto;
+            background: #ecf0f1;
         }
-        .group-title {
-            background: #2c3e50;
-            padding: 10px 15px;
+        .channel-item {
+            padding: 15px;
+            border-bottom: 1px solid #bdc3c7;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .channel-item:hover {
+            background: #3498db;
+            color: white;
+        }
+        .channel-item.active {
+            background: #2980b9;
+            color: white;
             font-weight: bold;
-            color: #ecf0f1;
-            border-bottom: 2px solid #3498db;
+        }
+        .channel-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #bdc3c7;
         }
         .status {
-            padding: 10px;
-            background: #e74c3c;
-            color: white;
+            padding: 15px;
+            margin: 10px 20px;
+            border-radius: 8px;
             text-align: center;
-            display: none;
+            font-weight: bold;
         }
-        .status.playing {
-            background: #27ae60;
-        }
-        .debug-info {
-            padding: 10px;
-            background: #f39c12;
-            color: white;
-            font-size: 12px;
-            display: none;
-        }
-        .loading {
-            color: #3498db;
-            font-style: italic;
+        .status.ready { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.loading { background: #fff3cd; color: #856404; }
+        
+        @media (max-width: 768px) {
+            #video {
+                height: 300px;
+            }
+            .controls {
+                flex-direction: column;
+            }
+            select, button {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="status" class="status">Hindi nakakonekta</div>
-        <div id="debug-info" class="debug-info"></div>
-        
-        <div class="controls">
-            <select id="channel-select">
-                <option value="">Pumili ng Channel</option>
-            </select>
-            <button onclick="playSelectedChannel()" id="play-btn">Play</button>
-            <button onclick="stopPlayback()" id="stop-btn">Stop</button>
-            <button onclick="toggleChannelList()">Ipakita/Itago Channel List</button>
-            <button onclick="toggleDebug()">Debug Info</button>
-            <span id="current-channel" class="loading">Walang channel na pinapanood</span>
+        <div class="header">
+            <h1>📺 Simple IPTV Player</h1>
+            <p>Pinoy TV Channels</p>
         </div>
-        
-        <div id="video-container">
-            <video id="video"
-                   controls
-                   autoplay
-                   crossorigin="anonymous"
-                   playsinline>
+
+        <div id="status" class="status loading">
+            🔄 Initializing Player...
+        </div>
+
+        <div class="player-section">
+            <video id="video" controls autoplay playsinline crossorigin="anonymous">
+                Your browser does not support the video tag.
             </video>
         </div>
-        
+
+        <div class="controls">
+            <select id="channel-select">
+                <option value="">🎬 Pumili ng Channel</option>
+            </select>
+            <button onclick="playSelectedChannel()">▶️ Play Channel</button>
+            <button onclick="showChannelList()">📋 Show All Channels</button>
+            <button onclick="testHLS()">🧪 Test HLS Stream</button>
+        </div>
+
         <div id="channel-list" class="channel-list" style="display: none;">
-            <!-- Channel list will be populated here -->
+            <!-- Channels will be listed here -->
         </div>
     </div>
 
     <script>
-        // M3U playlist data
-        const m3uPlaylist = `#EXTM3U
-#EXTINF:-1 tvg-id="1143" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png" group-title="WesleyVanneck",GTV
-#KODIPROP:inputstream.adaptive.manifest_type=mpd
-#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
-#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
-https://converse.nathcreqtives.com/1143/manifest.mpd
-#EXTINF:-1 tvg-id="1088" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134335547.png" group-title="WesleyVanneck",TV5
-#KODIPROP:inputstream.adaptive.manifest_type=mpd
-#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
-#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
-https://converse.nathcreqtives.com/1088/manifest.mpd
-#EXTINF:-1 tvg-id="1093" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126306082.png" group-title="WesleyVanneck",GMA 7
-#KODIPROP:inputstream.adaptive.manifest_type=mpd
-#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
-#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
-https://converse.nathcreqtives.com/1093/manifest.mpd
-#EXTINF:-1 group-title="WesleyVanneck",Heart Of Asia
-http://hls.nathcreqtives.com/playlist.m3u8?id=1
-#EXTINF:-1 group-title="WesleyVanneck",I Heart Movies
-http://hls.nathcreqtives.com/playlist.m3u8?id=2`;
-
-        let channels = [];
-        let currentChannelIndex = -1;
-        let shakaPlayer = null;
-
-        // Parse M3U playlist
-        function parseM3U(playlist) {
-            const lines = playlist.split('\n');
-            const channels = [];
-            let currentChannel = {};
-            
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                
-                if (line.startsWith('#EXTINF:')) {
-                    currentChannel = {
-                        name: '',
-                        tvgId: '',
-                        tvgLogo: '',
-                        groupTitle: 'WesleyVanneck',
-                        url: '',
-                        licenseKey: 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00',
-                        manifestType: 'mpd',
-                        licenseType: 'com.widevine.alpha',
-                        type: 'dash' // default to DASH
-                    };
-                    
-                    const info = line.substring(8);
-                    const commaIndex = info.indexOf(',');
-                    if (commaIndex !== -1) {
-                        currentChannel.name = info.substring(commaIndex + 1);
-                        
-                        // Extract attributes
-                        const attributes = info.substring(0, commaIndex);
-                        const tvgIdMatch = attributes.match(/tvg-id="([^"]*)"/);
-                        const tvgLogoMatch = attributes.match(/tvg-logo="([^"]*)"/);
-                        const groupTitleMatch = attributes.match(/group-title="([^"]*)"/);
-                        
-                        if (tvgIdMatch) currentChannel.tvgId = tvgIdMatch[1];
-                        if (tvgLogoMatch) currentChannel.tvgLogo = tvgLogoMatch[1];
-                        if (groupTitleMatch) currentChannel.groupTitle = groupTitleMatch[1];
-                    }
-                } 
-                else if (line.startsWith('#KODIPROP:inputstream.adaptive.license_key=')) {
-                    currentChannel.licenseKey = line.substring(42);
-                }
-                else if (line.startsWith('#KODIPROP:inputstream.adaptive.manifest_type=')) {
-                    currentChannel.manifestType = line.substring(42);
-                }
-                else if (line.startsWith('#KODIPROP:inputstream.adaptive.license_type=')) {
-                    currentChannel.licenseType = line.substring(42);
-                }
-                else if (line.startsWith('https://') || line.startsWith('http://')) {
-                    currentChannel.url = line;
-                    
-                    // Determine stream type
-                    if (line.includes('.mpd')) {
-                        currentChannel.type = 'dash';
-                    } else if (line.includes('.m3u8')) {
-                        currentChannel.type = 'hls';
-                    }
-                    
-                    channels.push(currentChannel);
-                    currentChannel = {};
-                }
+        // Simple channel list - direct streaming approach
+        const channels = [
+            {
+                name: "Heart Of Asia (HLS Test)",
+                url: "http://hls.nathcreqtives.com/playlist.m3u8?id=1",
+                type: "hls",
+                logo: "https://via.placeholder.com/40/3498db/ffffff?text=H"
+            },
+            {
+                name: "I Heart Movies (HLS Test)", 
+                url: "http://hls.nathcreqtives.com/playlist.m3u8?id=2",
+                type: "hls",
+                logo: "https://via.placeholder.com/40/e74c3c/ffffff?text=I"
+            },
+            {
+                name: "GMA 7",
+                url: "https://converse.nathcreqtives.com/1093/manifest.mpd",
+                type: "dash",
+                logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126306082.png"
+            },
+            {
+                name: "TV5",
+                url: "https://converse.nathcreqtives.com/1088/manifest.mpd",
+                type: "dash", 
+                logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134335547.png"
+            },
+            {
+                name: "GTV",
+                url: "https://converse.nathcreqtives.com/1143/manifest.mpd",
+                type: "dash",
+                logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png"
             }
+        ];
+
+        let currentChannel = null;
+
+        // Initialize the player
+        function initializePlayer() {
+            const video = document.getElementById('video');
+            const status = document.getElementById('status');
             
-            return channels;
-        }
-
-        // Initialize Shaka Player
-        async function initShakaPlayer() {
             try {
-                const video = document.getElementById('video');
-                
-                // Check if Shaka is available
-                if (!shaka || !shaka.Player.isBrowserSupported()) {
-                    throw new Error('Shaka Player not supported in this browser');
+                // Check basic video support
+                if (!video.canPlayType) {
+                    throw new Error('Browser does not support video playback');
                 }
-
-                // Create new player instance
-                shakaPlayer = new shaka.Player(video);
                 
-                // Configure for better compatibility
-                shakaPlayer.configure({
-                    drm: {
-                        servers: {
-                            'com.widevine.alpha': 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00'
-                        }
-                    },
-                    streaming: {
-                        bufferingGoal: 30,
-                        rebufferingGoal: 10,
-                        bufferBehind: 30,
-                        ignoreTextStreamFailures: true,
-                        smallGapLimit: 2.0,
-                        jumpLargeGaps: true
-                    },
-                    manifest: {
-                        dash: {
-                            ignoreMinBufferTime: true,
-                            autoCorrectDrift: true
-                        }
-                    }
-                });
-
-                // Listen for events
-                shakaPlayer.addEventListener('error', onErrorEvent);
-                shakaPlayer.addEventListener('loading', () => updateStatus('Naglo-load...', 'loading'));
-                shakaPlayer.addEventListener('loaded', () => updateStatus('Naka-load na', 'loading'));
-                shakaPlayer.addEventListener('buffering', (e) => {
-                    if (e.buffering) {
-                        updateStatus('Buffering...', 'loading');
-                    } else {
-                        updateStatus('Playing', 'playing');
-                    }
-                });
-
-                console.log('Shaka Player initialized successfully');
-                updateStatus('Handang mag-play', 'ready');
-                return true;
+                status.className = 'status ready';
+                status.innerHTML = '✅ Player Ready - Pumili ng channel para mag-play';
+                console.log('Player initialized successfully');
+                
             } catch (error) {
-                console.error('Error initializing Shaka Player:', error);
-                updateStatus('Error sa player: ' + error.message, 'error');
-                return false;
+                status.className = 'status error';
+                status.innerHTML = '❌ Error: ' + error.message;
+                console.error('Initialization error:', error);
             }
         }
 
-        function onErrorEvent(event) {
-            console.error('Error code', event.detail.code, 'object', event.detail);
-            updateStatus('Playback Error: ' + event.detail.message, 'error');
-            
-            // Try to provide more helpful error messages
-            let helpfulMessage = 'Unknown error';
-            if (event.detail.code === 1000) {
-                helpfulMessage = 'Network error - check internet connection';
-            } else if (event.detail.code === 1002) {
-                helpfulMessage = 'Video format not supported';
-            } else if (event.detail.code === 6001) {
-                helpfulMessage = 'DRM license error - may restricted content';
-            } else if (event.detail.code === 4000) {
-                helpfulMessage = 'Manifest parsing error - invalid stream';
-            }
-            
-            updateDebugInfo(`Shaka Error: ${event.detail.code} - ${helpfulMessage}`);
-        }
-
-        // Play selected channel
-        async function playChannel(channelIndex) {
-            if (channelIndex < 0 || channelIndex >= channels.length) {
-                updateStatus('Invalid channel', 'error');
-                return;
-            }
-
+        // Play a channel
+        function playChannel(channelIndex) {
             const channel = channels[channelIndex];
-            if (!channel.url) {
-                updateStatus('Walang URL ang channel na ito', 'error');
-                return;
-            }
-
+            if (!channel) return;
+            
+            const video = document.getElementById('video');
+            const status = document.getElementById('status');
+            
             try {
-                updateStatus('Inihahanda ang channel...', 'loading');
-                updateDebugInfo(`Trying to play: ${channel.name} | URL: ${channel.url} | Type: ${channel.type}`);
-
-                // Initialize player if not already done
-                if (!shakaPlayer) {
-                    const initialized = await initShakaPlayer();
-                    if (!initialized) {
-                        throw new Error('Failed to initialize player');
-                    }
-                }
-
+                status.className = 'status loading';
+                status.innerHTML = `🔄 Loading: ${channel.name}`;
+                
+                console.log('Attempting to play:', channel.name, channel.url);
+                
                 // Stop current playback
-                if (shakaPlayer && shakaPlayer.getAssetUri()) {
-                    await shakaPlayer.unload();
-                }
-
-                // Configure DRM for this specific channel
-                if (channel.licenseKey && channel.type === 'dash') {
-                    shakaPlayer.configure({
-                        drm: {
-                            servers: {
-                                'com.widevine.alpha': channel.licenseKey
-                            }
-                        }
+                video.pause();
+                video.src = '';
+                
+                // Set new source
+                video.src = channel.url;
+                
+                // Add source type for better compatibility
+                video.innerHTML = `
+                    <source src="${channel.url}" type="${channel.type === 'dash' ? 'application/dash+xml' : 'application/x-mpegURL'}">
+                    Your browser doesn't support this video format.
+                `;
+                
+                // Attempt to play
+                const playPromise = video.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        status.className = 'status ready';
+                        status.innerHTML = `✅ Now Playing: ${channel.name}`;
+                        currentChannel = channelIndex;
+                        updateChannelList();
+                        console.log('Playback started successfully');
+                    }).catch(error => {
+                        status.className = 'status error';
+                        status.innerHTML = `❌ Playback Error: ${error.message}`;
+                        console.error('Playback failed:', error);
                     });
                 }
-
-                // Load the stream
-                updateStatus('Kinokonekta sa stream...', 'loading');
-                await shakaPlayer.load(channel.url);
                 
-                currentChannelIndex = channelIndex;
-                updateStatus(`Now Playing: ${channel.name}`, 'playing');
-                updateChannelListUI();
-                document.getElementById('channel-select').value = channelIndex;
-                document.getElementById('current-channel').textContent = channel.name;
-                document.getElementById('current-channel').className = '';
-
-                console.log(`Successfully playing: ${channel.name}`);
-                updateDebugInfo(`Playing: ${channel.name} successfully`);
-
             } catch (error) {
-                console.error('Error loading channel:', error);
-                updateStatus('Error: ' + error.message, 'error');
-                updateDebugInfo(`Load Error: ${error.message}`);
-                
-                // Try alternative approach for HLS streams
-                if (channel.type === 'hls' || channel.url.includes('.m3u8')) {
-                    tryHlsFallback(channel);
-                }
+                status.className = 'status error';
+                status.innerHTML = `❌ Error: ${error.message}`;
+                console.error('Channel play error:', error);
             }
         }
 
-        // Fallback for HLS streams
-        function tryHlsFallback(channel) {
-            updateDebugInfo('Trying HLS fallback...');
-            const video = document.getElementById('video');
-            
-            // Try using native HLS support
-            video.src = channel.url;
-            video.load();
-            
-            video.play().then(() => {
-                updateStatus(`Playing (HLS): ${channel.name}`, 'playing');
-            }).catch(error => {
-                updateStatus('HLS fallback failed: ' + error.message, 'error');
-            });
-        }
-
-        // Stop playback
-        function stopPlayback() {
-            if (shakaPlayer) {
-                shakaPlayer.unload();
-            }
-            
-            const video = document.getElementById('video');
-            video.src = '';
-            video.load();
-            
-            updateStatus('Naka-stop', 'stopped');
-            document.getElementById('current-channel').textContent = 'Walang channel na pinapanood';
-            document.getElementById('current-channel').className = 'loading';
-            currentChannelIndex = -1;
-            updateChannelListUI();
-        }
-
-        // Update status display
-        function updateStatus(message, type) {
-            const statusEl = document.getElementById('status');
-            statusEl.textContent = message;
-            statusEl.style.display = 'block';
-            statusEl.className = 'status';
-            
-            if (type === 'playing') {
-                statusEl.classList.add('playing');
-            } else if (type === 'error') {
-                statusEl.style.background = '#e74c3c';
-            } else if (type === 'loading') {
-                statusEl.style.background = '#f39c12';
-            } else if (type === 'ready') {
-                statusEl.style.background = '#27ae60';
-            }
-        }
-
-        // Update debug info
-        function updateDebugInfo(info) {
-            const debugEl = document.getElementById('debug-info');
-            debugEl.textContent = 'Debug: ' + info;
-            console.log('Debug:', info);
-        }
-
-        // Populate channel lists
-        function populateChannelList() {
-            const select = document.getElementById('channel-select');
-            const channelList = document.getElementById('channel-list');
-            
-            select.innerHTML = '<option value="">Pumili ng Channel</option>';
-            channelList.innerHTML = '';
-            
-            let currentGroup = '';
-            
-            channels.forEach((channel, index) => {
-                // Add to select dropdown
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = channel.name;
-                select.appendChild(option);
-                
-                // Add to channel list
-                if (channel.groupTitle !== currentGroup) {
-                    currentGroup = channel.groupTitle;
-                    const groupTitle = document.createElement('div');
-                    groupTitle.className = 'group-title';
-                    groupTitle.textContent = currentGroup;
-                    channelList.appendChild(groupTitle);
-                }
-                
-                const channelItem = document.createElement('div');
-                channelItem.className = 'channel-item';
-                
-                if (channel.tvgLogo) {
-                    const img = document.createElement('img');
-                    img.src = channel.tvgLogo;
-                    img.alt = '';
-                    img.className = 'channel-logo';
-                    img.onerror = function() {
-                        this.style.display = 'none';
-                    };
-                    channelItem.appendChild(img);
-                }
-                
-                const channelName = document.createElement('span');
-                channelName.textContent = channel.name;
-                channelItem.appendChild(channelName);
-                
-                channelItem.onclick = () => playChannel(index);
-                channelList.appendChild(channelItem);
-            });
-        }
-
-        function updateChannelListUI() {
-            const channelItems = document.querySelectorAll('.channel-item');
-            channelItems.forEach((item, index) => {
-                if (index === currentChannelIndex) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-        }
-
+        // Play selected channel from dropdown
         function playSelectedChannel() {
             const select = document.getElementById('channel-select');
             const channelIndex = parseInt(select.value);
@@ -505,45 +263,100 @@ http://hls.nathcreqtives.com/playlist.m3u8?id=2`;
             }
         }
 
-        function toggleChannelList() {
-            const channelList = document.getElementById('channel-list');
-            channelList.style.display = channelList.style.display === 'none' ? 'block' : 'none';
+        // Show channel list
+        function showChannelList() {
+            const list = document.getElementById('channel-list');
+            if (list.style.display === 'none') {
+                list.style.display = 'block';
+                populateChannelList();
+            } else {
+                list.style.display = 'none';
+            }
         }
 
-        function toggleDebug() {
-            const debugEl = document.getElementById('debug-info');
-            debugEl.style.display = debugEl.style.display === 'none' ? 'block' : 'none';
-        }
-
-        // Test stream function
-        function testStream(url) {
-            updateDebugInfo('Testing stream: ' + url);
-            const video = document.getElementById('video');
-            video.src = url;
-            video.load();
-            video.play().catch(error => {
-                updateDebugInfo('Stream test failed: ' + error.message);
+        // Populate channel lists
+        function populateChannelList() {
+            const select = document.getElementById('channel-select');
+            const list = document.getElementById('channel-list');
+            
+            // Clear existing
+            select.innerHTML = '<option value="">🎬 Pumili ng Channel</option>';
+            list.innerHTML = '';
+            
+            // Add channels to both select and list
+            channels.forEach((channel, index) => {
+                // Add to dropdown
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = channel.name;
+                select.appendChild(option);
+                
+                // Add to list
+                const item = document.createElement('div');
+                item.className = 'channel-item' + (index === currentChannel ? ' active' : '');
+                item.innerHTML = `
+                    <img src="${channel.logo}" alt="" class="channel-logo" onerror="this.src='https://via.placeholder.com/40/95a5a6/ffffff?text=TV'">
+                    <span>${channel.name}</span>
+                    <small style="margin-left: auto; opacity: 0.7;">${channel.type.toUpperCase()}</small>
+                `;
+                item.onclick = () => playChannel(index);
+                list.appendChild(item);
             });
         }
 
-        // Initialize everything
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Parse playlist
-            channels = parseM3U(m3uPlaylist);
-            console.log('Parsed channels:', channels);
+        // Update channel list highlighting
+        function updateChannelList() {
+            const items = document.querySelectorAll('.channel-item');
+            items.forEach((item, index) => {
+                item.className = 'channel-item' + (index === currentChannel ? ' active' : '');
+            });
+        }
+
+        // Test HLS stream (simpler approach)
+        function testHLS() {
+            const testUrl = "http://hls.nathcreqtives.com/playlist.m3u8?id=1";
+            const status = document.getElementById('status');
+            const video = document.getElementById('video');
             
-            // Populate UI
+            status.className = 'status loading';
+            status.innerHTML = '🧪 Testing HLS Stream...';
+            
+            video.src = testUrl;
+            video.load();
+            
+            video.play().then(() => {
+                status.className = 'status ready';
+                status.innerHTML = '✅ HLS Test Successful!';
+            }).catch(error => {
+                status.className = 'status error';
+                status.innerHTML = '❌ HLS Test Failed: ' + error.message;
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePlayer();
             populateChannelList();
             
-            // Initialize player
-            await initShakaPlayer();
-            
-            // Auto-play first channel after a delay
+            // Auto-play first channel after 2 seconds
             setTimeout(() => {
                 if (channels.length > 0) {
                     playChannel(0);
                 }
-            }, 1000);
+            }, 2000);
+        });
+
+        // Error handling for video element
+        document.getElementById('video').addEventListener('error', function(e) {
+            const status = document.getElementById('status');
+            status.className = 'status error';
+            status.innerHTML = '❌ Video Error - May problema sa stream';
+            console.error('Video error:', e);
+        });
+
+        // Load event for successful playback
+        document.getElementById('video').addEventListener('loadeddata', function() {
+            console.log('Video data loaded successfully');
         });
     </script>
 </body>
