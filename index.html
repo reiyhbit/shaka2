@@ -24,6 +24,7 @@
         #video-container {
             width: 100%;
             background: black;
+            position: relative;
         }
         #video {
             width: 100%;
@@ -36,6 +37,7 @@
             align-items: center;
             background: #2c3e50;
             color: white;
+            flex-wrap: wrap;
         }
         .channel-list {
             max-height: 400px;
@@ -48,6 +50,9 @@
             border-bottom: 1px solid #4a6278;
             cursor: pointer;
             transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         .channel-item:hover {
             background: #4a6278;
@@ -56,6 +61,12 @@
             background: #3498db;
             font-weight: bold;
         }
+        .channel-logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
         select, button {
             padding: 8px 12px;
             border: none;
@@ -63,9 +74,14 @@
             background: #3498db;
             color: white;
             cursor: pointer;
+            min-width: 120px;
         }
         button:hover {
             background: #2980b9;
+        }
+        button:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
         }
         .group-title {
             background: #2c3e50;
@@ -74,24 +90,51 @@
             color: #ecf0f1;
             border-bottom: 2px solid #3498db;
         }
+        .status {
+            padding: 10px;
+            background: #e74c3c;
+            color: white;
+            text-align: center;
+            display: none;
+        }
+        .status.playing {
+            background: #27ae60;
+        }
+        .debug-info {
+            padding: 10px;
+            background: #f39c12;
+            color: white;
+            font-size: 12px;
+            display: none;
+        }
+        .loading {
+            color: #3498db;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div id="status" class="status">Hindi nakakonekta</div>
+        <div id="debug-info" class="debug-info"></div>
+        
         <div class="controls">
             <select id="channel-select">
                 <option value="">Pumili ng Channel</option>
-                <!-- Channels will be populated here -->
             </select>
-            <button onclick="playSelectedChannel()">Play</button>
+            <button onclick="playSelectedChannel()" id="play-btn">Play</button>
+            <button onclick="stopPlayback()" id="stop-btn">Stop</button>
             <button onclick="toggleChannelList()">Ipakita/Itago Channel List</button>
+            <button onclick="toggleDebug()">Debug Info</button>
+            <span id="current-channel" class="loading">Walang channel na pinapanood</span>
         </div>
         
         <div id="video-container">
             <video id="video"
                    controls
                    autoplay
-                   crossorigin="anonymous">
+                   crossorigin="anonymous"
+                   playsinline>
             </video>
         </div>
         
@@ -118,41 +161,6 @@ https://converse.nathcreqtives.com/1088/manifest.mpd
 #KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
 #KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
 https://converse.nathcreqtives.com/1093/manifest.mpd
-#EXTINF:-1 tvg-id="1094" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133873954.png" group-title="WesleyVanneck",RPTV
-#KODIPROP:inputstream.adaptive.manifest_type=mpd
-#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
-#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
-https://converse.nathcreqtives.com/1094/manifest.mpd
-#EXTINF:-1 tvg-id="1086" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133792284.png" group-title="WesleyVanneck",PTV
-#KODIPROP:inputstream.adaptive.manifest_type=mpd
-#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
-#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
-https://converse.nathcreqtives.com/1086/manifest.mpd
-#EXTINF:-1 tvg-id="1078" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723612823404.png" group-title="WesleyVanneck",PBO
-#KODIPROP:inputstream.adaptive.manifest_type=mpd
-#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
-#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
-https://converse.nathcreqtives.com/1078/manifest.mpd
-#EXTINF:-1 tvg-id="1089" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723128890006.png" group-title="WesleyVanneck",IBC 13
-#KODIPROP:inputstream.adaptive.manifest_type=mpd
-#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
-#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
-https://converse.nathcreqtives.com/1089/manifest.mpd
-#EXTINF:-1 tvg-id="1091" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134409636.png" group-title="WesleyVanneck",UNTV
-#KODIPROP:inputstream.adaptive.manifest_type=mpd
-#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
-#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
-https://converse.nathcreqtives.com/1091/manifest.mpd
-#EXTINF:-1 tvg-id="1340" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723604992973.png" group-title="WesleyVanneck",KNOWLEDGE CHANNEL
-#KODIPROP:inputstream.adaptive.manifest_type=mpd
-#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
-#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
-https://converse.nathcreqtives.com/1340/manifest.mpd
-#EXTINF:-1 tvg-id="1250" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723128953472.png" group-title="WesleyVanneck",JEEPNEY TV
-#KODIPROP:inputstream.adaptive.manifest_type=mpd
-#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
-#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
-https://converse.nathcreqtives.com/1250/manifest.mpd
 #EXTINF:-1 group-title="WesleyVanneck",Heart Of Asia
 http://hls.nathcreqtives.com/playlist.m3u8?id=1
 #EXTINF:-1 group-title="WesleyVanneck",I Heart Movies
@@ -160,6 +168,7 @@ http://hls.nathcreqtives.com/playlist.m3u8?id=2`;
 
         let channels = [];
         let currentChannelIndex = -1;
+        let shakaPlayer = null;
 
         // Parse M3U playlist
         function parseM3U(playlist) {
@@ -171,27 +180,33 @@ http://hls.nathcreqtives.com/playlist.m3u8?id=2`;
                 const line = lines[i].trim();
                 
                 if (line.startsWith('#EXTINF:')) {
-                    // Parse EXTINF line
-                    const info = line.substring(8);
-                    const parts = info.split(',');
-                    const attributes = parts[0];
-                    const name = parts[1];
-                    
-                    // Extract attributes
-                    const tvgIdMatch = attributes.match(/tvg-id="([^"]*)"/);
-                    const tvgLogoMatch = attributes.match(/tvg-logo="([^"]*)"/);
-                    const groupTitleMatch = attributes.match(/group-title="([^"]*)"/);
-                    
                     currentChannel = {
-                        name: name,
-                        tvgId: tvgIdMatch ? tvgIdMatch[1] : '',
-                        tvgLogo: tvgLogoMatch ? tvgLogoMatch[1] : '',
-                        groupTitle: groupTitleMatch ? groupTitleMatch[1] : 'WesleyVanneck',
+                        name: '',
+                        tvgId: '',
+                        tvgLogo: '',
+                        groupTitle: 'WesleyVanneck',
                         url: '',
-                        licenseKey: '',
+                        licenseKey: 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00',
                         manifestType: 'mpd',
-                        licenseType: 'com.widevine.alpha'
+                        licenseType: 'com.widevine.alpha',
+                        type: 'dash' // default to DASH
                     };
+                    
+                    const info = line.substring(8);
+                    const commaIndex = info.indexOf(',');
+                    if (commaIndex !== -1) {
+                        currentChannel.name = info.substring(commaIndex + 1);
+                        
+                        // Extract attributes
+                        const attributes = info.substring(0, commaIndex);
+                        const tvgIdMatch = attributes.match(/tvg-id="([^"]*)"/);
+                        const tvgLogoMatch = attributes.match(/tvg-logo="([^"]*)"/);
+                        const groupTitleMatch = attributes.match(/group-title="([^"]*)"/);
+                        
+                        if (tvgIdMatch) currentChannel.tvgId = tvgIdMatch[1];
+                        if (tvgLogoMatch) currentChannel.tvgLogo = tvgLogoMatch[1];
+                        if (groupTitleMatch) currentChannel.groupTitle = groupTitleMatch[1];
+                    }
                 } 
                 else if (line.startsWith('#KODIPROP:inputstream.adaptive.license_key=')) {
                     currentChannel.licenseKey = line.substring(42);
@@ -202,9 +217,16 @@ http://hls.nathcreqtives.com/playlist.m3u8?id=2`;
                 else if (line.startsWith('#KODIPROP:inputstream.adaptive.license_type=')) {
                     currentChannel.licenseType = line.substring(42);
                 }
-                else if (line.startsWith('http')) {
-                    // This is the URL line
+                else if (line.startsWith('https://') || line.startsWith('http://')) {
                     currentChannel.url = line;
+                    
+                    // Determine stream type
+                    if (line.includes('.mpd')) {
+                        currentChannel.type = 'dash';
+                    } else if (line.includes('.m3u8')) {
+                        currentChannel.type = 'hls';
+                    }
+                    
                     channels.push(currentChannel);
                     currentChannel = {};
                 }
@@ -215,69 +237,211 @@ http://hls.nathcreqtives.com/playlist.m3u8?id=2`;
 
         // Initialize Shaka Player
         async function initShakaPlayer() {
-            const video = document.getElementById('video');
-            const player = new shaka.Player(video);
-            
-            // Listen for error events
-            player.addEventListener('error', onErrorEvent);
-            
-            window.shakaPlayer = player;
-            console.log('Shaka Player initialized successfully');
+            try {
+                const video = document.getElementById('video');
+                
+                // Check if Shaka is available
+                if (!shaka || !shaka.Player.isBrowserSupported()) {
+                    throw new Error('Shaka Player not supported in this browser');
+                }
+
+                // Create new player instance
+                shakaPlayer = new shaka.Player(video);
+                
+                // Configure for better compatibility
+                shakaPlayer.configure({
+                    drm: {
+                        servers: {
+                            'com.widevine.alpha': 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00'
+                        }
+                    },
+                    streaming: {
+                        bufferingGoal: 30,
+                        rebufferingGoal: 10,
+                        bufferBehind: 30,
+                        ignoreTextStreamFailures: true,
+                        smallGapLimit: 2.0,
+                        jumpLargeGaps: true
+                    },
+                    manifest: {
+                        dash: {
+                            ignoreMinBufferTime: true,
+                            autoCorrectDrift: true
+                        }
+                    }
+                });
+
+                // Listen for events
+                shakaPlayer.addEventListener('error', onErrorEvent);
+                shakaPlayer.addEventListener('loading', () => updateStatus('Naglo-load...', 'loading'));
+                shakaPlayer.addEventListener('loaded', () => updateStatus('Naka-load na', 'loading'));
+                shakaPlayer.addEventListener('buffering', (e) => {
+                    if (e.buffering) {
+                        updateStatus('Buffering...', 'loading');
+                    } else {
+                        updateStatus('Playing', 'playing');
+                    }
+                });
+
+                console.log('Shaka Player initialized successfully');
+                updateStatus('Handang mag-play', 'ready');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Shaka Player:', error);
+                updateStatus('Error sa player: ' + error.message, 'error');
+                return false;
+            }
         }
 
         function onErrorEvent(event) {
-            // Extract the shaka.util.Error object from the event
             console.error('Error code', event.detail.code, 'object', event.detail);
-            alert('Error playing video: ' + event.detail.message);
+            updateStatus('Playback Error: ' + event.detail.message, 'error');
+            
+            // Try to provide more helpful error messages
+            let helpfulMessage = 'Unknown error';
+            if (event.detail.code === 1000) {
+                helpfulMessage = 'Network error - check internet connection';
+            } else if (event.detail.code === 1002) {
+                helpfulMessage = 'Video format not supported';
+            } else if (event.detail.code === 6001) {
+                helpfulMessage = 'DRM license error - may restricted content';
+            } else if (event.detail.code === 4000) {
+                helpfulMessage = 'Manifest parsing error - invalid stream';
+            }
+            
+            updateDebugInfo(`Shaka Error: ${event.detail.code} - ${helpfulMessage}`);
         }
 
         // Play selected channel
         async function playChannel(channelIndex) {
-            if (!window.shakaPlayer) {
-                await initShakaPlayer();
+            if (channelIndex < 0 || channelIndex >= channels.length) {
+                updateStatus('Invalid channel', 'error');
+                return;
             }
-            
+
             const channel = channels[channelIndex];
-            if (!channel) return;
-            
+            if (!channel.url) {
+                updateStatus('Walang URL ang channel na ito', 'error');
+                return;
+            }
+
             try {
-                // Configure DRM
-                const drmConfig = {
-                    servers: {
-                        'com.widevine.alpha': channel.licenseKey
+                updateStatus('Inihahanda ang channel...', 'loading');
+                updateDebugInfo(`Trying to play: ${channel.name} | URL: ${channel.url} | Type: ${channel.type}`);
+
+                // Initialize player if not already done
+                if (!shakaPlayer) {
+                    const initialized = await initShakaPlayer();
+                    if (!initialized) {
+                        throw new Error('Failed to initialize player');
                     }
-                };
-                
-                window.shakaPlayer.configure({
-                    drm: drmConfig,
-                    manifest: {
-                        dash: {
-                            ignoreMinBufferTime: true
+                }
+
+                // Stop current playback
+                if (shakaPlayer && shakaPlayer.getAssetUri()) {
+                    await shakaPlayer.unload();
+                }
+
+                // Configure DRM for this specific channel
+                if (channel.licenseKey && channel.type === 'dash') {
+                    shakaPlayer.configure({
+                        drm: {
+                            servers: {
+                                'com.widevine.alpha': channel.licenseKey
+                            }
                         }
-                    }
-                });
+                    });
+                }
+
+                // Load the stream
+                updateStatus('Kinokonekta sa stream...', 'loading');
+                await shakaPlayer.load(channel.url);
                 
-                // Load the manifest
-                await window.shakaPlayer.load(channel.url);
                 currentChannelIndex = channelIndex;
-                
-                // Update UI
+                updateStatus(`Now Playing: ${channel.name}`, 'playing');
                 updateChannelListUI();
                 document.getElementById('channel-select').value = channelIndex;
-                
-                console.log(`Now playing: ${channel.name}`);
+                document.getElementById('current-channel').textContent = channel.name;
+                document.getElementById('current-channel').className = '';
+
+                console.log(`Successfully playing: ${channel.name}`);
+                updateDebugInfo(`Playing: ${channel.name} successfully`);
+
             } catch (error) {
                 console.error('Error loading channel:', error);
-                alert('Error loading channel: ' + error.message);
+                updateStatus('Error: ' + error.message, 'error');
+                updateDebugInfo(`Load Error: ${error.message}`);
+                
+                // Try alternative approach for HLS streams
+                if (channel.type === 'hls' || channel.url.includes('.m3u8')) {
+                    tryHlsFallback(channel);
+                }
             }
         }
 
-        // Populate channel select and list
+        // Fallback for HLS streams
+        function tryHlsFallback(channel) {
+            updateDebugInfo('Trying HLS fallback...');
+            const video = document.getElementById('video');
+            
+            // Try using native HLS support
+            video.src = channel.url;
+            video.load();
+            
+            video.play().then(() => {
+                updateStatus(`Playing (HLS): ${channel.name}`, 'playing');
+            }).catch(error => {
+                updateStatus('HLS fallback failed: ' + error.message, 'error');
+            });
+        }
+
+        // Stop playback
+        function stopPlayback() {
+            if (shakaPlayer) {
+                shakaPlayer.unload();
+            }
+            
+            const video = document.getElementById('video');
+            video.src = '';
+            video.load();
+            
+            updateStatus('Naka-stop', 'stopped');
+            document.getElementById('current-channel').textContent = 'Walang channel na pinapanood';
+            document.getElementById('current-channel').className = 'loading';
+            currentChannelIndex = -1;
+            updateChannelListUI();
+        }
+
+        // Update status display
+        function updateStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.style.display = 'block';
+            statusEl.className = 'status';
+            
+            if (type === 'playing') {
+                statusEl.classList.add('playing');
+            } else if (type === 'error') {
+                statusEl.style.background = '#e74c3c';
+            } else if (type === 'loading') {
+                statusEl.style.background = '#f39c12';
+            } else if (type === 'ready') {
+                statusEl.style.background = '#27ae60';
+            }
+        }
+
+        // Update debug info
+        function updateDebugInfo(info) {
+            const debugEl = document.getElementById('debug-info');
+            debugEl.textContent = 'Debug: ' + info;
+            console.log('Debug:', info);
+        }
+
+        // Populate channel lists
         function populateChannelList() {
             const select = document.getElementById('channel-select');
             const channelList = document.getElementById('channel-list');
             
-            // Clear existing options
             select.innerHTML = '<option value="">Pumili ng Channel</option>';
             channelList.innerHTML = '';
             
@@ -301,13 +465,27 @@ http://hls.nathcreqtives.com/playlist.m3u8?id=2`;
                 
                 const channelItem = document.createElement('div');
                 channelItem.className = 'channel-item';
-                channelItem.textContent = channel.name;
+                
+                if (channel.tvgLogo) {
+                    const img = document.createElement('img');
+                    img.src = channel.tvgLogo;
+                    img.alt = '';
+                    img.className = 'channel-logo';
+                    img.onerror = function() {
+                        this.style.display = 'none';
+                    };
+                    channelItem.appendChild(img);
+                }
+                
+                const channelName = document.createElement('span');
+                channelName.textContent = channel.name;
+                channelItem.appendChild(channelName);
+                
                 channelItem.onclick = () => playChannel(index);
                 channelList.appendChild(channelItem);
             });
         }
 
-        // Update channel list UI to show current playing channel
         function updateChannelListUI() {
             const channelItems = document.querySelectorAll('.channel-item');
             channelItems.forEach((item, index) => {
@@ -319,7 +497,6 @@ http://hls.nathcreqtives.com/playlist.m3u8?id=2`;
             });
         }
 
-        // Play selected channel from dropdown
         function playSelectedChannel() {
             const select = document.getElementById('channel-select');
             const channelIndex = parseInt(select.value);
@@ -328,32 +505,45 @@ http://hls.nathcreqtives.com/playlist.m3u8?id=2`;
             }
         }
 
-        // Toggle channel list visibility
         function toggleChannelList() {
             const channelList = document.getElementById('channel-list');
-            if (channelList.style.display === 'none') {
-                channelList.style.display = 'block';
-            } else {
-                channelList.style.display = 'none';
-            }
+            channelList.style.display = channelList.style.display === 'none' ? 'block' : 'none';
         }
 
-        // Initialize everything when page loads
+        function toggleDebug() {
+            const debugEl = document.getElementById('debug-info');
+            debugEl.style.display = debugEl.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Test stream function
+        function testStream(url) {
+            updateDebugInfo('Testing stream: ' + url);
+            const video = document.getElementById('video');
+            video.src = url;
+            video.load();
+            video.play().catch(error => {
+                updateDebugInfo('Stream test failed: ' + error.message);
+            });
+        }
+
+        // Initialize everything
         document.addEventListener('DOMContentLoaded', async function() {
-            // Parse the M3U playlist
+            // Parse playlist
             channels = parseM3U(m3uPlaylist);
             console.log('Parsed channels:', channels);
             
-            // Populate channel lists
+            // Populate UI
             populateChannelList();
             
-            // Initialize Shaka Player
+            // Initialize player
             await initShakaPlayer();
             
-            // Auto-play first channel
-            if (channels.length > 0) {
-                playChannel(0);
-            }
+            // Auto-play first channel after a delay
+            setTimeout(() => {
+                if (channels.length > 0) {
+                    playChannel(0);
+                }
+            }, 1000);
         });
     </script>
 </body>
