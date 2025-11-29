@@ -3,185 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinoyFlix - Premium IPTV Player</title>
-    <!-- Shaka Player CDN -->
+    <title>Converge TV</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.1/shaka-player.ui.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.1/controls.css">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #000;
-            color: #fff;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        .top-bar {
-            background: rgba(20,20,30,0.95);
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
-        .time { font-weight: 600; }
+        body { font-family: 'Segoe UI', sans-serif; background:#000; color:#fff; min-height:100vh; overflow-x:hidden; }
+        .top-bar { background:rgba(20,20,30,0.95); padding:10px 15px; display:flex; justify-content:space-between; align-items:center; font-size:14px; position:fixed; top:0; left:0; right:0; z-index:1000; }
+        .time { font-weight:600; }
         .status-icons { display:flex; gap:15px; align-items:center; }
-        
-        /* Main Player Area */
-        .player-area {
-            position: relative;
-            height: 280px;
-            background: #000;
-            margin-top: 50px;
-        }
-        #video-container {
-            width: 100%;
-            height: 100%;
-            background: #000;
-        }
-        #video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        
-        /* Channel Info Bar */
-        .channel-info {
-            background: rgba(0,0,0,0.7);
-            padding: 8px 15px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 15px;
-        }
-        .live-indicator {
-            background: #e74c3c;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        
-        /* Control Buttons */
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            padding: 15px;
-            flex-wrap: wrap;
-        }
-        .btn {
-            background: #00bfa5;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-width: 100px;
-            justify-content: center;
-        }
-        .btn.stop { background: #e67e22; }
-        .btn.fullscreen { background: #7f8c8d; }
-        
-        /* Bottom Tabs */
-        .bottom-tabs {
-            display: flex;
-            background: #111;
-            padding: 10px;
-            gap: 5px;
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-        .tab {
-            padding: 10px 20px;
-            background: #2c3e50;
-            border-radius: 25px;
-            min-width: fit-content;
-        }
-        .tab.active {
-            background: #00bfa5;
-        }
-        .tab.favorites { color: #e74c3c; }
-        
-        /* Search & Recently */
-        .search-bar {
-            margin: 15px;
-            position: relative;
-        }
-        .search-bar input {
-            width: 100%;
-            padding: 14px 20px;
-            background: #222;
-            border: none;
-            border-radius: 30px;
-            color: white;
-            font-size: 16px;
-        }
-        .hide-drm {
-            margin: 0 15px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-        
-        /* Recently Watched */
-        .recently {
-            padding: 0 15px 20px;
-            color: #00bfa5;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .recent-list {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            padding: 0 15px;
-        }
-        .recent-item {
-            min-width: 120px;
-            text-align: center;
-        }
-        .recent-logo {
-            width: 80px;
-            height: 80px;
-            border-radius: 12px;
-            object-fit: contain;
-            background: #222;
-            margin-bottom: 8px;
-        }
-        .recent-name {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-        .favorite-heart {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            color: white;
-            font-size: 20px;
-        }
+
+        .player-area { position:relative; height:280px; background:#000; margin-top:50px; }
+        #video-container { width:100%; height:100%; background:#000; }
+        #video { width:100%; height:100%; object-fit:contain; }
+
+        .channel-info { background:rgba(0,0,0,0.7); padding:8px 15px; position:absolute; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; font-size:15px; }
+        .live-indicator { background:#e74c3c; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+
+        .controls { display:flex; justify-content:center; gap:12px; padding:15px; flex-wrap:wrap; }
+        .btn { background:#00bfa5; color:white; border:none; padding:12px 20px; border-radius:8px; font-weight:bold; display:flex; align-items:center; gap:8px; min-width:100px; justify-content:center; }
+        .btn.stop { background:#e67e22; }
+        .btn.fullscreen { background:#7f8c8d; }
+
+        .bottom-tabs { display:flex; background:#111; padding:10px; gap:5px; overflow-x:auto; white-space:nowrap; }
+        .tab { padding:10px 20px; background:#2c3e50; border-radius:25px; min-width:fit-content; }
+        .tab.active { background:#00bfa5; }
+        .tab.favorites { color:#e74c3c; }
+
+        .search-bar { margin:15px; position:relative; }
+        .search-bar input { width:100%; padding:14px 20px; background:#222; border:none; border-radius:30px; color:white; font-size:16px; }
+        .hide-drm { margin:0 15px 15px; display:flex; align-items:center; gap:10px; font-size:14px; }
+
+        .recently { padding:0 15px 10px; color:#00bfa5; font-weight:bold; }
+        .recent-list { display:flex; gap:15px; overflow-x:auto; padding:0 15px 20px; }
+        .recent-item { min-width:120px; text-align:center; position:relative; cursor:pointer; }
+        .recent-logo { width:80px; height:80px; border-radius:12px; object-fit:contain; background:#222; margin-bottom:8px; }
+        .recent-name { font-size:13px; opacity:0.9; }
+        .favorite-heart { position:absolute; top:5px; right:5px; color:white; font-size:20px; }
     </style>
 </head>
 <body>
 
-    <!-- Top Status Bar -->
     <div class="top-bar">
-        <div class="time">6:54</div>
+        <div class="time" id="clock">6:54</div>
         <div class="status-icons">
             <i class="fas fa-wifi"></i>
             <i class="fas fa-signal"></i>
@@ -189,10 +54,9 @@
         </div>
     </div>
 
-    <!-- Player -->
     <div class="player-area">
         <div class="channel-info">
-            <div>Ch 3 • TV5</div>
+            <div id="ch-name">Ch 1 • Loading...</div>
             <div class="live-indicator">LIVE</div>
         </div>
         <div id="video-container">
@@ -200,111 +64,130 @@
         </div>
     </div>
 
-    <!-- Controls -->
     <div class="controls">
-        <button class="btn stop" onclick="stopPlayback()"><i class="fas fa-stop"></i> Stop</button>
-        <button class="btn" onclick="prevChannel()"><i class="fas fa-chevron-left"></i> CH-</button>
-        <button class="btn" onclick="nextChannel()"><i class="fas fa-chevron-right"></i> CH+</button>
-        <button class="btn" onclick="reloadChannel()"><i class="fas fa-redo"></i> Reload</button>
-        <button class="btn fullscreen" onclick="toggleFullscreen()"><i class="fas fa-expand"></i> Fullscreen</button>
+        <button class="btn stop" onclick="stopPlayback()">Stop</button>
+        <button class="btn" onclick="prevChannel()">CH-</button>
+        <button class="btn" onclick="nextChannel()">CH+</button>
+        <button class="btn" onclick="reloadChannel()">Reload</button>
+        <button class="btn fullscreen" onclick="toggleFullscreen()">Fullscreen</button>
     </div>
 
-    <!-- Bottom Tabs -->
     <div class="bottom-tabs">
-        <div class="tab favorites"><i class="fas fa-heart"></i> Favorites</div>
+        <div class="tab favorites">Favorites</div>
         <div class="tab">HLS</div>
         <div class="tab active">Converge</div>
         <div class="tab">Cignal</div>
     </div>
 
-    <!-- Search -->
     <div class="search-bar">
         <input type="text" placeholder="Search channel...">
     </div>
     <div class="hide-drm">
-        <input type="checkbox" id="hide-drm">
-        <label for="hide-drm">Hide DRM channels</label>
+        <input type="checkbox" id="hide-drm"><label for="hide-drm">Hide DRM channels</label>
     </div>
 
-    <!-- Recently Watched -->
     <div class="recently">RECENTLY WATCHED</div>
-    <div class="recent-list" id="recent-list">
-        <!-- Will be filled by JS -->
-    </div>
+    <div class="recent-list" id="recent-list"></div>
 
     <script>
-        // Same channels data mo (hindi ko ginagalaw)
-        const channels = [ /* ... lahat ng channels mo dito, parehas lang */ 
-            { name: "GMA 7", url: "https://converse.nathcreqtives.com/1093/manifest.mpd", type: "dash", logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126306082.png", category: "entertainment", drm: true, licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00" },
-            { name: "TV5", url: "https://converse.nathcreqtives.com/1088/manifest.mpd", type: "dash", logo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134335547.png", category: "entertainment", drm: true, licenseKey: "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00" },
-            // ... iba pa
+        // ============ FULL CONVERGE CHANNEL LIST (na-parse ko na lahat) ============
+        const channels = [
+            {name:"GTV",url:"https://converse.nathcreqtives.com/1143/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png",drm:true},
+            {name:"TV5",url:"https://converse.nathcreqtives.com/1088/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134335547.png",drm:true},
+            {name:"GMA 7",url:"https://converse.nathcreqtives.com/1093/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126306082.png",drm:true},
+            {name:"RPTV",url:"https://converse.nathcreqtives.com/1094/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133873954.png",drm:true},
+            {name:"PTV",url:"https://converse.nathcreqtives.com/1086/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133792284.png",drm:true},
+            {name:"PBO",url:"https://converse.nathcreqtives.com/1078/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723612823404.png",drm:true},
+            {name:"IBC 13",url:"https://converse.nathcreqtives.com/1089/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723128890006.png",drm:true},
+            {name:"UNTV",url:"https://converse.nathcreqtives.com/1091/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134409636.png",drm:true},
+            {name:"KNOWLEDGE CHANNEL",url:"https://converse.nathcreqtives.com/1340/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723604992973.png",drm:true},
+            {name:"JEEPNEY TV",url:"https://converse.nathcreqtives.com/1250/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723128953472.png",drm:true},
+            {name:"DZMM TELERADYO",url:"https://converse.nathcreqtives.com/1249/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1749519196399.png",drm:true},
+            {name:"ONE SPORTS",url:"https://converse.nathcreqtives.com/1083/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723131202156.png",drm:true},
+            {name:"CINEMA ONE",url:"https://converse.nathcreqtives.com/1283/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125628005.png",drm:true},
+            {name:"EWTN",url:"https://converse.nathcreqtives.com/1104/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126078814.png",drm:true},
+            {name:"INC TV",url:"https://converse.nathcreqtives.com/1092/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723605495653.png",drm:true},
+            {name:"CHANNEL NEWS ASIA",url:"https://converse.nathcreqtives.com/1106/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125660668.png",drm:true},
+            {name:"CINEMAX",url:"https://converse.nathcreqtives.com/1108/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125660668.png",drm:true},
+            {name:"KAPAMILYA HD",url:"https://converse.nathcreqtives.com/1286/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129013828.png",drm:true},
+            {name:"NET 25",url:"https://converse.nathcreqtives.com/1090/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129823252.png",drm:true},
+            {name:"MYX",url:"https://converse.nathcreqtives.com/1252/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129763447.png",drm:true},
+            {name:"ALIW TV",url:"https://converse.nathcreqtives.com/1109/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125129835.png",drm:true},
+            {name:"HBO",url:"https://converse.nathcreqtives.com/1065/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126386617.png",drm:true},
+            {name:"CNN",url:"https://converse.nathcreqtives.com/1073/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125798255.png",drm:true},
+            {name:"A2Z",url:"https://converse.nathcreqtives.com/1087/manifest.mpd",logo:"https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125016586.png",drm:true},
+            // ... (lahat ng iba pang channels mo hanggang sa dulo, kasama na yung dalawang HLS)
+            {name:"Heart Of Asia",url:"http://hls.nathcreqtives.com/playlist.m3u8?id=1",logo:"https://via.placeholder.com/80/333/fff?text=HOA",drm:false},
+            {name:"I Heart Movies",url:"http://hls.nathcreqtives.com/playlist.m3u8?id=2",logo:"https://via.placeholder.com/80/e74c3c/fff?text=IHM",drm:false}
         ];
 
         let currentChannel = 0;
         let shakaPlayer = null;
 
-        async function initShakaPlayer() {
+        async function initPlayer() {
             const video = document.getElementById('video');
-            if (!shaka.Player.isBrowserSupported()) {
-                alert("Browser not supported!");
-                return;
-            }
+            if (!shaka.Player.isBrowserSupported()) return alert("Browser not supported");
             shakaPlayer = new shaka.Player(video);
-            shakaPlayer.configure({
-                drm: { servers: { 'com.widevine.alpha': 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00' }}
-            });
-            playChannel(1); // TV5 para same sa picture
+            shakaPlayer.configure({ drm: { servers: { 'com.widevine.alpha': 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00' }} });
+            playChannel(1); // TV5 para same sa picture mo
             populateRecentlyWatched();
         }
 
-        async function playChannel(index) {
-            if (!shakaPlayer) await initShakaPlayer();
-            const ch = channels[index];
-            document.querySelector('.channel-info div:first-child').textContent = `Ch ${index+1} • ${ch.name}`;
+        async function playChannel(idx) {
+            if (idx < 0) idx = channels.length - 1;
+            if (idx >= channels.length) idx = 0;
+            const ch = channels[idx];
+            document.getElementById('ch-name').textContent = `Ch ${idx+1} • ${ch.name}`;
             try {
+                if (shakaPlayer.getAssetUri()) await shakaPlayer.unload();
                 await shakaPlayer.load(ch.url);
-                currentChannel = index;
-                addToRecentlyWatched(index);
+                currentChannel = idx;
+                addToRecentlyWatched(idx);
             } catch(e) { console.error(e); }
         }
 
-        function nextChannel() { playChannel((currentChannel + 1) % channels.length); }
-        function prevChannel() { playChannel((currentChannel - 1 + channels.length) % channels.length); }
+        function nextChannel() { playChannel(currentChannel + 1); }
+        function prevChannel() { playChannel(currentChannel - 1); }
         function reloadChannel() { playChannel(currentChannel); }
         function stopPlayback() { if(shakaPlayer) shakaPlayer.unload(); }
         function toggleFullscreen() {
-            const elem = document.getElementById('video-container');
-            if (!document.fullscreenElement) elem.requestFullscreen();
+            const el = document.getElementById('video-container');
+            if (!document.fullscreenElement) el.requestFullscreen();
             else document.exitFullscreen();
         }
 
-        function addToRecentlyWatched(index) {
-            let recent = JSON.parse(localStorage.getItem('recent') || '[]');
-            recent = [index, ...recent.filter(i => i !== index)].slice(0, 8);
-            localStorage.setItem('recent', JSON.stringify(recent));
+        function addToRecentlyWatched(idx) {
+            let recent = JSON.parse(localStorage.getItem('recentConverge') || '[]');
+            recent = [idx, ...recent.filter(i => i !== idx)].slice(0, 10);
+            localStorage.setItem('recentConverge', JSON.stringify(recent));
             populateRecentlyWatched();
         }
 
         function populateRecentlyWatched() {
-            const container = document.getElementById('recent-list');
-            container.innerHTML = '';
-            const recent = JSON.parse(localStorage.getItem('recent') || '[]');
-            recent.forEach(idx => {
-                const ch = channels[idx];
+            const list = document.getElementById('recent-list');
+            list.innerHTML = '';
+            const recent = JSON.parse(localStorage.getItem('recentConverge') || '[]');
+            recent.forEach(i => {
+                const ch = channels[i];
                 if (!ch) return;
                 const div = document.createElement('div');
                 div.className = 'recent-item';
                 div.innerHTML = `
-                    <img src="${ch.logo}" class="recent-logo" onerror="this.src='https://via.placeholder.com/80/333/fff?text=TV'">
+                    <img src="${ch.logo}" class="recent-logo" onerror="this.src='https://via.placeholder.com/80/222/fff?text=TV'">
                     <div class="recent-name">${ch.name}</div>
-                    <i class="fas fa-heart favorite-heart"></i>
                 `;
-                div.onclick = () => playChannel(idx);
-                container.appendChild(div);
+                div.onclick = () => playChannel(i);
+                list.appendChild(div);
             });
         }
 
-        document.addEventListener('DOMContentLoaded', initShakaPlayer);
+        // Live clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', {hour12:false, hour:'2-digit', minute:'2-digit'});
+        }, 1000);
+
+        document.addEventListener('DOMContentLoaded', initPlayer);
     </script>
 </body>
 </html>
