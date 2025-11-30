@@ -257,7 +257,7 @@
 
         setInterval(() => {
             const d = new Date();
-            document.getElementById('clock').textContent = d.toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit'});
+            document.getElementById('clock').textContent = d.toLocaleTimeString('en-US',{hour12:true,hour:'2-digit',minute:'2-digit'});
         }, 1000);
 
         document.addEventListener('DOMContentLoaded', initPlayer);
