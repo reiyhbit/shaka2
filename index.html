@@ -604,6 +604,7 @@
                 this.recentChannels = JSON.parse(localStorage.getItem('iptv_recent') || '[]');
                 this.categories = {};
                 this.currentCategory = 'all';
+                this.currentProvider = 'cignal'; // Default provider
                 
                 this.initializeApp();
             }
@@ -612,8 +613,8 @@
                 // Initialize Shaka Player
                 this.initializePlayer();
                 
-                // Load default playlist
-                this.loadDefaultPlaylist();
+                // Load default Cignal playlist
+                this.loadCignalPlaylist();
                 
                 // Setup event listeners
                 this.setupEventListeners();
@@ -651,9 +652,51 @@
                 });
             }
             
-            async loadDefaultPlaylist() {
+            async loadCignalPlaylist() {
                 const m3u8Link = 'https://reiyhbit.github.io/iptv/playlist.m3u';
                 await this.loadPlaylistFromUrl(m3u8Link);
+            }
+            
+            async loadConvergePlaylist() {
+                // Converge DRM playlist with Widevine configuration
+                const convergePlaylist = `#EXTM3U
+#EXTINF:-1 tvg-id="1143" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png" group-title="WesleyVanneck",GTV
+#KODIPROP:inputstream.adaptive.manifest_type=mpd
+#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
+#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
+https://converse.nathcreqtives.com/1143/manifest.mpd
+#EXTINF:-1 tvg-id="1088" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134335547.png" group-title="WesleyVanneck",TV5
+#KODIPROP:inputstream.adaptive.manifest_type=mpd
+#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
+#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
+https://converse.nathcreqtives.com/1088/manifest.mpd
+#EXTINF:-1 tvg-id="1093" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126306082.png" group-title="WesleyVanneck",GMA 7
+#KODIPROP:inputstream.adaptive.manifest_type=mpd
+#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
+#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
+https://converse.nathcreqtives.com/1093/manifest.mpd
+#EXTINF:-1 tvg-id="1094" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133873954.png" group-title="WesleyVanneck",RPTV
+#KODIPROP:inputstream.adaptive.manifest_type=mpd
+#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
+#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
+https://converse.nathcreqtives.com/1094/manifest.mpd
+#EXTINF:-1 tvg-id="1086" tvg-logo="https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133792284.png" group-title="WesleyVanneck",PTV
+#KODIPROP:inputstream.adaptive.manifest_type=mpd
+#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha
+#KODIPROP:inputstream.adaptive.license_key=https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00
+https://converse.nathcreqtives.com/1086/manifest.mpd`;
+
+                // Configure DRM for Converge
+                this.player.configure({
+                    drm: {
+                        servers: {
+                            'com.widevine.alpha': 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00'
+                        }
+                    }
+                });
+
+                this.parsePlaylist(convergePlaylist);
+                this.showToast('Converge playlist loaded with DRM');
             }
             
             async loadPlaylistFromUrl(url) {
@@ -789,7 +832,7 @@
 
                 // Show channel count
                 if (this.currentCategory === 'all') {
-                    this.showToast(`Loaded ${this.channels.length} channels`);
+                    this.showToast(`${this.currentProvider.toUpperCase()} - ${this.channels.length} channels loaded`);
                 }
             }
             
@@ -803,21 +846,15 @@
                 this.addToRecent(index);
                 
                 try {
-                    // Configure DRM if available
-                    let licenseKey = channel.licenseKey;
-                    if (licenseKey && !Array.isArray(licenseKey)) {
-                        licenseKey = JSON.parse(decodeURIComponent(licenseKey));
-                    }
-                    
-                    if (licenseKey) {
-                        licenseKey.forEach(pair => {
-                            this.player.configure({
-                                drm: {
-                                    clearKeys: {
-                                        [pair.keyId]: pair.key
-                                    }
+                    // For Converge channels, use the DRM configuration
+                    if (this.currentProvider === 'converge') {
+                        // Configure DRM for Widevine
+                        this.player.configure({
+                            drm: {
+                                servers: {
+                                    'com.widevine.alpha': 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00'
                                 }
-                            });
+                            }
                         });
                     }
                     
@@ -978,20 +1015,16 @@
                 
                 // Provider buttons
                 document.getElementById('cignal-btn').addEventListener('click', () => {
-                    this.showAllChannels();
-                    this.showToast('Showing all channels');
+                    this.currentProvider = 'cignal';
+                    this.loadCignalPlaylist();
+                    this.showToast('Loading Cignal channels...');
                 });
                 
                 document.getElementById('converge-btn').addEventListener('click', () => {
-                    this.showAllChannels();
-                    this.showToast('Showing all channels');
+                    this.currentProvider = 'converge';
+                    this.loadConvergePlaylist();
+                    this.showToast('Loading Converge DRM channels...');
                 });
-            }
-            
-            showAllChannels() {
-                // Show all channels in the quick channels list
-                this.currentCategory = 'all';
-                this.updateQuickChannels();
             }
             
             showSettings() {
