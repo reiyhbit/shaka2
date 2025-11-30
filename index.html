@@ -5,7 +5,7 @@
     <meta content="width=device-width,initial-scale=1" name="viewport">
     <meta content="no-referrer" name="referrer">
     <link href="data:image/x-icon;," rel="icon">
-    <title>ReynielTV</title>
+    <title>ReynielTV - Clean IPTV</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.11.2/controls.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -159,7 +159,6 @@
             justify-content: center;
             gap: 8px;
             box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
-            text-decoration: none;
         }
         
         #converge-btn {
@@ -475,10 +474,10 @@
             <div id="recent-channels"></div>
 
             <div id="provider-buttons">
-                <!-- Cignal Button - Redirect to buildtest -->
-                <a href="https://reiyhbit.github.io/buildtest/" class="provider-btn" id="cignal-btn" style="text-decoration: none;">
+                <!-- Cignal Button - Same tab redirect -->
+                <button class="provider-btn" id="cignal-btn">
                     <i class="fas fa-satellite-dish"></i> Cignal
-                </a>
+                </button>
                 
                 <!-- Converge Button - Local player with auto-play -->
                 <button class="provider-btn" id="converge-btn">
@@ -823,6 +822,11 @@
                 document.getElementById('settings-btn').addEventListener('click', () => this.showSettings());
                 document.getElementById('close-settings').addEventListener('click', () => this.hideSettings());
                 document.getElementById('volume-slider').addEventListener('input', (e) => { document.getElementById('video').volume = e.target.value / 100; });
+
+                // Cignal button - redirect in same tab
+                document.getElementById('cignal-btn').addEventListener('click', () => {
+                    window.location.href = 'https://reiyhbit.github.io/buildtest/';
+                });
 
                 // Converge button - reload Converge playlist
                 document.getElementById('converge-btn').addEventListener('click', () => {
