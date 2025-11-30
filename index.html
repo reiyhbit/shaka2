@@ -177,31 +177,6 @@
             transform: scale(0.98);
         }
         
-        /* Navigation buttons - mas compact */
-        #nav-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            padding: 8px;
-            flex-shrink: 0;
-        }
-        
-        .nav-btn {
-            padding: 10px;
-            background: #61dafb;
-            color: #000;
-            border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .nav-btn:active {
-            background: #4fa3c4;
-            transform: scale(0.95);
-        }
-        
         /* Quick channels - LAHAT NG CHANNELS NA! */
         #quick-channels {
             flex: 1;
@@ -254,24 +229,6 @@
             color: #ff6b35;
             font-size: 11px;
             margin-left: 4px;
-        }
-        
-        /* All Channels Button */
-        #channel-list-btn {
-            margin: 6px;
-            padding: 10px;
-            background: #61dafb;
-            color: #000;
-            border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        
-        #channel-list-btn:active {
-            background: #4fa3c4;
         }
         
         /* Volume Control */
@@ -558,22 +515,15 @@
                 </button>
             </div>
             
-            <!-- Navigation Buttons - Smaller -->
-            <div id="nav-buttons">
-                <button class="nav-btn" id="prev-channel">← PREV</button>
-                <button class="nav-btn" id="next-channel">NEXT →</button>
-            </div>
-            
             <!-- Quick Channels List - LAHAT NG CHANNELS NA! -->
             <div id="quick-channels">
                 <!-- LAHAT ng channels lalabas dito -->
             </div>
             
-            <!-- Bottom Action Buttons -->
+            <!-- Bottom Action Buttons - Settings only -->
             <div class="bottom-actions">
-                <button id="channel-list-btn" style="flex: 1;">📋 ALL CHANNELS</button>
-                <button id="settings-btn">
-                    <i class="fas fa-cog"></i>
+                <button id="settings-btn" style="flex: 1;">
+                    <i class="fas fa-cog"></i> SETTINGS
                 </button>
             </div>
         </div>
@@ -982,34 +932,6 @@
                 document.getElementById('channel-status').textContent = status;
             }
             
-            nextChannel() {
-                const channels = this.categories[this.currentCategory] || this.channels;
-                const currentChannel = this.channels[this.currentChannelIndex];
-                const currentIndexInCategory = channels.findIndex(c => c.manifestUrl === currentChannel.manifestUrl);
-                
-                let nextIndexInCategory = (currentIndexInCategory + 1) % channels.length;
-                if (nextIndexInCategory < 0) nextIndexInCategory = channels.length - 1;
-                
-                const nextChannel = channels[nextIndexInCategory];
-                const nextIndex = this.channels.findIndex(c => c.manifestUrl === nextChannel.manifestUrl);
-                
-                this.playChannel(nextIndex);
-            }
-            
-            prevChannel() {
-                const channels = this.categories[this.currentCategory] || this.channels;
-                const currentChannel = this.channels[this.currentChannelIndex];
-                const currentIndexInCategory = channels.findIndex(c => c.manifestUrl === currentChannel.manifestUrl);
-                
-                let prevIndexInCategory = (currentIndexInCategory - 1 + channels.length) % channels.length;
-                if (prevIndexInCategory < 0) prevIndexInCategory = channels.length - 1;
-                
-                const prevChannel = channels[prevIndexInCategory];
-                const prevIndex = this.channels.findIndex(c => c.manifestUrl === prevChannel.manifestUrl);
-                
-                this.playChannel(prevIndex);
-            }
-            
             toggleFullscreen() {
                 this.isFullscreen = !this.isFullscreen;
                 const appContainer = document.getElementById('app-container');
@@ -1034,14 +956,6 @@
             }
             
             setupEventListeners() {
-                // Channel navigation
-                document.getElementById('prev-channel').addEventListener('click', () => this.prevChannel());
-                document.getElementById('next-channel').addEventListener('click', () => this.nextChannel());
-                
-                // Channel list
-                document.getElementById('channel-list-btn').addEventListener('click', () => this.showChannelList());
-                document.getElementById('close-channels').addEventListener('click', () => this.hideChannelList());
-                
                 // Fullscreen
                 document.getElementById('maximize-btn').addEventListener('click', () => this.toggleFullscreen());
                 
@@ -1078,17 +992,6 @@
                 // Show all channels in the quick channels list
                 this.currentCategory = 'all';
                 this.updateQuickChannels();
-            }
-            
-            showChannelList() {
-                document.getElementById('channel-overlay').style.display = 'flex';
-                document.getElementById('channel-search').focus();
-            }
-            
-            hideChannelList() {
-                document.getElementById('channel-overlay').style.display = 'none';
-                document.getElementById('channel-search').value = '';
-                this.filterChannels(''); // Reset filter
             }
             
             showSettings() {
