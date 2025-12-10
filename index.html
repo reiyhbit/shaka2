@@ -35,35 +35,16 @@
             padding: 12px 15px;
             text-align: center;
             flex-shrink: 0;
+            z-index: 10;
         }
         
-        #brand-logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+        #brand-logo { position: absolute; top: 10px; left: 10px; z-index: 10; display: flex; align-items: center;
         }
         
-        #brand-circle {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ff0000;
-            font-weight: bold;
-            font-size: 12px;
-            text-align: center;
-            line-height: 1.1;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        #brand-circle { width: 40px; height: 40px; background: #ff0000; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; text-align: center; line-height: 1.1; box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
         }
         
-        #brand-text {
-            font-size: 20px;
-            font-weight: bold;
-        }
+        
         
         #tagline {
             font-size: 12px;
@@ -73,10 +54,10 @@
         
         /* Video Container */
         #video-container {
-            flex: 1;
+            height: 35vh; /* Fixed height para may space sa channels */
             background: #000;
             position: relative;
-            min-height: 200px;
+            flex-shrink: 0;
         }
         
         #video {
@@ -109,10 +90,10 @@
         
         /* Controls Container */
         #controls-container {
-            background: #2d2d2d;
+            flex: 1; /* Takes remaining space */
             display: flex;
             flex-direction: column;
-            flex-shrink: 0;
+            min-height: 0; /* Important for scrolling */
         }
         
         #provider-buttons {
@@ -218,54 +199,109 @@
             color: #ff6b35;
         }
         
-        /* Quick Channels */
+        /* Quick Channels - FIXED SCROLLING */
+        #quick-channels-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* Important for scrolling */
+            overflow: hidden;
+            position: relative;
+        }
+        
+        #quick-channels-header {
+            padding: 5px 15px;
+            background: #2d2d2d;
+            font-size: 12px;
+            color: #aaa;
+            border-bottom: 1px solid #444;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #channel-count {
+            background: #61dafb;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
         #quick-channels {
             flex: 1;
             overflow-y: auto;
-            padding: 5px;
+            padding: 8px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 5px;
+            gap: 6px;
+            min-height: 0; /* Important for scrolling */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+        }
+        
+        /* Scrollbar styling */
+        #quick-channels::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #quick-channels::-webkit-scrollbar-track {
+            background: #2d2d2d;
+            border-radius: 3px;
+        }
+        
+        #quick-channels::-webkit-scrollbar-thumb {
+            background: #61dafb;
+            border-radius: 3px;
+        }
+        
+        #quick-channels::-webkit-scrollbar-thumb:hover {
+            background: #4fa3c4;
         }
         
         .quick-channel {
             display: flex;
             align-items: center;
-            padding: 8px 10px;
+            padding: 10px;
             background: #3c4043;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            min-height: 40px;
+            min-height: 45px;
             position: relative;
+            transition: all 0.2s ease;
         }
         
         .quick-channel:active {
             background: #61dafb;
             color: #000;
+            transform: scale(0.98);
         }
         
         .quick-channel.active {
             background: linear-gradient(135deg, #61dafb, #8ae2ff);
+            color: #000;
+            box-shadow: 0 0 10px rgba(97, 218, 251, 0.5);
         }
         
         .channel-logo {
-            width: 24px;
-            height: 24px;
-            margin-right: 8px;
-            border-radius: 4px;
+            width: 28px;
+            height: 28px;
+            margin-right: 10px;
+            border-radius: 6px;
             object-fit: cover;
             flex-shrink: 0;
-            background: #61dafb;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #000;
+            color: white;
             font-weight: bold;
-            font-size: 10px;
+            font-size: 12px;
         }
         
         .channel-name {
-            font-size: 12px;
+            font-size: 13px;
             flex: 1;
             white-space: nowrap;
             overflow: hidden;
@@ -274,13 +310,13 @@
         
         .channel-fav {
             color: #ff6b35;
-            font-size: 10px;
+            font-size: 11px;
             margin-left: 4px;
         }
         
         .drm-indicator {
             color: #61dafb;
-            font-size: 10px;
+            font-size: 11px;
             margin-left: 4px;
         }
         
@@ -294,7 +330,7 @@
         }
         
         #settings-btn {
-            padding: 10px;
+            padding: 12px;
             background: #555;
             color: white;
             border: none;
@@ -304,8 +340,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
-            font-size: 13px;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: bold;
         }
         
         /* Loading */
@@ -431,6 +468,15 @@
             border-radius: 5px;
             color: white;
         }
+        
+        /* No channels message */
+        .no-channels {
+            grid-column: 1 / span 2;
+            text-align: center;
+            padding: 20px;
+            color: #888;
+            font-size: 14px;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
 </head>
@@ -484,9 +530,15 @@
                 </button>
             </div>
             
-            <div id="quick-channels">
-                <div class="quick-channel" style="text-align: center; opacity: 0.7; justify-content: center; grid-column: 1 / span 2;">
-                    Loading Converge playlist...
+            <div id="quick-channels-container">
+                <div id="quick-channels-header">
+                    <span>Channels</span>
+                    <span id="channel-count">Loading...</span>
+                </div>
+                <div id="quick-channels">
+                    <div class="no-channels">
+                        Loading Converge playlist...
+                    </div>
                 </div>
             </div>
             
@@ -544,7 +596,7 @@
                 this.recentChannels = JSON.parse(localStorage.getItem('tv_recent') || '[]');
                 this.currentStreamUrl = '';
                 
-                // Playlist URL - Using your provided URL
+                // Playlist URL
                 this.playlistUrl = "https://converse.nathcreqtives.com/playlist.m3u?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJyZWl5aDEwMjY5NCIsImV4cCI6MTc2NTg1Njc0MH0.6hmppZKNycvU17S2latBLhBPM2wpyHgksWrWRtQp9bM";
                 
                 // DRM Configuration
@@ -704,45 +756,43 @@
             
             updateChannelList() {
                 const container = document.getElementById('quick-channels');
-                container.innerHTML = '';
+                const channelCount = document.getElementById('channel-count');
+                
+                channelCount.textContent = `${this.channels.length} channels`;
                 
                 if (this.channels.length === 0) {
                     container.innerHTML = `
-                        <div class="quick-channel" style="text-align: center; opacity: 0.7; justify-content: center; grid-column: 1 / span 2;">
-                            No channels available
+                        <div class="no-channels">
+                            No channels available. Try reloading the playlist.
                         </div>
                     `;
                     return;
                 }
                 
+                let channelsHTML = '';
+                
                 this.channels.forEach((channel, index) => {
-                    const channelEl = document.createElement('div');
-                    channelEl.className = 'quick-channel';
-                    if (index === this.currentChannelIndex) {
-                        channelEl.classList.add('active');
-                    }
-                    
-                    // Get first letter for logo
                     const logoLetter = channel.name.charAt(0).toUpperCase();
                     const isFavorite = this.favorites.includes(index);
+                    const isActive = index === this.currentChannelIndex;
                     
-                    channelEl.innerHTML = `
-                        <div class="channel-logo">
-                            ${logoLetter}
-                        </div>
-                        <div class="channel-name">
-                            ${channel.name}
-                            ${isFavorite ? '<span class="channel-fav"><i class="fas fa-star"></i></span>' : ''}
-                            ${channel.drm ? '<span class="drm-indicator"><i class="fas fa-lock"></i></span>' : ''}
+                    channelsHTML += `
+                        <div class="quick-channel ${isActive ? 'active' : ''}" 
+                             data-index="${index}"
+                             onclick="tvApp.playChannel(${index})">
+                            <div class="channel-logo">
+                                ${logoLetter}
+                            </div>
+                            <div class="channel-name">
+                                ${channel.name}
+                                ${isFavorite ? '<span class="channel-fav"><i class="fas fa-star"></i></span>' : ''}
+                                ${channel.drm ? '<span class="drm-indicator"><i class="fas fa-lock"></i></span>' : ''}
+                            </div>
                         </div>
                     `;
-                    
-                    channelEl.addEventListener('click', () => {
-                        this.playChannel(index);
-                    });
-                    
-                    container.appendChild(channelEl);
                 });
+                
+                container.innerHTML = channelsHTML;
             }
             
             async playChannel(index) {
@@ -758,7 +808,22 @@
                     // Update UI
                     this.updateChannelInfo(channel.name);
                     this.updateFavoritesUI();
-                    this.updateChannelList();
+                    
+                    // Update active channel in list
+                    const container = document.getElementById('quick-channels');
+                    const channelElements = container.querySelectorAll('.quick-channel');
+                    channelElements.forEach(el => el.classList.remove('active'));
+                    
+                    const activeElement = container.querySelector(`.quick-channel[data-index="${index}"]`);
+                    if (activeElement) {
+                        activeElement.classList.add('active');
+                        
+                        // Scroll to active channel
+                        activeElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
                     
                     // Configure player for DRM or non-DRM
                     if (channel.drm && this.player) {
@@ -855,16 +920,6 @@
                 
                 const nextIndex = (this.currentChannelIndex + 1) % this.channels.length;
                 this.playChannel(nextIndex);
-                
-                // Scroll to channel
-                const container = document.getElementById('quick-channels');
-                const channelEls = container.querySelectorAll('.quick-channel');
-                if (channelEls[nextIndex]) {
-                    channelEls[nextIndex].scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                }
             }
             
             prevChannel() {
@@ -872,16 +927,6 @@
                 
                 const prevIndex = (this.currentChannelIndex - 1 + this.channels.length) % this.channels.length;
                 this.playChannel(prevIndex);
-                
-                // Scroll to channel
-                const container = document.getElementById('quick-channels');
-                const channelEls = container.querySelectorAll('.quick-channel');
-                if (channelEls[prevIndex]) {
-                    channelEls[prevIndex].scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                }
             }
             
             toggleFullscreen() {
