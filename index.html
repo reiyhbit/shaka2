@@ -448,13 +448,28 @@
             align-items:center;
             justify-content:center;
         }
+        
+        .error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 2001;
+            max-width: 80%;
+            text-align: center;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div id="app-container">
         <div id="video-container">
             <div id="brand-logo"><div id="brand-circle">Reyniel<br>TV</div></div>
-            <video id="video" controls playsinline>Your browser does not support the video tag.</video>
+            <video id="video" playsinline></video>
             <button id="maximize-btn">⛶</button>
             <div class="loading" id="loading" style="display:none">Loading...</div>
             <div id="volume-control">
@@ -475,12 +490,10 @@
             <div id="recent-channels"></div>
 
             <div id="provider-buttons">
-                <!-- Cignal Button - Redirect to buildtest -->
                 <a href="https://reynielcignaltv.vercel.app/" class="provider-btn" id="cignal-btn" style="text-decoration: none;">
                     <i class="fas fa-satellite-dish"></i> Cignal
                 </a>
                 
-                <!-- Converge Button - Local player with auto-play -->
                 <button class="provider-btn" id="converge-btn">
                     <i class="fas fa-bolt"></i> Converge
                 </button>
@@ -529,18 +542,15 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
-    <script src="https://dbghelp.github.io/M3U8Interpreter.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <div class="error-message" id="error-message"></div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
     <script>
         class EnhancedMobileIPTV {
             constructor() {
                 this.channels = [];
                 this.currentChannelIndex = 0;
                 this.player = null;
-                this.xmlepg = null;
                 this.isFullscreen = false;
                 this.favorites = JSON.parse(localStorage.getItem('iptv_favorites') || '[]');
                 this.recentChannels = JSON.parse(localStorage.getItem('iptv_recent') || '[]');
@@ -555,8 +565,8 @@
                 this.initializeApp();
             }
 
-            initializeApp() {
-                this.initializePlayer();
+            async initializeApp() {
+                await this.initializePlayer();
                 this.setupEventListeners();
                 this.updateFavoritesUI();
                 this.updateRecentChannelsUI();
@@ -564,29 +574,71 @@
                 this.loadPlaylistFromURL();
             }
 
-            initializePlayer() {
+            async initializePlayer() {
                 shaka.polyfill.installAll();
-                this.player = new shaka.Player(document.getElementById('video'));
-
-                this.player.addEventListener('loading', () => {
-                    document.getElementById('loading').style.display = 'block';
-                    this.updateChannelStatus('Loading...');
+                
+                // Create player without media element (fixing deprecated warning)
+                this.player = new shaka.Player();
+                
+                // Configure DRM with proper robustness settings
+                this.player.configure({
+                    drm: {
+                        servers: { 'com.widevine.alpha': this.convergeLicense },
+                        advanced: {
+                            'com.widevine.alpha': {
+                                'videoRobustness': 'SW_SECURE_CRYPTO',
+                                'audioRobustness': 'SW_SECURE_CRYPTO'
+                            }
+                        }
+                    },
+                    streaming: {
+                        bufferingGoal: 30,
+                        rebufferingGoal: 2,
+                        bufferBehind: 30,
+                        ignoreTextStreamFailures: true
+                    },
+                    manifest: {
+                        dash: {
+                            ignoreSuggestedPresentationDelay: true
+                        }
+                    }
                 });
-
-                this.player.addEventListener('loaded', () => {
+                
+                // Get video element
+                const videoElement = document.getElementById('video');
+                
+                // Listen for player events
+                this.player.addEventListener('error', (error) => {
+                    console.error('Player error:', error);
+                    this.showError('Player error: ' + error.detail.message);
+                    this.updateChannelStatus('Error');
+                    document.getElementById('loading').style.display = 'none';
+                });
+                
+                // Attach player to video element (correct method for v4.7+)
+                try {
+                    await this.player.attach(videoElement);
+                    console.log('Shaka Player attached successfully');
+                } catch (error) {
+                    console.error('Failed to attach player:', error);
+                    this.showError('Failed to initialize player');
+                }
+                
+                // Add video element event listeners
+                videoElement.addEventListener('waiting', () => {
+                    document.getElementById('loading').style.display = 'block';
+                    this.updateChannelStatus('Buffering...');
+                });
+                
+                videoElement.addEventListener('playing', () => {
                     document.getElementById('loading').style.display = 'none';
                     this.updateChannelStatus('Playing');
-                    // AUTO-PLAY when loaded
-                    document.getElementById('video').play().catch(e => {
-                        console.log('Auto-play prevented by browser:', e);
-                        this.showToast('Tap the video to play');
-                    });
                 });
-
-                this.player.addEventListener('error', (error) => {
+                
+                videoElement.addEventListener('error', (e) => {
+                    console.error('Video element error:', e);
+                    this.showError('Video error: ' + videoElement.error?.message);
                     document.getElementById('loading').style.display = 'none';
-                    this.updateChannelStatus('Error loading channel');
-                    console.error('Player error:', error);
                 });
             }
 
@@ -597,6 +649,10 @@
                     
                     // Fetch the M3U playlist
                     const response = await fetch(this.playlistUrl);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
                     const playlistText = await response.text();
                     
                     // Parse the M3U playlist
@@ -618,7 +674,7 @@
                     this.showToast(`Loaded ${this.channels.length} channels`);
                 } catch (error) {
                     console.error('Error loading playlist:', error);
-                    this.showToast('Error loading playlist: ' + error.message);
+                    this.showError('Error loading playlist: ' + error.message);
                 } finally {
                     document.getElementById('loading').style.display = 'none';
                 }
@@ -641,7 +697,7 @@
                         
                         currentChannel = {
                             id: `channel-${channels.length}`,
-                            channelName: channelName,
+                            channelName: channelName.trim(),
                             tvgLogo: '',
                             manifestUrl: '',
                             drm: false,
@@ -662,19 +718,29 @@
                             }
                         }
                         
-                        // Check if channel has DRM (based on URL pattern)
-                        const nextLine = i + 1 < lines.length ? lines[i + 1].trim() : '';
-                        if (nextLine && !nextLine.startsWith('#')) {
-                            currentChannel.manifestUrl = nextLine;
-                            // Check if it's a DRM channel
-                            if (nextLine.includes('converse.nathcreqtives.com') && 
-                                (nextLine.includes('.mpd') || nextLine.includes('/manifest.mpd'))) {
-                                currentChannel.drm = true;
+                        // Check next line for URL
+                        if (i + 1 < lines.length) {
+                            const nextLine = lines[i + 1].trim();
+                            if (nextLine && !nextLine.startsWith('#')) {
+                                currentChannel.manifestUrl = nextLine;
+                                // Check if it's a DRM channel
+                                if (nextLine.includes('.mpd') || nextLine.includes('/manifest.mpd')) {
+                                    currentChannel.drm = true;
+                                }
+                                // Move to next line
+                                i++;
                             }
                         }
+                        
+                        channels.push(currentChannel);
+                        currentChannel = null;
                     } else if (line && !line.startsWith('#') && currentChannel) {
                         // This is a URL line
                         currentChannel.manifestUrl = line;
+                        // Check if it's a DRM channel
+                        if (line.includes('.mpd') || line.includes('/manifest.mpd')) {
+                            currentChannel.drm = true;
+                        }
                         channels.push(currentChannel);
                         currentChannel = null;
                     }
@@ -765,6 +831,7 @@
             async playChannel(index) {
                 if (typeof index !== 'number' || index < 0 || index >= this.channels.length) {
                     console.error('Invalid channel index', index);
+                    this.showError('Invalid channel');
                     return;
                 }
 
@@ -773,11 +840,20 @@
                 this.addToRecent(index);
 
                 try {
+                    document.getElementById('loading').style.display = 'block';
+                    this.updateChannelStatus('Loading channel...');
+                    
                     // Configure DRM if needed
                     if (channel.drm) {
                         this.player.configure({
                             drm: {
-                                servers: { 'com.widevine.alpha': this.convergeLicense }
+                                servers: { 'com.widevine.alpha': this.convergeLicense },
+                                advanced: {
+                                    'com.widevine.alpha': {
+                                        'videoRobustness': 'SW_SECURE_CRYPTO',
+                                        'audioRobustness': 'SW_SECURE_CRYPTO'
+                                    }
+                                }
                             }
                         });
                     } else {
@@ -787,16 +863,30 @@
                         });
                     }
 
+                    // Load the manifest
                     await this.player.load(channel.manifestUrl);
+                    
+                    // Try to auto-play
+                    const videoElement = document.getElementById('video');
+                    await videoElement.play().catch(e => {
+                        console.log('Auto-play prevented:', e);
+                        // Don't show error for auto-play restrictions
+                        if (!e.message.includes('play()') && !e.name.includes('NotAllowed')) {
+                            this.showToast('Tap the video to play');
+                        }
+                    });
+                    
                     this.updateChannelInfo(channel.channelName || 'Channel');
                     this.updateFavoriteButton();
                     this.updateChannelList();
                     this.updateQuickChannels();
                     this.showToast(`Now playing: ${channel.channelName || 'Channel'}`);
                 } catch (err) {
-                    console.error('playChannel error', err);
-                    this.showToast('Error playing channel: ' + err.message);
+                    console.error('playChannel error:', err);
+                    this.showError('Error playing channel: ' + (err.message || 'Unknown error'));
                     this.updateChannelStatus('Error');
+                } finally {
+                    document.getElementById('loading').style.display = 'none';
                 }
             }
 
@@ -869,10 +959,26 @@
                 this.isFullscreen = !this.isFullscreen;
                 const appContainer = document.getElementById('app-container');
                 const maximizeBtn = document.getElementById('maximize-btn');
+                const videoElement = document.getElementById('video');
+                
                 if (this.isFullscreen) {
+                    if (videoElement.requestFullscreen) {
+                        videoElement.requestFullscreen();
+                    } else if (videoElement.webkitRequestFullscreen) {
+                        videoElement.webkitRequestFullscreen();
+                    } else if (videoElement.msRequestFullscreen) {
+                        videoElement.msRequestFullscreen();
+                    }
                     appContainer.classList.add('fullscreen');
-                    maximizeBtn.textContent = '⛷';
+                    maximizeBtn.textContent = '⛶';
                 } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
                     appContainer.classList.remove('fullscreen');
                     maximizeBtn.textContent = '⛶';
                 }
@@ -884,7 +990,9 @@
                 document.getElementById('favorite-btn').addEventListener('click', () => this.toggleFavorite());
                 document.getElementById('settings-btn').addEventListener('click', () => this.showSettings());
                 document.getElementById('close-settings').addEventListener('click', () => this.hideSettings());
-                document.getElementById('volume-slider').addEventListener('input', (e) => { document.getElementById('video').volume = e.target.value / 100; });
+                document.getElementById('volume-slider').addEventListener('input', (e) => { 
+                    document.getElementById('video').volume = e.target.value / 100; 
+                });
 
                 // Converge button - reload playlist
                 document.getElementById('converge-btn').addEventListener('click', () => {
@@ -893,6 +1001,14 @@
                 });
 
                 document.getElementById('close-channels').addEventListener('click', () => this.hideChannelList());
+                
+                // Handle fullscreen change
+                document.addEventListener('fullscreenchange', () => {
+                    this.isFullscreen = !!document.fullscreenElement;
+                });
+                document.addEventListener('webkitfullscreenchange', () => {
+                    this.isFullscreen = !!document.webkitFullscreenElement;
+                });
             }
 
             showSettings() { document.getElementById('settings-panel').classList.add('open'); }
@@ -917,11 +1033,22 @@
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 3000);
             }
+            
+            showError(message) {
+                const errorEl = document.getElementById('error-message');
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+                setTimeout(() => {
+                    errorEl.style.display = 'none';
+                }, 5000);
+            }
         }
 
         // Initialize the app when DOM is loaded
         let iptvApp;
-        document.addEventListener('DOMContentLoaded', () => { iptvApp = new EnhancedMobileIPTV(); });
+        document.addEventListener('DOMContentLoaded', () => { 
+            iptvApp = new EnhancedMobileIPTV(); 
+        });
     </script>
 </body>
 </html>
