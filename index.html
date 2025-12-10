@@ -5,132 +5,407 @@
     <meta content="width=device-width,initial-scale=1" name="viewport">
     <meta content="no-referrer" name="referrer">
     <link href="data:image/x-icon;," rel="icon">
-    <title>ReynielTV</title>
+    <title>ReynielTV - Clean IPTV</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.11.2/controls.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background: #1a1a1a;
+            background-color: #1a1a1a;
             color: white;
             height: 100vh;
             overflow: hidden;
         }
+        #app-container { display: flex; flex-direction: column; height: 100vh; }
         
-        #app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+        /* Video Container - Same as before */
+        #video-container { 
+            height: 40vh; 
+            background: #000; 
+            position: relative; 
+            flex-shrink: 0; 
+            border: none; 
+        }
+        #video { width: 100%; height: 100%; object-fit: contain; }
+        
+        /* Brand Logo - Same as your design */
+        #brand-logo { 
+            position: absolute; 
+            top: 10px; 
+            left: 10px; 
+            z-index: 10; 
+            display: flex; 
+            align-items: center; 
+        }
+        #brand-circle { 
+            width: 40px; 
+            height: 40px; 
+            background: #ff0000; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-weight: bold; 
+            font-size: 12px; 
+            text-align: center; 
+            line-height: 1.1; 
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.7); 
         }
         
-        /* Header */
-        #header {
-            background: linear-gradient(135deg, #ff0000 0%, #ff6b35 100%);
-            padding: 12px 15px;
-            text-align: center;
-            flex-shrink: 0;
-            z-index: 10;
+        /* Maximize Button - Same as your design */
+        #maximize-btn { 
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            background: rgba(0, 0, 0, 0.7); 
+            color: white; 
+            border: none; 
+            border-radius: 50%; 
+            width: 40px; 
+            height: 40px; 
+            font-size: 18px; 
+            cursor: pointer; 
+            z-index: 10; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        #maximize-btn:active { background: rgba(97, 218, 251, 0.8); }
+        
+        /* Controls Container - Using your layout */
+        #controls-container { 
+            flex: 1; 
+            background: #2d2d2d; 
+            display: flex; 
+            flex-direction: column; 
+            height: 60vh; 
+            overflow: hidden; 
         }
         
-        #brand-logo { position: absolute; top: 10px; left: 10px; z-index: 10; display: flex; align-items: center;
+        /* Channel Info - Your design */
+        #channel-info { 
+            padding: 8px 15px; 
+            background: #3c4043; 
+            border-bottom: 1px solid #444; 
+            flex-shrink: 0; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .channel-info-left { flex: 1; }
+        #current-channel { 
+            font-size: 16px; 
+            font-weight: bold; 
+            margin-bottom: 2px; 
+        }
+        #channel-status { 
+            font-size: 12px; 
+            color: #61dafb; 
         }
         
-        #brand-circle { width: 40px; height: 40px; background: #ff0000; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; text-align: center; line-height: 1.1; box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+        /* Favorite Button - Your design */
+        .favorite-btn { 
+            background: none; 
+            border: none; 
+            color: #888; 
+            font-size: 18px; 
+            cursor: pointer; 
+            padding: 5px; 
         }
+        .favorite-btn.active { color: #ff6b35; }
         
-        
-        
-        #tagline {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-top: 2px;
+        /* Provider Buttons - Your design */
+        #provider-buttons { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 6px; 
+            padding: 8px; 
+            flex-shrink: 0; 
         }
-        
-        /* Video Container */
-        #video-container {
-            height: 35vh; /* Fixed height para may space sa channels */
-            background: #000;
-            position: relative;
-            flex-shrink: 0;
-        }
-        
-        #video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        
-        #maximize-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 18px;
-            cursor: pointer;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        #maximize-btn:active {
-            background: rgba(97, 218, 251, 0.8);
-        }
-        
-        /* Controls Container */
-        #controls-container {
-            flex: 1; /* Takes remaining space */
-            display: flex;
-            flex-direction: column;
-            min-height: 0; /* Important for scrolling */
-        }
-        
-        #provider-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            padding: 8px;
-            flex-shrink: 0;
-        }
-        
-        .provider-btn {
-            padding: 12px;
-            background: linear-gradient(135deg, #ff6b35, #ff8e53);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
+        .provider-btn { 
+            padding: 12px; 
+            background: linear-gradient(135deg, #ff6b35, #ff8e53); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            box-shadow: 0 4px 8px rgba(255,107,53,0.3); 
             text-decoration: none;
         }
+        #converge-btn { 
+            background: linear-gradient(135deg,#61dafb,#8ae2ff); 
+            box-shadow: 0 4px 8px rgba(97,218,251,0.3); 
+        }
+        .provider-btn:active { transform: scale(0.98); }
         
-        #converge-btn {
-            background: linear-gradient(135deg, #61dafb, #8ae2ff);
-            box-shadow: 0 4px 8px rgba(97, 218, 251, 0.3);
+        /* Quick Channels - With FIXED scrolling */
+        #quick-channels-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
         }
         
-        .provider-btn:active {
+        #quick-channels-header {
+            padding: 5px 15px;
+            background: #2d2d2d;
+            font-size: 12px;
+            color: #aaa;
+            border-bottom: 1px solid #444;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #channel-count {
+            background: #61dafb;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        #quick-channels { 
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            min-height: 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Scrollbar styling for channels */
+        #quick-channels::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #quick-channels::-webkit-scrollbar-track {
+            background: #2d2d2d;
+            border-radius: 3px;
+        }
+        
+        #quick-channels::-webkit-scrollbar-thumb {
+            background: #61dafb;
+            border-radius: 3px;
+        }
+        
+        #quick-channels::-webkit-scrollbar-thumb:hover {
+            background: #4fa3c4;
+        }
+        
+        /* Channel items - Your design */
+        .quick-channel { 
+            display: flex; 
+            align-items: center; 
+            padding: 5px 6px; 
+            background: #3c4043; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            min-height: 32px; 
+            position: relative; 
+            transition: all 0.2s ease;
+        }
+        .quick-channel:active { 
+            background: #61dafb; 
+            color: #000; 
             transform: scale(0.98);
         }
+        .quick-channel.active { 
+            background: #4fa3c4; 
+        }
         
-        /* Channel Navigation */
+        .channel-logo { 
+            width: 22px; 
+            height: 22px; 
+            margin-right: 6px; 
+            border-radius: 3px; 
+            object-fit: cover; 
+            flex-shrink: 0; 
+        }
+        .channel-name { 
+            font-size: 11px; 
+            flex: 1; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+        .channel-fav { 
+            color: #ff6b35; 
+            font-size: 11px; 
+            margin-left: 4px; 
+        }
+        
+        /* Volume Control - Your design */
+        #volume-control { 
+            position: absolute; 
+            bottom: 20px; 
+            right: 20px; 
+            background: rgba(0,0,0,0.7); 
+            padding: 10px; 
+            border-radius: 20px; 
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            z-index: 20; 
+        }
+        #volume-slider { 
+            width: 100px; 
+            height: 5px; 
+            -webkit-appearance: none; 
+            background: #555; 
+            border-radius: 5px; 
+            margin: 10px 0; 
+        }
+        #volume-slider::-webkit-slider-thumb { 
+            -webkit-appearance: none; 
+            width: 15px; 
+            height: 15px; 
+            border-radius: 50%; 
+            background: #61dafb; 
+            cursor: pointer; 
+        }
+        
+        /* Fullscreen - Your design */
+        .fullscreen #video-container { 
+            height: 100vh; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            z-index: 1000; 
+        }
+        .fullscreen #controls-container { display: none; }
+        .fullscreen #maximize-btn { 
+            top: 20px; 
+            right: 20px; 
+            background: rgba(0,0,0,0.8); 
+        }
+        
+        /* Bottom Actions - Your design */
+        .bottom-actions { 
+            display: flex; 
+            gap: 8px; 
+            padding: 6px; 
+            flex-shrink: 0; 
+        }
+        #settings-btn { 
+            padding: 10px; 
+            background: #555; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            width: 50px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        
+        /* Loading - Your design */
+        .loading { 
+            position: absolute; 
+            top:50%; 
+            left:50%; 
+            transform: translate(-50%,-50%); 
+            color:#61dafb; 
+            font-size:16px; 
+        }
+        
+        /* Toast - Your design */
+        .toast { 
+            position: fixed; 
+            top: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: #333; 
+            color: white; 
+            padding: 12px 20px; 
+            border-radius: 8px; 
+            z-index: 2000; 
+            animation: fadeInOut 3s ease-in-out; 
+        }
+        @keyframes fadeInOut { 0%,100%{opacity:0;} 10%,90%{opacity:1;} }
+        
+        /* Error Message - Added for better UX */
+        .error-message {
+            display: none;
+            background: #ff4444;
+            color: white;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        /* Settings Panel - Your design */
+        #settings-panel { 
+            position: fixed; 
+            top:0; 
+            right:-300px; 
+            width:300px; 
+            height:100%; 
+            background:#2d2d2d; 
+            z-index:1002; 
+            transition:right 0.3s ease; 
+            padding:20px; 
+            overflow-y:auto; 
+        }
+        #settings-panel.open { right:0; }
+        .settings-header { 
+            display:flex; 
+            justify-content:space-between; 
+            align-items:center; 
+            margin-bottom:20px; 
+            padding-bottom:10px; 
+            border-bottom:1px solid #444; 
+        }
+        .settings-option { margin-bottom:15px; }
+        .settings-label { 
+            display:block; 
+            margin-bottom:5px; 
+            font-size:14px; 
+        }
+        .settings-select { 
+            width:100%; 
+            padding:8px; 
+            background:#1a1a1a; 
+            border:1px solid #444; 
+            border-radius:5px; 
+            color:white; 
+        }
+        
+        /* Recent Channels - Your design */
+        #recent-channels { 
+            display:none; 
+            padding:8px; 
+            border-bottom:1px solid #444; 
+        }
+        .recent-channel { 
+            display:inline-flex; 
+            align-items:center; 
+            padding:4px 8px; 
+            margin-right:6px; 
+            background:#3c4043; 
+            border-radius:12px; 
+            font-size:11px; 
+            cursor:pointer; 
+        }
+        
+        /* Channel Navigation Buttons - Added from working version */
         .channel-nav {
             display: flex;
             gap: 10px;
@@ -159,358 +434,49 @@
             color: #000;
         }
         
-        /* Channel Info */
-        #channel-info {
-            padding: 8px 15px;
-            background: #3c4043;
-            border-top: 1px solid #444;
-            border-bottom: 1px solid #444;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        
-        .channel-info-left {
-            flex: 1;
-        }
-        
-        #current-channel {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 2px;
-        }
-        
-        #channel-status {
-            font-size: 12px;
-            color: #61dafb;
-        }
-        
-        .favorite-btn {
-            background: none;
-            border: none;
-            color: #888;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 5px;
-        }
-        
-        .favorite-btn.active {
-            color: #ff6b35;
-        }
-        
-        /* Quick Channels - FIXED SCROLLING */
-        #quick-channels-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 0; /* Important for scrolling */
-            overflow: hidden;
-            position: relative;
-        }
-        
-        #quick-channels-header {
-            padding: 5px 15px;
-            background: #2d2d2d;
-            font-size: 12px;
-            color: #aaa;
-            border-bottom: 1px solid #444;
-            flex-shrink: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        #channel-count {
-            background: #61dafb;
-            color: #000;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: bold;
-        }
-        
-        #quick-channels {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            min-height: 0; /* Important for scrolling */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
-        }
-        
-        /* Scrollbar styling */
-        #quick-channels::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        #quick-channels::-webkit-scrollbar-track {
-            background: #2d2d2d;
-            border-radius: 3px;
-        }
-        
-        #quick-channels::-webkit-scrollbar-thumb {
-            background: #61dafb;
-            border-radius: 3px;
-        }
-        
-        #quick-channels::-webkit-scrollbar-thumb:hover {
-            background: #4fa3c4;
-        }
-        
-        .quick-channel {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            background: #3c4043;
-            border-radius: 8px;
-            cursor: pointer;
-            min-height: 45px;
-            position: relative;
-            transition: all 0.2s ease;
-        }
-        
-        .quick-channel:active {
-            background: #61dafb;
-            color: #000;
-            transform: scale(0.98);
-        }
-        
-        .quick-channel.active {
-            background: linear-gradient(135deg, #61dafb, #8ae2ff);
-            color: #000;
-            box-shadow: 0 0 10px rgba(97, 218, 251, 0.5);
-        }
-        
-        .channel-logo {
-            width: 28px;
-            height: 28px;
-            margin-right: 10px;
-            border-radius: 6px;
-            object-fit: cover;
-            flex-shrink: 0;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-        }
-        
-        .channel-name {
-            font-size: 13px;
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .channel-fav {
-            color: #ff6b35;
-            font-size: 11px;
-            margin-left: 4px;
-        }
-        
+        /* DRM Indicator - Added from working version */
         .drm-indicator {
             color: #61dafb;
             font-size: 11px;
             margin-left: 4px;
         }
-        
-        /* Bottom Actions */
-        .bottom-actions {
-            display: flex;
-            gap: 8px;
-            padding: 8px;
-            flex-shrink: 0;
-            border-top: 1px solid #444;
-        }
-        
-        #settings-btn {
-            padding: 12px;
-            background: #555;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        
-        /* Loading */
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #61dafb;
-            text-align: center;
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            display: none;
-        }
-        
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #61dafb;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Fullscreen */
-        .fullscreen #video-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
-        }
-        
-        .fullscreen #controls-container {
-            display: none;
-        }
-        
-        .fullscreen #header {
-            display: none;
-        }
-        
-        /* Toast */
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            z-index: 2000;
-            animation: fadeInOut 3s ease-in-out;
-        }
-        
-        @keyframes fadeInOut {
-            0%,100%{opacity:0;} 10%,90%{opacity:1;}
-        }
-        
-        /* Error Message */
-        .error-message {
-            display: none;
-            background: #ff4444;
-            color: white;
-            padding: 10px;
-            margin: 10px;
-            border-radius: 5px;
-            text-align: center;
-            font-size: 14px;
-        }
-        
-        /* Settings Panel */
-        #settings-panel {
-            position: fixed;
-            top: 0;
-            right: -300px;
-            width: 300px;
-            height: 100%;
-            background: #2d2d2d;
-            z-index: 1002;
-            transition: right 0.3s ease;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        
-        #settings-panel.open {
-            right: 0;
-        }
-        
-        .settings-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #444;
-        }
-        
-        .settings-option {
-            margin-bottom: 15px;
-        }
-        
-        .settings-label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-        
-        .settings-select {
-            width: 100%;
-            padding: 8px;
-            background: #1a1a1a;
-            border: 1px solid #444;
-            border-radius: 5px;
-            color: white;
-        }
-        
-        /* No channels message */
-        .no-channels {
-            grid-column: 1 / span 2;
-            text-align: center;
-            padding: 20px;
-            color: #888;
-            font-size: 14px;
-        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
 </head>
 <body>
     <div id="app-container">
-        <div id="header">
-            <div id="brand-logo">
-                <div id="brand-circle">R<br>TV</div>
-                <div id="brand-text">ReynielTV</div>
-            </div>
-            <div id="tagline">Converge & Cignal Channels</div>
-        </div>
-        
-        <div class="error-message" id="error-message"></div>
-        
         <div id="video-container">
+            <div id="brand-logo"><div id="brand-circle">Reyniel<br>TV</div></div>
             <video id="video" autoplay playsinline controls></video>
             <button id="maximize-btn">⛶</button>
-            <div class="loading" id="loading">
-                <div class="loader"></div>
-                <div id="loading-text">Loading...</div>
+            <div class="loading" id="loading" style="display:none">Loading...</div>
+            <div id="volume-control">
+                <i class="fas fa-volume-up"></i>
+                <input type="range" id="volume-slider" min="0" max="100" value="100">
             </div>
         </div>
-        
+
         <div id="controls-container">
+            <div id="channel-info">
+                <div class="channel-info-left">
+                    <div id="current-channel">Select a channel</div>
+                    <div id="channel-status">Ready</div>
+                </div>
+                <button class="favorite-btn" id="favorite-btn"><i class="far fa-star"></i></button>
+            </div>
+
+            <div id="recent-channels"></div>
+
             <div id="provider-buttons">
-                <button class="provider-btn" id="converge-btn">
-                    <i class="fas fa-bolt"></i> Converge
-                </button>
+                <!-- Cignal Button now links to external site -->
                 <a href="https://reynielcignaltv.vercel.app/" class="provider-btn" id="cignal-btn" style="text-decoration: none;">
                     <i class="fas fa-satellite-dish"></i> Cignal
                 </a>
+                <button class="provider-btn" id="converge-btn">
+                    <i class="fas fa-bolt"></i> Converge
+                </button>
             </div>
             
+            <!-- Channel Navigation from working version -->
             <div class="channel-nav">
                 <button class="channel-nav-btn" id="prev-channel-btn">
                     <i class="fas fa-chevron-left"></i> Prev
@@ -520,36 +486,29 @@
                 </button>
             </div>
             
-            <div id="channel-info">
-                <div class="channel-info-left">
-                    <div id="current-channel">Select a channel</div>
-                    <div id="channel-status">Ready</div>
-                </div>
-                <button class="favorite-btn" id="favorite-btn">
-                    <i class="far fa-star"></i>
-                </button>
-            </div>
-            
+            <!-- Quick Channels with header -->
             <div id="quick-channels-container">
                 <div id="quick-channels-header">
                     <span>Channels</span>
                     <span id="channel-count">Loading...</span>
                 </div>
                 <div id="quick-channels">
-                    <div class="no-channels">
+                    <div class="quick-channel" style="text-align: center; opacity: 0.7; justify-content: center; grid-column: 1 / span 2;">
                         Loading Converge playlist...
                     </div>
                 </div>
             </div>
-            
+
             <div class="bottom-actions">
-                <button id="settings-btn">
-                    <i class="fas fa-cog"></i> Settings
-                </button>
+                <button id="settings-btn" style="flex:1;"><i class="fas fa-cog"></i> SETTINGS</button>
             </div>
         </div>
     </div>
 
+    <!-- Error message container -->
+    <div class="error-message" id="error-message"></div>
+
+    <!-- Settings Panel - Your design -->
     <div id="settings-panel">
         <div class="settings-header">
             <h3>Settings</h3>
@@ -584,22 +543,31 @@
                 <option value="blue">Blue</option>
             </select>
         </div>
+        <div class="settings-option">
+            <label class="settings-label">Parental Controls</label>
+            <button style="width:100%;padding:10px;background:#ff6b35;color:white;border:none;border-radius:5px;cursor:pointer" id="parental-controls-btn">
+                Enable PIN
+            </button>
+        </div>
     </div>
 
+    <!-- Scripts - Using Shaka Player only -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
+    
     <script>
-        class ReynielTVPlayer {
+        class EnhancedMobileIPTV {
             constructor() {
                 this.channels = [];
                 this.currentChannelIndex = -1;
                 this.player = null;
-                this.favorites = JSON.parse(localStorage.getItem('tv_favorites') || '[]');
-                this.recentChannels = JSON.parse(localStorage.getItem('tv_recent') || '[]');
+                this.favorites = JSON.parse(localStorage.getItem('iptv_favorites') || '[]');
+                this.recentChannels = JSON.parse(localStorage.getItem('iptv_recent') || '[]');
                 this.currentStreamUrl = '';
                 
-                // Playlist URL
+                // Playlist URL from your working version
                 this.playlistUrl = "https://converse.nathcreqtives.com/playlist.m3u?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJyZWl5aDEwMjY5NCIsImV4cCI6MTc2NTg1Njc0MH0.6hmppZKNycvU17S2latBLhBPM2wpyHgksWrWRtQp9bM";
                 
-                // DRM Configuration
+                // DRM Configuration from working version
                 this.drmConfig = {
                     servers: {
                         'com.widevine.alpha': 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00'
@@ -612,7 +580,6 @@
                     }
                 };
                 
-                // Initialize the app
                 this.init();
             }
             
@@ -628,7 +595,6 @@
             async initializePlayer() {
                 const video = document.getElementById('video');
                 
-                // Install polyfills
                 shaka.polyfill.installAll();
                 
                 if (!shaka.Player.isBrowserSupported()) {
@@ -637,10 +603,8 @@
                 }
                 
                 try {
-                    // Create player without media element
                     this.player = new shaka.Player();
                     
-                    // Configure player with robustness levels
                     this.player.configure({
                         drm: this.drmConfig,
                         streaming: {
@@ -652,10 +616,8 @@
                         }
                     });
                     
-                    // Attach player to video element
                     await this.player.attach(video);
                     
-                    // Listen for error events
                     this.player.addEventListener('error', (event) => {
                         console.error('Player error:', event.detail);
                         this.showError('Player error: ' + event.detail.message);
@@ -710,13 +672,11 @@
                     const line = lines[i].trim();
                     
                     if (line.startsWith('#EXTINF:')) {
-                        // Parse EXTINF line
                         const info = line.substring(8);
                         const commaIndex = info.indexOf(',');
                         const attrs = commaIndex > 0 ? info.substring(0, commaIndex) : '';
                         const name = commaIndex > 0 ? info.substring(commaIndex + 1) : info;
                         
-                        // Parse attributes
                         const tvgLogo = this.extractAttribute(line, 'tvg-logo');
                         const groupTitle = this.extractAttribute(line, 'group-title') || 'Converge';
                         
@@ -728,15 +688,12 @@
                         };
                         
                     } else if (line && !line.startsWith('#') && currentChannel.name) {
-                        // This is the stream URL
                         currentChannel.url = line.trim();
                         
-                        // Check if it's a DRM channel
                         if (line.includes('.mpd') || line.includes('/manifest.mpd')) {
                             currentChannel.drm = true;
                         }
                         
-                        // Add to channels
                         if (currentChannel.url.startsWith('http')) {
                             channels.push({...currentChannel});
                         }
@@ -762,37 +719,42 @@
                 
                 if (this.channels.length === 0) {
                     container.innerHTML = `
-                        <div class="no-channels">
-                            No channels available. Try reloading the playlist.
+                        <div class="quick-channel" style="text-align: center; opacity: 0.7; justify-content: center; grid-column: 1 / span 2;">
+                            No channels available
                         </div>
                     `;
                     return;
                 }
                 
-                let channelsHTML = '';
+                container.innerHTML = '';
                 
                 this.channels.forEach((channel, index) => {
+                    const channelEl = document.createElement('div');
+                    channelEl.className = 'quick-channel';
+                    if (index === this.currentChannelIndex) {
+                        channelEl.classList.add('active');
+                    }
+                    
                     const logoLetter = channel.name.charAt(0).toUpperCase();
                     const isFavorite = this.favorites.includes(index);
-                    const isActive = index === this.currentChannelIndex;
                     
-                    channelsHTML += `
-                        <div class="quick-channel ${isActive ? 'active' : ''}" 
-                             data-index="${index}"
-                             onclick="tvApp.playChannel(${index})">
-                            <div class="channel-logo">
-                                ${logoLetter}
-                            </div>
-                            <div class="channel-name">
-                                ${channel.name}
-                                ${isFavorite ? '<span class="channel-fav"><i class="fas fa-star"></i></span>' : ''}
-                                ${channel.drm ? '<span class="drm-indicator"><i class="fas fa-lock"></i></span>' : ''}
-                            </div>
+                    channelEl.innerHTML = `
+                        <div class="channel-logo" style="background: #61dafb; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px;">
+                            ${logoLetter}
+                        </div>
+                        <div class="channel-name">
+                            ${channel.name}
+                            ${isFavorite ? '<span class="channel-fav"><i class="fas fa-star"></i></span>' : ''}
+                            ${channel.drm ? '<span class="drm-indicator"><i class="fas fa-lock"></i></span>' : ''}
                         </div>
                     `;
+                    
+                    channelEl.addEventListener('click', () => {
+                        this.playChannel(index);
+                    });
+                    
+                    container.appendChild(channelEl);
                 });
-                
-                container.innerHTML = channelsHTML;
             }
             
             async playChannel(index) {
@@ -805,40 +767,20 @@
                 try {
                     this.showLoading(`Loading ${channel.name}...`);
                     
-                    // Update UI
                     this.updateChannelInfo(channel.name);
                     this.updateFavoritesUI();
+                    this.updateChannelList();
                     
-                    // Update active channel in list
-                    const container = document.getElementById('quick-channels');
-                    const channelElements = container.querySelectorAll('.quick-channel');
-                    channelElements.forEach(el => el.classList.remove('active'));
-                    
-                    const activeElement = container.querySelector(`.quick-channel[data-index="${index}"]`);
-                    if (activeElement) {
-                        activeElement.classList.add('active');
-                        
-                        // Scroll to active channel
-                        activeElement.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                    }
-                    
-                    // Configure player for DRM or non-DRM
                     if (channel.drm && this.player) {
-                        // Configure for Widevine DRM
                         this.player.configure({
                             drm: this.drmConfig
                         });
                     } else if (this.player) {
-                        // Reset DRM for non-DRM channels
                         this.player.configure({
                             drm: { servers: {} }
                         });
                     }
                     
-                    // Load and play
                     if (this.player) {
                         await this.player.load(channel.url);
                         const video = document.getElementById('video');
@@ -847,7 +789,6 @@
                             this.showToast('Tap the video to play');
                         });
                     } else {
-                        // Fallback to native video
                         const video = document.getElementById('video');
                         video.src = channel.url;
                         video.load();
@@ -860,7 +801,6 @@
                     this.updateChannelStatus('Playing');
                     this.showToast(`Now playing: ${channel.name}`);
                     
-                    // Add to recent
                     this.addToRecent(index);
                     
                 } catch (error) {
@@ -878,7 +818,7 @@
                 if (this.recentChannels.length > 5) {
                     this.recentChannels = this.recentChannels.slice(0, 5);
                 }
-                localStorage.setItem('tv_recent', JSON.stringify(this.recentChannels));
+                localStorage.setItem('iptv_recent', JSON.stringify(this.recentChannels));
             }
             
             toggleFavorite() {
@@ -892,7 +832,7 @@
                     this.favorites.push(index);
                     this.showToast('Added to favorites');
                 }
-                localStorage.setItem('tv_favorites', JSON.stringify(this.favorites));
+                localStorage.setItem('iptv_favorites', JSON.stringify(this.favorites));
                 this.updateFavoritesUI();
                 this.updateChannelList();
             }
@@ -920,6 +860,15 @@
                 
                 const nextIndex = (this.currentChannelIndex + 1) % this.channels.length;
                 this.playChannel(nextIndex);
+                
+                const container = document.getElementById('quick-channels');
+                const channelEls = container.querySelectorAll('.quick-channel');
+                if (channelEls[nextIndex]) {
+                    channelEls[nextIndex].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
             }
             
             prevChannel() {
@@ -927,11 +876,20 @@
                 
                 const prevIndex = (this.currentChannelIndex - 1 + this.channels.length) % this.channels.length;
                 this.playChannel(prevIndex);
+                
+                const container = document.getElementById('quick-channels');
+                const channelEls = container.querySelectorAll('.quick-channel');
+                if (channelEls[prevIndex]) {
+                    channelEls[prevIndex].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
             }
             
             toggleFullscreen() {
-                const videoContainer = document.getElementById('video-container');
                 const appContainer = document.getElementById('app-container');
+                const maximizeBtn = document.getElementById('maximize-btn');
                 const video = document.getElementById('video');
                 
                 if (!document.fullscreenElement) {
@@ -943,6 +901,7 @@
                         video.msRequestFullscreen();
                     }
                     appContainer.classList.add('fullscreen');
+                    maximizeBtn.textContent = '✕';
                 } else {
                     if (document.exitFullscreen) {
                         document.exitFullscreen();
@@ -952,6 +911,7 @@
                         document.msExitFullscreen();
                     }
                     appContainer.classList.remove('fullscreen');
+                    maximizeBtn.textContent = '⛶';
                 }
             }
             
@@ -1000,6 +960,11 @@
                     }
                 });
                 
+                // Volume slider
+                document.getElementById('volume-slider').addEventListener('input', (e) => { 
+                    document.getElementById('video').volume = e.target.value / 100; 
+                });
+                
                 // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
                     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -1029,8 +994,10 @@
             
             showLoading(message) {
                 const loading = document.getElementById('loading');
-                const loadingText = document.getElementById('loading-text');
-                loadingText.textContent = message;
+                const loadingText = document.getElementById('loading-text') || loading;
+                if (loadingText.textContent !== undefined) {
+                    loadingText.textContent = message;
+                }
                 loading.style.display = 'block';
             }
             
@@ -1057,9 +1024,9 @@
         }
         
         // Initialize the app
-        let tvApp;
+        let iptvApp;
         document.addEventListener('DOMContentLoaded', () => {
-            tvApp = new ReynielTVPlayer();
+            iptvApp = new EnhancedMobileIPTV();
         });
     </script>
 </body>
