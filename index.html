@@ -547,108 +547,21 @@
                 this.categories = {};
                 this.currentCategory = 'all';
 
-                // Converge playlist with DRM - UPDATED WITH ALL CHANNELS
+                // Converge DRM license
                 this.convergeLicense = "https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00";
-                this.convergeChannels = [
-                    { id: 'conv-1143', channelName: "GTV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png", manifestUrl: "https://converse.nathcreqtives.com/1143/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1088', channelName: "TV5", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134335547.png", manifestUrl: "https://converse.nathcreqtives.com/1088/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1093', channelName: "GMA 7", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126306082.png", manifestUrl: "https://converse.nathcreqtives.com/1093/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1094', channelName: "RPTV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133873954.png", manifestUrl: "https://converse.nathcreqtives.com/1094/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1086', channelName: "PTV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133792284.png", manifestUrl: "https://converse.nathcreqtives.com/1086/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1078', channelName: "PBO", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723612823404.png", manifestUrl: "https://converse.nathcreqtives.com/1078/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1089', channelName: "IBC 13", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723128890006.png", manifestUrl: "https://converse.nathcreqtives.com/1089/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1091', channelName: "UNTV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134409636.png", manifestUrl: "https://converse.nathcreqtives.com/1091/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1340', channelName: "KNOWLEDGE CHANNEL", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723604992973.png", manifestUrl: "https://converse.nathcreqtives.com/1340/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1250', channelName: "JEEPNEY TV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723128953472.png", manifestUrl: "https://converse.nathcreqtives.com/1250/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1249', channelName: "DZMM TELERADYO", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1749519196399.png", manifestUrl: "https://converse.nathcreqtives.com/1249/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1083', channelName: "ONE SPORTS", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723131202156.png", manifestUrl: "https://converse.nathcreqtives.com/1083/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1283', channelName: "CINEMA ONE", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125628005.png", manifestUrl: "https://converse.nathcreqtives.com/1283/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1104', channelName: "EWTN", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126078814.png", manifestUrl: "https://converse.nathcreqtives.com/1104/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1092', channelName: "INC TV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723605495653.png", manifestUrl: "https://converse.nathcreqtives.com/1092/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1106', channelName: "CHANNEL NEWS ASIA", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125590334.png", manifestUrl: "https://converse.nathcreqtives.com/1106/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1108', channelName: "CINEMAX", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125660668.png", manifestUrl: "https://converse.nathcreqtives.com/1108/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1286', channelName: "KAPAMILYA HD", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129013828.png", manifestUrl: "https://converse.nathcreqtives.com/1286/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1090', channelName: "NET 25", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129823252.png", manifestUrl: "https://converse.nathcreqtives.com/1090/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1252', channelName: "MYX", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129763447.png", manifestUrl: "https://converse.nathcreqtives.com/1252/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1109', channelName: "ALIW TV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125129835.png", manifestUrl: "https://converse.nathcreqtives.com/1109/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1065', channelName: "HBO", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126386617.png", manifestUrl: "https://converse.nathcreqtives.com/1065/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1073', channelName: "CNN", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125798255.png", manifestUrl: "https://converse.nathcreqtives.com/1073/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1087', channelName: "A2Z", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125016586.png", manifestUrl: "https://converse.nathcreqtives.com/1087/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1077', channelName: "CELESTIAL MOVIES PINOY", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723219252241.png", manifestUrl: "https://converse.nathcreqtives.com/1077/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1159', channelName: "RJTV 29", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133830822.png", manifestUrl: "https://converse.nathcreqtives.com/1159/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1223', channelName: "CCTV4", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125521068.png", manifestUrl: "https://converse.nathcreqtives.com/1223/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1178', channelName: "CARTOON NETWORK", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125431025.png", manifestUrl: "https://converse.nathcreqtives.com/1178/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1079', channelName: "VIVA CINEMA", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134481136.png", manifestUrl: "https://converse.nathcreqtives.com/1079/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1152', channelName: "HALLYPOP", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1733707474289.png", manifestUrl: "https://converse.nathcreqtives.com/1152/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1179', channelName: "ALL TV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723136602348.png", manifestUrl: "https://converse.nathcreqtives.com/1179/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1149', channelName: "TAP TV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134180637.png", manifestUrl: "https://converse.nathcreqtives.com/1149/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1174', channelName: "DZRH", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126004028.png", manifestUrl: "https://converse.nathcreqtives.com/1174/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1267', channelName: "METRO", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129722508.png", manifestUrl: "https://converse.nathcreqtives.com/1267/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1202', channelName: "STAR CHANNEL 1", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723219661968.png", manifestUrl: "https://converse.nathcreqtives.com/1202/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1263', channelName: "KIX", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129053549.png", manifestUrl: "https://converse.nathcreqtives.com/1263/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1216', channelName: "ANC HD", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723219396137.png", manifestUrl: "https://converse.nathcreqtives.com/1216/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1151', channelName: "TAP SPORTS", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134161793.png", manifestUrl: "https://converse.nathcreqtives.com/1151/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1102', channelName: "FASHION TV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126284675.png", manifestUrl: "https://converse.nathcreqtives.com/1102/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1234', channelName: "GNN tv44", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1735903243498.png", manifestUrl: "https://converse.nathcreqtives.com/1234/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1156', channelName: "TV5MONDE", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134373931.png", manifestUrl: "https://converse.nathcreqtives.com/1156/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1081', channelName: "SOLAR SPORTS", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134030645.png", manifestUrl: "https://converse.nathcreqtives.com/1081/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1214', channelName: "NHK BS1", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129897469.png", manifestUrl: "https://converse.nathcreqtives.com/1214/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1337', channelName: "XINGKONG", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723124083530.png", manifestUrl: "https://converse.nathcreqtives.com/1337/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1166', channelName: "DEUTSCHE WELLE", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723606286242.png", manifestUrl: "https://converse.nathcreqtives.com/1166/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1112', channelName: "TVE", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134391817.png", manifestUrl: "https://converse.nathcreqtives.com/1112/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1314', channelName: "CLTV36", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125735177.png", manifestUrl: "https://converse.nathcreqtives.com/1314/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1150', channelName: "TAP EDGE", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134099364.png", manifestUrl: "https://converse.nathcreqtives.com/1150/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1213', channelName: "BS PREMIUM", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723130002404.png", manifestUrl: "https://converse.nathcreqtives.com/1213/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1113', channelName: "PHOENIX CHINESE", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723131346405.png", manifestUrl: "https://converse.nathcreqtives.com/1113/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1123', channelName: "MINDANOW", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1730362635883.png", manifestUrl: "https://converse.nathcreqtives.com/1123/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1096', channelName: "WARNER TV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134500990.png", manifestUrl: "https://converse.nathcreqtives.com/1096/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1111', channelName: "ABC AUSTRALIA", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125072025.png", manifestUrl: "https://converse.nathcreqtives.com/1111/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1146', channelName: "CGTN", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125560281.png", manifestUrl: "https://converse.nathcreqtives.com/1146/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1107', channelName: "ARIRANG", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125337224.png", manifestUrl: "https://converse.nathcreqtives.com/1107/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1343', channelName: "AL JAZEERA", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723125103446.png", manifestUrl: "https://converse.nathcreqtives.com/1343/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1327', channelName: "RADIO MARIA", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133809689.png", manifestUrl: "https://converse.nathcreqtives.com/1327/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1124', channelName: "BILYONARYO NEWS HD", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723605539308.png", manifestUrl: "https://converse.nathcreqtives.com/1124/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1145', channelName: "NHK WORLD", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723131229501.png", manifestUrl: "https://converse.nathcreqtives.com/1145/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1165', channelName: "BS FUJI", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723219327674.png", manifestUrl: "https://converse.nathcreqtives.com/1165/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1103', channelName: "Light TV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129682729.png", manifestUrl: "https://converse.nathcreqtives.com/1103/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1080', channelName: "TMC", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723219688328.png", manifestUrl: "https://converse.nathcreqtives.com/1080/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1254', channelName: "CINEMO", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723219276891.png", manifestUrl: "https://converse.nathcreqtives.com/1254/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1406', channelName: "EDGESPORT", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126027555.png", manifestUrl: "https://converse.nathcreqtives.com/1406/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1155', channelName: "SMNI", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133929628.png", manifestUrl: "https://converse.nathcreqtives.com/1155/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1304', channelName: "TAP MOVIES", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134117906.png", manifestUrl: "https://converse.nathcreqtives.com/1304/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1154', channelName: "LIVING ASIA", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723605044807.png", manifestUrl: "https://converse.nathcreqtives.com/1154/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1253', channelName: "THRILL", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134284048.png", manifestUrl: "https://converse.nathcreqtives.com/1253/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1305', channelName: "TAP ACTION FLIX", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134076089.png", manifestUrl: "https://converse.nathcreqtives.com/1305/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1244', channelName: "CELESTIALCLASSIC MOVIES", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723219296797.png", manifestUrl: "https://converse.nathcreqtives.com/1244/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1134', channelName: "VEGAS LIFE", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723219709476.png", manifestUrl: "https://converse.nathcreqtives.com/1134/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1204', channelName: "PREMIER SPORTS 2", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133748606.png", manifestUrl: "https://converse.nathcreqtives.com/1204/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1135', channelName: "PREMIER SPORTS", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133770267.png", manifestUrl: "https://converse.nathcreqtives.com/1135/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1196', channelName: "LOTUS", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723129704683.png", manifestUrl: "https://converse.nathcreqtives.com/1196/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1127', channelName: "PREMIER FOOTBALL", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723132198713.png", manifestUrl: "https://converse.nathcreqtives.com/1127/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1215', channelName: "NICK Jr.", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723130097999.png", manifestUrl: "https://converse.nathcreqtives.com/1215/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1125', channelName: "CARTOONITO", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723219376954.png", manifestUrl: "https://converse.nathcreqtives.com/1125/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1195', channelName: "FILAM TV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126098951.png", manifestUrl: "https://converse.nathcreqtives.com/1195/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1199', channelName: "USA TODAY NEWS", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134428182.png", manifestUrl: "https://converse.nathcreqtives.com/1199/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1243', channelName: "SOLAR FLIX", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134009531.png", manifestUrl: "https://converse.nathcreqtives.com/1243/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1160', channelName: "TV MARIA", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134353936.png", manifestUrl: "https://converse.nathcreqtives.com/1160/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1157', channelName: "FRANCE 24", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126239977.png", manifestUrl: "https://converse.nathcreqtives.com/1157/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1176', channelName: "SAUDI TV", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723612444093.png", manifestUrl: "https://converse.nathcreqtives.com/1176/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1147', channelName: "TBN", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723134224456.png", manifestUrl: "https://converse.nathcreqtives.com/1147/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1175', channelName: "ORAS NG HIMALA", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723131279043.png", manifestUrl: "https://converse.nathcreqtives.com/1175/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'conv-1177', channelName: "ROCK TV OF MANILA", tvgLogo: "https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723133849713.png", manifestUrl: "https://converse.nathcreqtives.com/1177/manifest.mpd", drm: true, groupTitle: "WesleyVanneck" },
-                    { id: 'nath-1', channelName: "Heart Of Asia", tvgLogo: "", manifestUrl: "http://hls.nathcreqtives.com/playlist.m3u8?id=1", drm: false, groupTitle: "WesleyVanneck" },
-                    { id: 'nath-2', channelName: "I Heart Movies", tvgLogo: "", manifestUrl: "http://hls.nathcreqtives.com/playlist.m3u8?id=2", drm: false, groupTitle: "WesleyVanneck" }
-                ];
+                // Your playlist URL
+                this.playlistUrl = "https://converse.nathcreqtives.com/playlist.m3u?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJyZWl5aDEwMjY5NCIsImV4cCI6MTc2NTg1Njc0MH0.6hmppZKNycvU17S2latBLhBPM2wpyHgksWrWRtQp9bM";
 
                 this.initializeApp();
             }
 
             initializeApp() {
                 this.initializePlayer();
-                this.loadConvergePlaylist(); // Auto-load Converge on startup
                 this.setupEventListeners();
                 this.updateFavoritesUI();
                 this.updateRecentChannelsUI();
+                // Auto-load playlist on startup
+                this.loadPlaylistFromURL();
             }
 
             initializePlayer() {
@@ -677,36 +590,97 @@
                 });
             }
 
-            async loadConvergePlaylist() {
+            async loadPlaylistFromURL() {
                 try {
                     document.getElementById('loading').style.display = 'block';
-                    this.updateChannelStatus('Loading Converge channels...');
-
-                    // Configure DRM for Converge
-                    this.player.configure({
-                        drm: {
-                            servers: { 'com.widevine.alpha': this.convergeLicense }
-                        }
-                    });
-
-                    // Set channels to converge channels
-                    this.channels = this.convergeChannels;
+                    this.updateChannelStatus('Loading playlist...');
+                    
+                    // Fetch the M3U playlist
+                    const response = await fetch(this.playlistUrl);
+                    const playlistText = await response.text();
+                    
+                    // Parse the M3U playlist
+                    this.channels = this.parseM3UPlaylist(playlistText);
+                    
+                    if (this.channels.length === 0) {
+                        throw new Error('No channels found in playlist');
+                    }
+                    
                     this.extractCategories();
                     this.updateChannelList();
                     this.updateQuickChannels();
-
-                    // Auto-play first channel
+                    
+                    // Auto-play first channel if available
                     if (this.channels.length > 0) {
                         await this.playChannel(0);
                     }
-
-                    this.showToast(`Loaded ${this.channels.length} Converge channels`);
+                    
+                    this.showToast(`Loaded ${this.channels.length} channels`);
                 } catch (error) {
-                    console.error('Error loading Converge playlist:', error);
-                    this.showToast('Error loading Converge channels');
+                    console.error('Error loading playlist:', error);
+                    this.showToast('Error loading playlist: ' + error.message);
                 } finally {
                     document.getElementById('loading').style.display = 'none';
                 }
+            }
+
+            parseM3UPlaylist(playlistText) {
+                const channels = [];
+                const lines = playlistText.split('\n');
+                let currentChannel = null;
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    
+                    if (line.startsWith('#EXTINF:')) {
+                        // Parse EXTINF line
+                        const extinf = line.substring(8);
+                        const commaIndex = extinf.indexOf(',');
+                        const attributes = extinf.substring(0, commaIndex);
+                        const channelName = extinf.substring(commaIndex + 1);
+                        
+                        currentChannel = {
+                            id: `channel-${channels.length}`,
+                            channelName: channelName,
+                            tvgLogo: '',
+                            manifestUrl: '',
+                            drm: false,
+                            groupTitle: 'Converge'
+                        };
+                        
+                        // Parse attributes
+                        const attrRegex = /([a-zA-Z0-9\-]+)="([^"]*)"/g;
+                        let match;
+                        while ((match = attrRegex.exec(attributes)) !== null) {
+                            const key = match[1];
+                            const value = match[2];
+                            
+                            if (key === 'tvg-logo') {
+                                currentChannel.tvgLogo = value;
+                            } else if (key === 'group-title') {
+                                currentChannel.groupTitle = value;
+                            }
+                        }
+                        
+                        // Check if channel has DRM (based on URL pattern)
+                        const nextLine = i + 1 < lines.length ? lines[i + 1].trim() : '';
+                        if (nextLine && !nextLine.startsWith('#')) {
+                            currentChannel.manifestUrl = nextLine;
+                            // Check if it's a DRM channel
+                            if (nextLine.includes('converse.nathcreqtives.com') && 
+                                (nextLine.includes('.mpd') || nextLine.includes('/manifest.mpd'))) {
+                                currentChannel.drm = true;
+                            }
+                        }
+                    } else if (line && !line.startsWith('#') && currentChannel) {
+                        // This is a URL line
+                        currentChannel.manifestUrl = line;
+                        channels.push(currentChannel);
+                        currentChannel = null;
+                    }
+                }
+                
+                return channels;
             }
 
             extractCategories() {
@@ -799,12 +773,17 @@
                 this.addToRecent(index);
 
                 try {
-                    // Configure DRM for Converge channels
+                    // Configure DRM if needed
                     if (channel.drm) {
                         this.player.configure({
                             drm: {
                                 servers: { 'com.widevine.alpha': this.convergeLicense }
                             }
+                        });
+                    } else {
+                        // Reset DRM configuration for non-DRM channels
+                        this.player.configure({
+                            drm: { servers: {} }
                         });
                     }
 
@@ -816,7 +795,7 @@
                     this.showToast(`Now playing: ${channel.channelName || 'Channel'}`);
                 } catch (err) {
                     console.error('playChannel error', err);
-                    this.showToast('Error playing channel');
+                    this.showToast('Error playing channel: ' + err.message);
                     this.updateChannelStatus('Error');
                 }
             }
@@ -907,10 +886,10 @@
                 document.getElementById('close-settings').addEventListener('click', () => this.hideSettings());
                 document.getElementById('volume-slider').addEventListener('input', (e) => { document.getElementById('video').volume = e.target.value / 100; });
 
-                // Converge button - reload Converge playlist
+                // Converge button - reload playlist
                 document.getElementById('converge-btn').addEventListener('click', () => {
-                    this.loadConvergePlaylist();
-                    this.showToast('Loading Converge channels...');
+                    this.loadPlaylistFromURL();
+                    this.showToast('Reloading playlist...');
                 });
 
                 document.getElementById('close-channels').addEventListener('click', () => this.hideChannelList());
