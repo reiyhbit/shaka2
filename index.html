@@ -745,7 +745,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
     
     <script>
-        // WORKING IPTV App - Using the EXACT parsing method from reference
+        // WORKING IPTV App - Focused on main playlist only
         class WorkingIPTVApp {
             constructor() {
                 this.channels = [];
@@ -755,7 +755,7 @@
                 this.categories = {};
                 this.currentCategory = 'all';
                 
-                // EXACT SAME AUTO-LOAD CONFIG as reference
+                // AUTO-LOAD CONFIG - Main playlist only
                 this.AUTO_LOAD_CONFIG = {
                     enabled: true,
                     delay: 1000,
@@ -773,7 +773,7 @@
                 this.initializePlayer();
                 this.setupEventListeners();
                 this.updateFavoritesUI();
-                this.initAutoLoad(); // Auto-load on startup
+                this.initAutoLoad(); // Auto-load main playlist only
             }
             
             initializePlayer() {
@@ -810,22 +810,22 @@
                 }
             }
             
-            // EXACT AUTO-LOAD FUNCTION from reference
+            // Auto-load function - Main playlist only
             async initAutoLoad() {
                 if (!this.AUTO_LOAD_CONFIG.enabled) return;
                 
-                console.log(`Auto-loading playlist in ${this.AUTO_LOAD_CONFIG.delay}ms...`);
+                console.log(`Auto-loading main playlist in ${this.AUTO_LOAD_CONFIG.delay}ms...`);
                 
                 setTimeout(async () => {
                     try {
-                        this.showToast('Auto-loading playlist...', 'info', 2000);
+                        this.showToast('Loading main playlist...', 'info', 2000);
                         this.showLoading(true);
                         
                         let m3uData;
                         let successUrl = null;
                         let retryCount = 0;
                         
-                        // Try all URLs until one works
+                        // Try the main playlist URL only
                         for (const playlistUrl of this.AUTO_LOAD_CONFIG.playlistUrls) {
                             try {
                                 console.log(`Trying playlist URL: ${playlistUrl}`);
@@ -857,27 +857,21 @@
                                 retryCount++;
                                 
                                 if (retryCount >= this.AUTO_LOAD_CONFIG.maxRetries) {
-                                    throw new Error('All playlist URLs failed');
+                                    throw new Error('Main playlist failed to load');
                                 }
                                 continue;
                             }
                         }
                         
                         if (!m3uData) {
-                            throw new Error('No working playlist URLs found');
+                            throw new Error('Main playlist not available');
                         }
                         
                         this.channels = this.parseM3U(m3uData);
                         
                         if (this.channels.length === 0) {
-                            // If no channels found, create a sample channel
-                            this.channels = [{
-                                name: 'Sample Stream (Auto-loaded)',
-                                url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8',
-                                group: 'Auto-loaded',
-                                logo: ''
-                            }];
-                            this.showToast('Using sample stream', 'warning');
+                            this.showError('No channels found in main playlist');
+                            return;
                         }
                         
                         this.extractCategories();
@@ -887,18 +881,15 @@
                         if (this.AUTO_LOAD_CONFIG.playFirstChannel && this.channels.length > 0) {
                             setTimeout(() => {
                                 this.playChannel(0);
-                                const sourceName = successUrl ? new URL(successUrl).hostname : 'backup';
-                                this.showToast(`Auto-playing from ${sourceName}: ${this.channels[0].name}`, 'success');
+                                this.showToast(`Playing: ${this.channels[0].name}`, 'success');
                             }, 500);
                         } else {
-                            const sourceName = successUrl ? new URL(successUrl).hostname : 'backup';
-                            this.showToast(`Loaded ${this.channels.length} channels from ${sourceName}`, 'success');
+                            this.showToast(`Loaded ${this.channels.length} channels`, 'success');
                         }
                         
                     } catch (error) {
-                        console.error('Auto-load failed:', error);
-                        this.showError('Auto-load failed. Using demo channels.');
-                        this.loadDemoChannels();
+                        console.error('Main playlist load failed:', error);
+                        this.showError('Main playlist failed to load. Please check your connection.');
                         
                     } finally {
                         this.showLoading(false);
@@ -906,7 +897,7 @@
                 }, this.AUTO_LOAD_CONFIG.delay);
             }
             
-            // EXACT M3U PARSING from reference
+            // M3U parsing function
             parseM3U(data) {
                 const lines = data.split('\n');
                 const channels = [];
@@ -1012,39 +1003,6 @@
                 }
             }
             
-            loadDemoChannels() {
-                this.channels = [
-                    {
-                        name: 'Tears of Steel (Demo)',
-                        url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8',
-                        group: 'Demo',
-                        logo: '',
-                        id: 0
-                    },
-                    {
-                        name: 'Big Buck Bunny',
-                        url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-                        group: 'Demo',
-                        logo: '',
-                        id: 1
-                    },
-                    {
-                        name: 'Sintel (Demo)',
-                        url: 'https://dash.akamaized.net/dash264/TestCases/1c/qualcomm/1/MultiRate.mpd',
-                        group: 'Demo',
-                        logo: '',
-                        id: 2
-                    }
-                ];
-                
-                this.extractCategories();
-                this.updateChannelsGrid();
-                
-                if (this.channels.length > 0) {
-                    this.playChannel(0);
-                }
-            }
-            
             loadProviderPreset(provider) {
                 const providerChannels = {
                     cignal: [
@@ -1087,7 +1045,7 @@
                 
                 if (this.channels.length > 0) {
                     this.playChannel(0);
-                    this.showToast(`Loaded ${provider.toUpperCase()} channels`, 'success');
+                    this.showToast(`Loaded ${provider.toUpperCase()} preset`, 'success');
                 }
             }
             
@@ -1273,14 +1231,13 @@
                 this.playChannel(prevChannel.id);
             }
             
-            // NEW FUNCTION: Open Cignal website in browser
+            // Function: Open Cignal website in browser
             openCignalWebsite() {
                 this.showToast('Opening Cignal TV...', 'info');
-                // Open in same tab
                 window.location.href = 'https://reynielcgnaltv.pages.dev/';
             }
             
-            // NEW FUNCTION: Refresh browser
+            // Function: Refresh browser
             refreshBrowser() {
                 this.showToast('Refreshing application...', 'info');
                 setTimeout(() => {
@@ -1293,13 +1250,13 @@
                 document.getElementById('prev-channel').addEventListener('click', () => this.prevChannel());
                 document.getElementById('next-channel').addEventListener('click', () => this.nextChannel());
                 
-                // MODIFIED: Cignal button now opens website in browser (same tab)
+                // Cignal button opens website
                 document.getElementById('cignal-btn').addEventListener('click', () => this.openCignalWebsite());
                 
-                // MODIFIED: Converge button now refreshes browser
+                // Converge button refreshes browser
                 document.getElementById('converge-btn').addEventListener('click', () => this.refreshBrowser());
                 
-                // Settings presets (kept for backward compatibility)
+                // Settings presets
                 document.getElementById('load-cignal-preset').addEventListener('click', () => this.loadProviderPreset('cignal'));
                 document.getElementById('load-converge-preset').addEventListener('click', () => this.loadProviderPreset('converge'));
                 
@@ -1467,4 +1424,4 @@
         });
     </script>
 </body>
-    </html>
+</html>
