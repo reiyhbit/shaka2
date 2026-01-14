@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV Web Player</title>
+    <title>IPTV Web Player - Local Version</title>
     <style>
         * {
             margin: 0;
@@ -64,6 +64,15 @@
         
         .start-button:hover {
             background: #3a56d4;
+        }
+        
+        .protocol-warning {
+            background: #ffa502;
+            color: #000;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
         }
         
         .main-content {
@@ -199,9 +208,12 @@
 <body>
     <div class="container">
         <div class="welcome-screen" id="welcomeScreen">
-            <h1>🎬 Welcome to IPTV Web Player</h1>
-            <p>Click the button below to start watching</p>
-            <p><small>Note: You must interact with the page first to enable video playback</small></p>
+            <h1>🎬 IPTV Web Player</h1>
+            <p>This player works with HTTP streams</p>
+            <div class="protocol-warning" id="protocolWarning">
+                ⚠️ Note: If you're using HTTPS, HTTP streams may be blocked.
+                Save this file locally and open via HTTP:// instead.
+            </div>
             <button class="start-button" onclick="startPlayer()">Start IPTV Player</button>
         </div>
         
@@ -213,7 +225,6 @@
         <div class="main-content" id="mainContent">
             <div class="video-container">
                 <video id="videoPlayer" controls>
-                    <source id="videoSource" type="application/dash+xml">
                     Your browser does not support the video tag.
                 </video>
             </div>
@@ -230,7 +241,7 @@
             <button onclick="playCurrent()">▶️ Play</button>
             <button onclick="pauseVideo()">⏸️ Pause</button>
             <button onclick="fullscreen()">📺 Fullscreen</button>
-            <button onclick="reloadChannel()">🔄 Reload Channel</button>
+            <button onclick="reloadChannel()">🔄 Reload</button>
             <div class="status" id="status">
                 Select a channel to start
             </div>
@@ -243,6 +254,9 @@
         <div class="error" id="error">
             <p id="errorMessage"></p>
             <button onclick="retryPlayback()">🔄 Try Again</button>
+            <button onclick="openLocal()" style="margin-top: 10px; background: #2ed573;">
+                💾 Open Local Version
+            </button>
         </div>
     </div>
 
@@ -264,7 +278,6 @@
         ];
 
         const videoPlayer = document.getElementById('videoPlayer');
-        const videoSource = document.getElementById('videoSource');
         const channelList = document.getElementById('channelList');
         const status = document.getElementById('status');
         const loading = document.getElementById('loading');
@@ -274,10 +287,16 @@
         const mainHeader = document.getElementById('mainHeader');
         const mainContent = document.getElementById('mainContent');
         const controls = document.getElementById('controls');
+        const protocolWarning = document.getElementById('protocolWarning');
         
         let currentChannel = null;
-        let dashPlayer = null;
+        let player = null;
         let userHasInteracted = false;
+
+        // Check if page is loaded via HTTPS
+        function isHTTPS() {
+            return window.location.protocol === 'https:';
+        }
 
         // Start the player after user interaction
         function startPlayer() {
@@ -287,12 +306,22 @@
             mainContent.classList.add('active');
             controls.style.display = 'flex';
             
+            // Show warning if using HTTPS
+            if (isHTTPS()) {
+                protocolWarning.style.display = 'block';
+                protocolWarning.innerHTML = `
+                    ⚠️ <strong>Mixed Content Warning</strong><br>
+                    You're viewing this page via HTTPS. HTTP streams may be blocked.<br>
+                    For best results, save this file and open via <code>file://</code> or local HTTP server.
+                `;
+            }
+            
             initializeChannels();
             
-            // Select first channel but don't auto-play
+            // Select first channel
             if (channels.length > 0) {
                 selectChannel(0);
-                status.textContent = "Click 'Play' or select a channel to start";
+                status.textContent = "Click 'Play' to start";
             }
         }
 
@@ -307,7 +336,7 @@
             });
         }
 
-        // Select a channel (load without auto-playing)
+        // Select a channel
         function selectChannel(index) {
             const channel = channels[index];
             currentChannel = index;
@@ -317,13 +346,13 @@
                 item.classList.toggle('active', i === index);
             });
             
-            status.textContent = `Selected: ${channel.name} - Click Play to start`;
+            status.textContent = `Selected: ${channel.name}`;
             
             // Clean up previous player
-            if (dashPlayer) {
+            if (player) {
                 try {
-                    dashPlayer.destroy();
-                    dashPlayer = null;
+                    player.destroy();
+                    player = null;
                 } catch (e) {
                     console.log("Cleaning up previous player");
                 }
@@ -333,40 +362,6 @@
             videoPlayer.pause();
             videoPlayer.src = '';
             videoPlayer.load();
-            
-            // Initialize DASH player
-            if (dashjs.supportsMediaSource()) {
-                dashPlayer = dashjs.MediaPlayer().create();
-                
-                // Configure DRM
-                const drmConfig = {
-                    drm: {
-                        servers: {
-                            "com.widevine.alpha": channel.licenseKey
-                        }
-                    }
-                };
-                
-                dashPlayer.initialize(videoPlayer, null, false);
-                dashPlayer.setProtectionData(drmConfig.drm);
-                
-                // Event listeners
-                dashPlayer.on('error', (e) => {
-                    showError(`DASH Error: ${e.error || 'Unknown error'}`);
-                });
-                
-                dashPlayer.on('playback_playing', () => {
-                    loading.style.display = 'none';
-                    status.textContent = `Now Playing: ${channel.name}`;
-                });
-                
-                dashPlayer.on('playback_meta_data_loaded', () => {
-                    status.textContent = `Loaded: ${channel.name} - Click Play`;
-                });
-                
-            } else {
-                showError("Your browser doesn't support DASH playback");
-            }
         }
 
         // Play current channel
@@ -380,40 +375,45 @@
             
             loading.style.display = 'block';
             error.style.display = 'none';
-            status.textContent = `Starting ${channel.name}...`;
+            status.textContent = `Loading ${channel.name}...`;
             
             try {
-                if (dashPlayer) {
-                    dashPlayer.attachSource(channel.url);
-                    
-                    // Play with user interaction context
-                    videoPlayer.play().then(() => {
-                        console.log("Playback started successfully");
-                        loading.style.display = 'none';
-                    }).catch(err => {
-                        showError(`Playback failed: ${err.message}`);
-                        loading.style.display = 'none';
-                    });
-                } else {
-                    // Fallback to standard video element
-                    videoPlayer.src = channel.url;
-                    videoPlayer.load();
-                    
-                    videoPlayer.addEventListener('loadeddata', () => {
-                        videoPlayer.play().catch(err => {
-                            showError(`Playback failed: ${err.message}`);
-                        });
-                    });
-                    
-                    videoPlayer.addEventListener('playing', () => {
-                        loading.style.display = 'none';
-                        status.textContent = `Now Playing: ${channel.name}`;
-                    });
-                    
-                    videoPlayer.addEventListener('error', () => {
-                        showError(`Failed to load ${channel.name}`);
-                    });
+                // Initialize Shaka Player
+                if (!player) {
+                    player = new shaka.Player(videoPlayer);
                 }
+                
+                // Configure DRM
+                const drmConfig = {
+                    drm: {
+                        servers: {
+                            'com.widevine.alpha': channel.licenseKey
+                        }
+                    }
+                };
+                
+                player.configure({
+                    drm: drmConfig.drm,
+                    streaming: {
+                        bufferingGoal: 30
+                    }
+                });
+                
+                // Load the stream
+                player.load(channel.url).then(() => {
+                    console.log("Stream loaded successfully");
+                    loading.style.display = 'none';
+                    
+                    // Try to play
+                    return videoPlayer.play();
+                }).then(() => {
+                    status.textContent = `Now Playing: ${channel.name}`;
+                }).catch((error) => {
+                    showError(`Playback failed: ${error.message}`);
+                    console.error('Error code', error.code, 'object', error);
+                    loading.style.display = 'none';
+                });
+                
             } catch (error) {
                 showError(`Error: ${error.message}`);
                 loading.style.display = 'none';
@@ -472,63 +472,29 @@
             }
         }
 
-        // Keyboard shortcuts (only after interaction)
-        document.addEventListener('keydown', (e) => {
-            if (!userHasInteracted) return;
-            
-            switch(e.key) {
-                case ' ':
-                case 'Spacebar':
-                    e.preventDefault();
-                    if (videoPlayer.paused) {
-                        playCurrent();
-                    } else {
-                        pauseVideo();
-                    }
-                    break;
-                case 'f':
-                case 'F':
-                    fullscreen();
-                    break;
-                case 'ArrowUp':
-                    if (currentChannel > 0) {
-                        selectChannel(currentChannel - 1);
-                    }
-                    break;
-                case 'ArrowDown':
-                    if (currentChannel < channels.length - 1) {
-                        selectChannel(currentChannel + 1);
-                    }
-                    break;
-                case 'r':
-                case 'R':
-                    if (e.ctrlKey || e.metaKey) {
-                        reloadChannel();
-                    }
-                    break;
-            }
-        });
+        // Open local version
+        function openLocal() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], {type: 'text/html'});
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        }
 
-        // Video player event listeners
-        videoPlayer.addEventListener('play', () => {
-            if (userHasInteracted) {
-                status.textContent = `Playing: ${channels[currentChannel]?.name || 'Channel'}`;
-            }
-        });
-
-        videoPlayer.addEventListener('pause', () => {
-            status.textContent = 'Paused';
-        });
-
-        // Check for DASH support on load
+        // Initialize
         window.addEventListener('DOMContentLoaded', () => {
-            if (!dashjs.supportsMediaSource()) {
-                showError("Your browser doesn't support DASH playback. Please use Chrome or Firefox.");
+            // Check if Shaka Player is available
+            if (!shaka.Player.isBrowserSupported()) {
+                showError("Your browser doesn't support Shaka Player");
+                return;
             }
+            
+            // Initialize Shaka Player
+            shaka.polyfill.installAll();
         });
     </script>
     
-    <!-- Include dash.js for DASH playback -->
-    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+    <!-- Include Shaka Player -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.1/shaka-player.ui.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.1/controls.css">
 </body>
 </html>
