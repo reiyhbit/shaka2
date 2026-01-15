@@ -3,117 +3,636 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV Player with Proxy</title>
+    <title>IPTV Web Player - GitHub Pages</title>
     <style>
-        /* Same styles as above */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #0a0a0a; color: white; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        header { text-align: center; padding: 20px; background: #111; border-radius: 10px; margin-bottom: 20px; }
-        h1 { color: #00a8ff; margin-bottom: 10px; }
-        .video-container { background: #111; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
-        #videoPlayer { width: 100%; height: 500px; background: #000; }
-        .channel-list { background: #111; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
-        .channel-item { padding: 10px; margin: 5px 0; background: #222; border-radius: 5px; cursor: pointer; }
-        .channel-item:hover { background: #333; }
-        .channel-item.active { background: #00a8ff; color: white; }
-        .controls { display: flex; gap: 10px; margin-top: 20px; }
-        button { padding: 10px 20px; background: #00a8ff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #0097e6; }
-        .status { flex-grow: 1; padding: 10px; background: #222; border-radius: 5px; }
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a56d4;
+            --dark: #0f0f23;
+            --darker: #1a1a2e;
+            --light: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--darker) 0%, #16213e 100%);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            color: #4cc9f0;
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            color: #b0b7c3;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .player-section {
+            background: var(--darker);
+            border-radius: 15px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .player-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            background: #000;
+        }
+        
+        #videoPlayer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+        
+        .channels-section {
+            background: var(--darker);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-title {
+            color: #4cc9f0;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .channels-list {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 500px;
+            padding-right: 10px;
+        }
+        
+        .channel-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .channel-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+            border-color: rgba(76, 201, 240, 0.3);
+        }
+        
+        .channel-item.active {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.3), rgba(76, 201, 240, 0.3));
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .channel-number {
+            font-size: 0.9rem;
+            color: #4cc9f0;
+            margin-bottom: 5px;
+        }
+        
+        .channel-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .controls-section {
+            background: var(--darker);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .control-label {
+            color: #b0b7c3;
+            font-size: 0.9rem;
+        }
+        
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .status-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff4757;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.connected {
+            background: #2ed573;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .status-text {
+            flex: 1;
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 35, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .loading.active {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #4cc9f0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .quality-selector {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: white;
+            font-size: 1rem;
+            width: 100%;
+            cursor: pointer;
+        }
+        
+        .quality-selector:focus {
+            outline: none;
+            border-color: #4cc9f0;
+        }
+        
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .volume-slider {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4cc9f0;
+            cursor: pointer;
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #4cc9f0;
+        }
+        
+        .info-title {
+            color: #4cc9f0;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        .info-text {
+            color: #b0b7c3;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #b0b7c3;
+            font-size: 0.9rem;
+            margin-top: 50px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .github-link {
+            color: #4cc9f0;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .github-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(76, 201, 240, 0.5);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(76, 201, 240, 0.8);
+        }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>📺 IPTV Player with Proxy</h1>
-            <p>Using CORS proxy to avoid mixed content errors</p>
-        </header>
-        
-        <div class="video-container">
-            <video id="videoPlayer" controls crossorigin="anonymous">
-                Your browser does not support DASH playback.
-            </video>
-        </div>
-        
-        <div class="channel-list">
-            <h2>📡 Channels</h2>
-            <div id="channelList"></div>
-        </div>
-        
-        <div class="controls">
-            <button onclick="playCurrent()">▶ Play</button>
-            <button onclick="pauseVideo()">⏸ Pause</button>
-            <div class="status" id="status">Ready</div>
-        </div>
+    <div class="loading" id="loadingScreen">
+        <div class="spinner"></div>
+        <div style="font-size: 1.2rem; color: #4cc9f0;">Loading IPTV Player...</div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/dashjs/dist/dash.all.min.js"></script>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-satellite-dish"></i> IPTV Web Player</h1>
+            <p class="subtitle">Stream your IPTV channels directly in browser with DASH support and Widevine DRM</p>
+        </header>
+
+        <div class="main-layout">
+            <div class="player-section">
+                <div class="player-container">
+                    <video id="videoPlayer" controls crossorigin="anonymous">
+                        Your browser does not support HTML5 video with DASH.
+                    </video>
+                </div>
+            </div>
+
+            <div class="channels-section">
+                <div class="section-title">
+                    <i class="fas fa-list"></i>
+                    <span>Channel List</span>
+                </div>
+                <div class="channels-list" id="channelList">
+                    <!-- Channels will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <div class="controls-grid">
+                <div class="control-group">
+                    <div class="control-label">Playback Controls</div>
+                    <div class="buttons-grid">
+                        <button class="btn" onclick="playVideo()">
+                            <i class="fas fa-play"></i> Play
+                        </button>
+                        <button class="btn" onclick="pauseVideo()">
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button class="btn" onclick="toggleFullscreen()">
+                            <i class="fas fa-expand"></i> Fullscreen
+                        </button>
+                        <button class="btn btn-secondary" onclick="reloadStream()">
+                            <i class="fas fa-redo"></i> Reload
+                        </button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">Volume</div>
+                    <div class="volume-control">
+                        <i class="fas fa-volume-up" style="color: #4cc9f0;"></i>
+                        <input type="range" min="0" max="100" value="100" class="volume-slider" id="volumeSlider" oninput="setVolume(this.value)">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">Quality</div>
+                    <select class="quality-selector" id="qualitySelector" onchange="changeQuality(this.value)">
+                        <option value="auto">Auto</option>
+                        <option value="1080">1080p</option>
+                        <option value="720">720p</option>
+                        <option value="480">480p</option>
+                        <option value="360">360p</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="status-bar">
+                <div class="status-indicator" id="statusIndicator"></div>
+                <div class="status-text" id="statusText">Select a channel to begin streaming</div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <div class="info-title"><i class="fas fa-info-circle"></i> How to Use</div>
+            <div class="info-text">
+                1. Select a channel from the list<br>
+                2. Click Play to start streaming<br>
+                3. Use controls to adjust volume and quality<br>
+                4. Fullscreen mode for better viewing<br>
+                <strong>Note:</strong> This player uses CORS proxy to bypass mixed-content restrictions.
+            </div>
+        </div>
+
+        <footer>
+            <p>IPTV Web Player | Compatible with DASH streams and Widevine DRM</p>
+            <p>Streaming via CORS Proxy | GitHub Pages Compatible</p>
+            <a href="https://github.com/yourusername/iptv-web" class="github-link" target="_blank">
+                <i class="fab fa-github"></i> View on GitHub
+            </a>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/dashjs@4.7.0/dist/dash.all.min.js"></script>
     <script>
+        // Your IPTV channels with CORS proxy
         const channels = [
             {
+                id: 1,
                 name: "Channel 1065",
+                number: "1065",
                 url: "http://136.158.97.2:6610/001/2/ch00000090990000001065/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20TsXah2%2FZLFNNIdWrVrXDMAosKg8aLji3LHWqHUI%2FwQyJsyK4TH4mOENKJ45mwOyS0g%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001085&contentid=ch00000000000000001085&videoid=ch00000090990000001065&recommendtype=0&userid=1368249806492&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=NJY3IWFAY6XXXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO&IASHttpSessionId=RR20448820260101155236346387&ispcode=55",
-                licenseKey: "https://ottmdrm.comclark.com/widevine/"
+                licenseKey: "https://ottmdrm.comclark.com/widevine/",
+                type: "dash"
             },
             {
+                id: 2,
                 name: "Channel 1075",
+                number: "1075",
                 url: "http://136.158.97.2:6610/001/2/ch00000090990000001075/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20TsXah2%2FZLFNNIdWrVrXDMAqJxLC59eO5kyq497fsAC7QsyK4TH4mOENKJ45mwOyS0g%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001134&contentid=ch00000000000000001134&videoid=ch00000090990000001075&recommendtype=0&userid=1265632122474&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=H3ED17F8SJXXXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO&IASHttpSessionId=RR20447020260101155236141564&ispcode=55",
-                licenseKey: "https://ottmdrm.comclark.com/widevine/"
+                licenseKey: "https://ottmdrm.comclark.com/widevine/",
+                type: "dash"
             }
         ];
 
-        const videoPlayer = document.getElementById('videoPlayer');
-        const status = document.getElementById('status');
-        let currentChannel = null;
-        let player = null;
+        // Available CORS proxies
+        const CORS_PROXIES = [
+            'https://api.codetabs.com/v1/proxy?quest=',
+            'https://corsproxy.io/?',
+            'https://proxy.cors.sh/',
+            'https://cors-anywhere.herokuapp.com/'
+        ];
 
-        // CORS Proxy function
-        function getProxyUrl(url) {
-            // Remove existing proxy if present
-            url = url.replace(/^https?:\/\/corsproxy\.org\/?/, '');
-            url = url.replace(/^https?:\/\/corsproxy\.io\/?/, '');
-            
-            // Encode the URL for proxy
-            return `https://corsproxy.io/?${encodeURIComponent(url)}`;
+        let currentProxyIndex = 0;
+        let player = null;
+        let currentChannel = null;
+        let isLoading = false;
+
+        // DOM Elements
+        const videoPlayer = document.getElementById('videoPlayer');
+        const channelList = document.getElementById('channelList');
+        const statusText = document.getElementById('statusText');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const loadingScreen = document.getElementById('loadingScreen');
+        const volumeSlider = document.getElementById('volumeSlider');
+
+        // Initialize application
+        function init() {
+            // Hide loading screen after 1.5 seconds
+            setTimeout(() => {
+                loadingScreen.classList.remove('active');
+                initPlayer();
+                loadChannels();
+                
+                // Auto-select first channel
+                if (channels.length > 0) {
+                    setTimeout(() => selectChannel(0), 500);
+                }
+            }, 1500);
         }
 
-        // Initialize
-        function init() {
-            const channelList = document.getElementById('channelList');
+        // Initialize dash.js player
+        function initPlayer() {
+            if (!dashjs.supportsMediaSource()) {
+                showError("Your browser doesn't support MediaSource Extensions");
+                return;
+            }
+
+            player = dashjs.MediaPlayer().create();
             
-            channels.forEach((channel, index) => {
-                const div = document.createElement('div');
-                div.className = 'channel-item';
-                div.textContent = channel.name;
-                div.onclick = () => loadChannel(index);
-                channelList.appendChild(div);
+            // Configure player
+            player.updateSettings({
+                'streaming': {
+                    'fastSwitchEnabled': true,
+                    'buffer': {
+                        'fastSwitchEnabled': true,
+                        'bufferTimeAtTopQuality': 30,
+                        'bufferTimeAtTopQualityLongForm': 60
+                    }
+                },
+                'debug': {
+                    'logLevel': dashjs.Debug.LOG_LEVEL_NONE
+                }
             });
 
-            // Initialize dash.js player
-            player = dashjs.MediaPlayer().create();
-            player.initialize(videoPlayer, null, true);
+            player.initialize(videoPlayer, null, false);
             
-            // Try first channel
-            if (channels.length > 0) {
-                loadChannel(0);
-            }
+            // Setup event handlers
+            player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, onStreamInitialized);
+            player.on(dashjs.MediaPlayer.events.ERROR, onPlayerError);
+            player.on(dashjs.MediaPlayer.events.PLAYBACK_PLAYING, onPlaybackPlaying);
+            player.on(dashjs.MediaPlayer.events.PLAYBACK_PAUSED, onPlaybackPaused);
+            player.on(dashjs.MediaPlayer.events.PLAYBACK_ENDED, onPlaybackEnded);
         }
 
-        // Load channel
-        function loadChannel(index) {
-            currentChannel = index;
+        // Load channels into UI
+        function loadChannels() {
+            channelList.innerHTML = '';
+            
+            channels.forEach((channel, index) => {
+                const channelElement = document.createElement('div');
+                channelElement.className = 'channel-item';
+                channelElement.innerHTML = `
+                    <div class="channel-number">CH ${channel.number}</div>
+                    <div class="channel-name">${channel.name}</div>
+                `;
+                channelElement.onclick = () => selectChannel(index);
+                channelList.appendChild(channelElement);
+            });
+        }
+
+        // Select a channel
+        function selectChannel(index) {
+            if (isLoading) return;
+            
             const channel = channels[index];
+            currentChannel = index;
             
             // Update UI
             document.querySelectorAll('.channel-item').forEach((item, i) => {
                 item.classList.toggle('active', i === index);
             });
             
-            status.textContent = `Loading ${channel.name}...`;
+            // Show loading
+            isLoading = true;
+            loadingScreen.classList.add('active');
+            updateStatus(`Loading ${channel.name}...`, 'loading');
             
-            // Use proxy URL
-            const proxyUrl = getProxyUrl(channel.url);
+            // Load stream with CORS proxy
+            loadStreamWithProxy(channel);
+        }
+
+        // Load stream with CORS proxy
+        function loadStreamWithProxy(channel, proxyIndex = 0) {
+            if (proxyIndex >= CORS_PROXIES.length) {
+                showError("All proxies failed. Please try again later.");
+                isLoading = false;
+                loadingScreen.classList.remove('active');
+                return;
+            }
+
+            const proxyUrl = CORS_PROXIES[proxyIndex];
+            const streamUrl = proxyUrl + encodeURIComponent(channel.url);
+            
+            console.log(`Trying proxy ${proxyIndex + 1}: ${proxyUrl}`);
             
             // Configure DRM
             const drmConfig = {
@@ -125,30 +644,206 @@
             };
             
             player.setProtectionData(drmConfig.drm);
-            player.attachSource(proxyUrl);
             
-            videoPlayer.play().then(() => {
-                status.textContent = `Playing: ${channel.name}`;
-            }).catch(err => {
-                status.textContent = `Click play button to start ${channel.name}`;
+            // Set source with timeout
+            const timeout = setTimeout(() => {
+                console.log(`Proxy ${proxyIndex + 1} timeout, trying next...`);
+                loadStreamWithProxy(channel, proxyIndex + 1);
+            }, 10000);
+            
+            player.attachSource(streamUrl);
+            
+            player.once(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
+                clearTimeout(timeout);
+                console.log(`Proxy ${proxyIndex + 1} successful!`);
+                currentProxyIndex = proxyIndex;
+                
+                // Try to play
+                videoPlayer.play().then(() => {
+                    isLoading = false;
+                    loadingScreen.classList.remove('active');
+                    updateStatus(`Playing: ${channel.name}`, 'connected');
+                }).catch(err => {
+                    console.log("Auto-play prevented, waiting for user interaction");
+                    isLoading = false;
+                    loadingScreen.classList.remove('active');
+                    updateStatus(`${channel.name} loaded. Click Play to start.`, 'ready');
+                });
+            });
+            
+            player.once(dashjs.MediaPlayer.events.ERROR, () => {
+                clearTimeout(timeout);
+                console.log(`Proxy ${proxyIndex + 1} failed, trying next...`);
+                loadStreamWithProxy(channel, proxyIndex + 1);
             });
         }
 
-        function playCurrent() {
-            if (currentChannel !== null) {
+        // Play video
+        function playVideo() {
+            if (player && currentChannel !== null) {
                 videoPlayer.play().then(() => {
-                    status.textContent = `Playing: ${channels[currentChannel].name}`;
+                    updateStatus(`Playing: ${channels[currentChannel].name}`, 'connected');
+                }).catch(err => {
+                    updateStatus("Click the play button on the video player", 'warning');
                 });
             }
         }
 
+        // Pause video
         function pauseVideo() {
-            videoPlayer.pause();
-            status.textContent = 'Paused';
+            if (player) {
+                videoPlayer.pause();
+                updateStatus("Paused", 'paused');
+            }
         }
 
-        // Initialize on load
-        window.onload = init;
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                if (videoPlayer.requestFullscreen) {
+                    videoPlayer.requestFullscreen();
+                } else if (videoPlayer.webkitRequestFullscreen) {
+                    videoPlayer.webkitRequestFullscreen();
+                } else if (videoPlayer.msRequestFullscreen) {
+                    videoPlayer.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        // Reload current stream
+        function reloadStream() {
+            if (currentChannel !== null) {
+                selectChannel(currentChannel);
+            }
+        }
+
+        // Set volume
+        function setVolume(value) {
+            videoPlayer.volume = value / 100;
+            const icon = value > 0 ? 'fa-volume-up' : 'fa-volume-mute';
+            volumeSlider.previousElementSibling.className = `fas ${icon}`;
+            volumeSlider.previousElementSibling.style.color = '#4cc9f0';
+        }
+
+        // Change quality
+        function changeQuality(quality) {
+            if (player) {
+                const bitrates = player.getBitrateInfoListFor('video');
+                if (bitrates.length > 0) {
+                    if (quality === 'auto') {
+                        player.setAutoSwitchQualityFor('video', true);
+                    } else {
+                        player.setAutoSwitchQualityFor('video', false);
+                        const targetBitrate = parseInt(quality) * 1000;
+                        let selectedIndex = 0;
+                        
+                        bitrates.forEach((bitrate, index) => {
+                            if (bitrate.bitrate <= targetBitrate) {
+                                selectedIndex = index;
+                            }
+                        });
+                        
+                        player.setQualityFor('video', selectedIndex);
+                    }
+                }
+            }
+        }
+
+        // Update status display
+        function updateStatus(message, type = 'info') {
+            statusText.textContent = message;
+            
+            switch(type) {
+                case 'connected':
+                    statusIndicator.className = 'status-indicator connected';
+                    break;
+                case 'loading':
+                    statusIndicator.className = 'status-indicator';
+                    break;
+                case 'paused':
+                    statusIndicator.className = 'status-indicator';
+                    break;
+                case 'error':
+                    statusIndicator.className = 'status-indicator';
+                    break;
+                default:
+                    statusIndicator.className = 'status-indicator';
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            updateStatus(`Error: ${message}`, 'error');
+            alert(message);
+        }
+
+        // Player event handlers
+        function onStreamInitialized(e) {
+            console.log("Stream initialized successfully");
+        }
+
+        function onPlayerError(e) {
+            console.error("Player error:", e.error);
+            showError(`Playback error: ${e.error.message || 'Unknown error'}`);
+            isLoading = false;
+            loadingScreen.classList.remove('active');
+        }
+
+        function onPlaybackPlaying(e) {
+            console.log("Playback started");
+        }
+
+        function onPlaybackPaused(e) {
+            console.log("Playback paused");
+        }
+
+        function onPlaybackEnded(e) {
+            console.log("Playback ended");
+            updateStatus("Stream ended", 'info');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Space for play/pause
+            if (e.code === 'Space' && document.activeElement !== videoPlayer) {
+                e.preventDefault();
+                if (videoPlayer.paused) {
+                    playVideo();
+                } else {
+                    pauseVideo();
+                }
+            }
+            
+            // F for fullscreen
+            if (e.code === 'KeyF') {
+                toggleFullscreen();
+            }
+            
+            // Arrow keys for channel switching
+            if (e.code === 'ArrowUp' && currentChannel > 0) {
+                selectChannel(currentChannel - 1);
+            }
+            if (e.code === 'ArrowDown' && currentChannel < channels.length - 1) {
+                selectChannel(currentChannel + 1);
+            }
+            
+            // M for mute
+            if (e.code === 'KeyM') {
+                videoPlayer.muted = !videoPlayer.muted;
+                updateStatus(videoPlayer.muted ? "Muted" : "Unmuted", 'info');
+            }
+        });
+
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
