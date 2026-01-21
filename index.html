@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -540,6 +539,35 @@
         .fullscreen #controls-container {
             display: none;
         }
+        
+        /* DRM Status Indicator */
+        .drm-status {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            z-index: 10;
+            display: none;
+        }
+        
+        .drm-status.active {
+            display: block;
+        }
+        
+        .drm-status.clearkey {
+            background: rgba(97, 218, 251, 0.9);
+            color: #000;
+        }
+        
+        .drm-status.widevine {
+            background: rgba(255, 107, 53, 0.9);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -550,6 +578,10 @@
                 <div id="brand-circle">Reyniel<br>TV</div>
             </div>
             <div class="channel-number" id="channel-number">CH 1</div>
+            
+            <!-- DRM Status Indicator -->
+            <div class="drm-status" id="drm-status"></div>
+            
             <video id="video" controls playsinline>
                 Your browser does not support the video tag.
             </video>
@@ -567,6 +599,10 @@
                 <div class="stats-row">
                     <span class="stats-label">Resolution:</span>
                     <span class="stats-value" id="current-resolution">N/A</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">DRM:</span>
+                    <span class="stats-value" id="drm-type">None</span>
                 </div>
             </div>
             
@@ -664,6 +700,20 @@
             </div>
         </div>
         
+        <!-- DRM Configuration -->
+        <div class="auto-load-config">
+            <h4>DRM Configuration</h4>
+            <div class="config-row">
+                <span>Widevine License URL:</span>
+                <input type="checkbox" id="widevine-toggle" checked>
+            </div>
+            <div class="settings-option">
+                <label class="settings-label">License Server URL</label>
+                <input type="text" class="settings-select" id="license-server-url" 
+                       value="https://ottmdrm.comclark.com/widevine/" placeholder="License server URL">
+            </div>
+        </div>
+        
         <div class="settings-option">
             <label class="settings-label">Video Quality</label>
             <select class="settings-select" id="quality-select">
@@ -698,7 +748,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
     
     <script>
-        // Enhanced Mobile IPTV App with Improved M3U Parsing
+        // Enhanced Mobile IPTV App with Widevine DRM Support
         class EnhancedMobileIPTV {
             constructor() {
                 this.channels = [];
@@ -712,7 +762,15 @@
                 this.currentStreamStats = {
                     bufferHealth: 0,
                     bitrate: 0,
-                    resolution: 'N/A'
+                    resolution: 'N/A',
+                    drmType: 'None'
+                };
+                
+                // DRM Configuration
+                this.drmConfig = {
+                    widevineEnabled: true,
+                    widevineLicenseServer: "https://ottmdrm.comclark.com/widevine/",
+                    clearkeyEnabled: true
                 };
                 
                 // Auto-load configuration
@@ -733,20 +791,54 @@
                 this.initializePlayer();
                 this.setupEventListeners();
                 this.updateFavoritesUI();
+                this.loadSettings();
                 this.initAutoLoad();
+            }
+            
+            loadSettings() {
+                // Load saved settings
+                const savedLicenseServer = localStorage.getItem('widevine_license_server');
+                if (savedLicenseServer) {
+                    this.drmConfig.widevineLicenseServer = savedLicenseServer;
+                }
+                
+                // Update UI
+                document.getElementById('license-server-url').value = this.drmConfig.widevineLicenseServer;
+                document.getElementById('widevine-toggle').checked = this.drmConfig.widevineEnabled;
+            }
+            
+            saveSettings() {
+                localStorage.setItem('widevine_license_server', this.drmConfig.widevineLicenseServer);
             }
             
             initializePlayer() {
                 shaka.polyfill.installAll();
                 this.player = new shaka.Player(document.getElementById('video'));
                 
-                // Configure player
+                // Configure player with DRM
                 this.player.configure({
+                    drm: {
+                        servers: {},
+                        clearKeys: {},
+                        advanced: {}
+                    },
                     streaming: {
                         bufferingGoal: 30,
-                        rebufferingGoal: 2
+                        rebufferingGoal: 2,
+                        lowLatencyMode: false
                     }
                 });
+                
+                // Set up Widevine license server
+                if (this.drmConfig.widevineEnabled && this.drmConfig.widevineLicenseServer) {
+                    this.player.configure({
+                        drm: {
+                            servers: {
+                                'com.widevine.alpha': this.drmConfig.widevineLicenseServer
+                            }
+                        }
+                    });
+                }
                 
                 // Event listeners
                 this.player.addEventListener('loading', () => {
@@ -760,13 +852,36 @@
                     this.isPlaying = true;
                     this.updatePlayPauseButton();
                     this.showStatsPanel(true);
+                    
+                    // Check for DRM info
+                    const drmInfo = this.player.getDrmInfo();
+                    if (drmInfo) {
+                        this.updateDRMStatus(drmInfo.keySystem);
+                    }
                 });
                 
                 this.player.addEventListener('error', (error) => {
                     this.showLoading(false);
                     this.updateChannelStatus('Error loading channel');
                     console.error('Player error:', error);
-                    this.showError(`Error: ${error.code} - ${error.category}`);
+                    
+                    // Check if it's a DRM error
+                    if (error.code === shaka.util.Error.Code.LICENSE_REQUEST_FAILED) {
+                        this.showError(`DRM Error: License request failed. Check license server configuration.`);
+                    } else {
+                        this.showError(`Error: ${error.code} - ${error.category}`);
+                    }
+                });
+                
+                // DRM events
+                this.player.addEventListener('drmlicenseexpired', () => {
+                    console.log('DRM license expired');
+                    this.showToast('DRM license expired, renewing...', 'warning');
+                });
+                
+                this.player.addEventListener('drmlicenseupdate', () => {
+                    console.log('DRM license updated');
+                    this.showToast('DRM license updated', 'success');
                 });
                 
                 // Statistics monitoring
@@ -778,6 +893,32 @@
                 
                 // Update stats periodically
                 setInterval(() => this.updateStats(), 1000);
+            }
+            
+            updateDRMStatus(drmType) {
+                const drmStatus = document.getElementById('drm-status');
+                const drmTypeElement = document.getElementById('drm-type');
+                
+                if (drmType) {
+                    this.currentStreamStats.drmType = drmType;
+                    drmStatus.textContent = `DRM: ${drmType}`;
+                    drmStatus.className = 'drm-status active';
+                    
+                    // Add specific class for different DRM types
+                    if (drmType.includes('widevine')) {
+                        drmStatus.classList.add('widevine');
+                    } else if (drmType.includes('clearkey')) {
+                        drmStatus.classList.add('clearkey');
+                    }
+                    
+                    // Update stats panel
+                    drmTypeElement.textContent = drmType;
+                    this.showToast(`Content protected with ${drmType}`, 'info');
+                } else {
+                    drmStatus.className = 'drm-status';
+                    drmTypeElement.textContent = 'None';
+                    this.currentStreamStats.drmType = 'None';
+                }
             }
             
             // AUTO-LOAD FUNCTION (from reference script)
@@ -886,7 +1027,7 @@
                 }, this.autoLoadConfig.delay);
             }
             
-            // ENHANCED M3U PARSING (from reference script)
+            // ENHANCED M3U PARSING with Widevine support
             parseM3U(data) {
                 const lines = data.split('\n');
                 const channels = [];
@@ -928,6 +1069,21 @@
                             const keyData = prop.split('=').slice(1).join('=');
                             this.parseLicenseKeyData(currentChannel, keyData);
                         }
+                    }
+                    else if (trimmedLine.startsWith('#EXT-X-KEY:')) {
+                        // Parse HLS encryption key information
+                        const params = trimmedLine.substring(11).split(',');
+                        params.forEach(param => {
+                            if (param.includes('METHOD=')) {
+                                currentChannel.encryptionMethod = param.split('=')[1];
+                            } else if (param.includes('URI="')) {
+                                currentChannel.keyUri = param.split('"')[1];
+                            } else if (param.includes('KEYFORMAT=')) {
+                                currentChannel.keyFormat = param.split('=')[1];
+                            } else if (param.includes('KEYFORMATVERSIONS=')) {
+                                currentChannel.keyFormatVersions = param.split('=')[1];
+                            }
+                        });
                     }
                     else if (trimmedLine && !trimmedLine.startsWith('#')) {
                         currentChannel.url = trimmedLine;
@@ -1115,6 +1271,7 @@
                 channelsToShow.forEach(channel => {
                     const isFavorite = this.favorites.includes(channel.id);
                     const isActive = channel.id === this.channels[this.currentChannelIndex]?.id;
+                    const hasDRM = channel.licenseType || channel.licenseKey;
                     
                     const card = document.createElement('div');
                     card.className = 'channel-card';
@@ -1128,7 +1285,10 @@
                         </div>
                         <div class="channel-name">${channel.name}</div>
                         <div class="channel-group">${channel.group || 'General'}</div>
-                        ${isFavorite ? '<i class="fas fa-star" style="color: #ff6b35; margin-top: 5px;"></i>' : ''}
+                        <div style="display: flex; gap: 5px; margin-top: 5px;">
+                            ${isFavorite ? '<i class="fas fa-star" style="color: #ff6b35;"></i>' : ''}
+                            ${hasDRM ? '<i class="fas fa-lock" style="color: #61dafb;"></i>' : ''}
+                        </div>
                     `;
                     
                     card.addEventListener('click', () => {
@@ -1152,6 +1312,7 @@
             createChannelListItem(channel) {
                 const isFavorite = this.favorites.includes(channel.id);
                 const isActive = channel.id === this.channels[this.currentChannelIndex]?.id;
+                const hasDRM = channel.licenseType || channel.licenseKey;
                 
                 const item = document.createElement('div');
                 item.className = 'channel-item';
@@ -1169,7 +1330,10 @@
                         <div style="font-weight: bold; font-size: 14px;">${channel.name}</div>
                         <div style="font-size: 12px; color: #aaa;">${channel.group || 'General'}</div>
                     </div>
-                    ${isFavorite ? '<i class="fas fa-star" style="color: #ff6b35; margin-left: 10px;"></i>' : ''}
+                    <div style="display: flex; gap: 5px;">
+                        ${isFavorite ? '<i class="fas fa-star" style="color: #ff6b35;"></i>' : ''}
+                        ${hasDRM ? '<i class="fas fa-lock" style="color: #61dafb;"></i>' : ''}
+                    </div>
                 `;
                 
                 item.addEventListener('click', () => {
@@ -1192,19 +1356,32 @@
                     
                     // Configure DRM if available
                     const config = {
-                        drm: {},
+                        drm: {
+                            servers: {},
+                            clearKeys: {}
+                        },
                         streaming: {
                             bufferingGoal: 30,
                             rebufferingGoal: 2
                         }
                     };
                     
-                    if (channel.licenseType === 'org.w3.clearkey' && channel.k1 && channel.k2) {
-                        config.drm.clearKeys = { [channel.k1]: channel.k2 };
-                    } else if (channel.licenseType && channel.licenseKey) {
-                        config.drm.servers = { [channel.licenseType]: channel.licenseKey };
+                    // Configure Widevine license server
+                    if (this.drmConfig.widevineEnabled && this.drmConfig.widevineLicenseServer) {
+                        config.drm.servers['com.widevine.alpha'] = this.drmConfig.widevineLicenseServer;
                     }
                     
+                    // Configure ClearKey if available in channel
+                    if (channel.licenseType === 'org.w3.clearkey' && channel.k1 && channel.k2) {
+                        config.drm.clearKeys = { [channel.k1]: channel.k2 };
+                        console.log('Using ClearKey DRM:', channel.k1, channel.k2);
+                    } else if (channel.licenseType && channel.licenseKey) {
+                        // Use provided license server for this specific channel
+                        config.drm.servers[channel.licenseType] = channel.licenseKey;
+                        console.log('Using custom license server:', channel.licenseType, channel.licenseKey);
+                    }
+                    
+                    // Apply configuration
                     this.player.configure(config);
                     
                     // Load the channel
@@ -1219,11 +1396,28 @@
                     this.updateFavoriteButton();
                     this.updateChannelsGrid();
                     
+                    // Check for DRM info
+                    const drmInfo = this.player.getDrmInfo();
+                    if (drmInfo) {
+                        this.updateDRMStatus(drmInfo.keySystem);
+                    } else {
+                        this.updateDRMStatus(null);
+                    }
+                    
                     this.showToast(`Now playing: ${channel.name}`);
                     
                 } catch (error) {
                     console.error('Error playing channel:', error);
-                    this.showError('Error playing channel');
+                    
+                    // Check if it's a DRM error
+                    if (error.code === shaka.util.Error.Code.LICENSE_REQUEST_FAILED) {
+                        this.showError(`DRM Error: Unable to obtain license. Check your license server configuration.`);
+                    } else if (error.code === shaka.util.Error.Code.MANIFEST_DRM_SYSTEM_UNSUPPORTED) {
+                        this.showError(`DRM Error: DRM system not supported by your browser.`);
+                    } else {
+                        this.showError(`Error playing channel: ${error.message || 'Unknown error'}`);
+                    }
+                    
                     this.updateChannelStatus('Error');
                 } finally {
                     this.showLoading(false);
@@ -1295,6 +1489,7 @@
                 document.getElementById('buffer-health').textContent = `${this.currentStreamStats.bufferHealth}s`;
                 document.getElementById('current-bitrate').textContent = `${this.currentStreamStats.bitrate} kbps`;
                 document.getElementById('current-resolution').textContent = this.currentStreamStats.resolution;
+                document.getElementById('drm-type').textContent = this.currentStreamStats.drmType;
             }
             
             showStatsPanel(show) {
@@ -1370,6 +1565,7 @@
             
             hideSettings() {
                 document.getElementById('settings-panel').classList.remove('open');
+                this.saveSettings();
             }
             
             showLoading(show) {
@@ -1431,6 +1627,25 @@
                 
                 document.getElementById('auto-play-toggle').addEventListener('change', (e) => {
                     this.autoLoadConfig.playFirstChannel = e.target.checked;
+                });
+                
+                // DRM configuration
+                document.getElementById('widevine-toggle').addEventListener('change', (e) => {
+                    this.drmConfig.widevineEnabled = e.target.checked;
+                });
+                
+                document.getElementById('license-server-url').addEventListener('change', (e) => {
+                    this.drmConfig.widevineLicenseServer = e.target.value;
+                    // Update player configuration
+                    if (this.drmConfig.widevineEnabled) {
+                        this.player.configure({
+                            drm: {
+                                servers: {
+                                    'com.widevine.alpha': this.drmConfig.widevineLicenseServer
+                                }
+                            }
+                        });
+                    }
                 });
                 
                 // Category tabs
